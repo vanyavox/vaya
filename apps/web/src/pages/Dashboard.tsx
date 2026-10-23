@@ -84,18 +84,18 @@ export function Dashboard() {
           <div className="theme-muted text-xs sm:text-sm">События сегодня</div>
           <div className="text-2xl sm:text-3xl font-bold">{events?.length ?? 0}</div>
         </div>
-        <div className="card">
+        <Link to="/app/todos?assignee=me" className="card theme-hover block">
           <div className="theme-muted text-xs sm:text-sm">Мои задачи</div>
           <div className="text-2xl sm:text-3xl font-bold">{tasks?.personal?.total ?? 0}</div>
-        </div>
-        <div className="card">
+        </Link>
+        <Link to="/app/todos" className="card theme-hover block">
           <div className="theme-muted text-xs sm:text-sm">Наши задачи</div>
           <div className="text-2xl sm:text-3xl font-bold">{tasks?.couple?.total ?? 0}</div>
-        </div>
-        <div className="card">
+        </Link>
+        <Link to="/app/todos?status=DONE" className="card theme-hover block">
           <div className="theme-muted text-xs sm:text-sm">Выполнено</div>
           <div className="text-2xl sm:text-3xl font-bold">{tasks?.couple?.byStatus?.DONE ?? 0}</div>
-        </div>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

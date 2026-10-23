@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { useAuth } from '../app/AuthContext';
@@ -31,15 +32,23 @@ const STATUS_BADGE: Record<string, string> = {
 export function Todos() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [assignee, setAssignee] = useState('all');
-  const [status, setStatus] = useState('all');
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const assignee = searchParams.get('assignee') ?? 'all';
+  const status = searchParams.get('status') ?? 'all';
+  const [search, setSearch] = useState(searchParams.get('q') ?? '');
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('OTHER');
   const [dueDate, setDueDate] = useState('');
   const [assigneeChoice, setAssigneeChoice] = useState<'me' | 'partner' | 'both'>('me');
   const [statusMenuId, setStatusMenuId] = useState<string | null>(null);
+
+  const updateParam = (key: string, value: string, dropValue = 'all') => {
+    const next = new URLSearchParams(searchParams);
+    if (!value || value === dropValue) next.delete(key);
+    else next.set(key, value);
+    setSearchParams(next, { replace: true });
+  };
 
   const { data: couple } = useQuery({
     queryKey: ['couple'],
@@ -142,7 +151,7 @@ export function Todos() {
           ].map((s) => (
             <button
               key={s.value}
-              onClick={() => setAssignee(s.value)}
+              onClick={() => updateParam('assignee', s.value)}
               className={`px-3 py-1.5 rounded-btn text-sm ${
                 assignee === s.value ? 'bg-primary text-white' : 'theme-surface border theme-border theme-muted'
               }`}
@@ -155,7 +164,7 @@ export function Todos() {
         <select
           className="input w-auto"
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => updateParam('status', e.target.value)}
         >
           <option value="all">Все статусы</option>
           <option value="TODO">Ожидает</option>

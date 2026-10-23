@@ -63,7 +63,7 @@ export function AppLayout() {
 
       {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[52px] z-30 bg-black/20" onClick={() => setMobileMenuOpen(false)}>
+        <div className="lg:hidden fixed inset-0 top-[52px] z-30 overlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="bg-surface border-b border-border p-2" onClick={(e) => e.stopPropagation()}>
             {secondaryNav.map((item) => (
               <NavLink
@@ -82,7 +82,7 @@ export function AppLayout() {
             ))}
             <button
               onClick={handleLogout}
-              className="w-full text-left px-4 py-3 text-sm text-danger rounded-btn hover:bg-red-50"
+              className="w-full text-left px-4 py-3 text-sm text-danger rounded-btn hover:bg-danger/10"
             >
               Выйти
             </button>
@@ -138,7 +138,7 @@ export function AppLayout() {
           </NavLink>
           <button
             onClick={handleLogout}
-            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn hover:bg-danger/10 transition-colors"
           >
             Выйти
           </button>

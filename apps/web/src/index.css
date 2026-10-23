@@ -2,39 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Theme variables ─────────────────────────────────────────────────────── */
+/* ── Theme color tokens (RGB triplets for Tailwind alpha) ────────────────── */
 :root {
-  --color-surface: #ffffff;
-  --color-background: #f8f9fa;
-  --color-border: #e5e7eb;
-  --color-text: #1a1a2e;
-  --color-text-secondary: #6b7280;
-  --color-hover: #f3f4f6;
-  --color-input-bg: #ffffff;
-  --color-overlay: rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --c-surface: 255 255 255;
+  --c-bg: 248 249 250;
+  --c-border: 229 231 235;
+  --c-text: 26 26 46;
+  --c-muted: 107 114 128;
+  --c-hover: 243 244 246;
+  --c-input: 255 255 255;
+  --c-overlay: 0 0 0;
+  color-scheme: light;
 }
 
 .dark {
-  --color-surface: #1e1e2e;
-  --color-background: #12121c;
-  --color-border: #2e2e42;
-  --color-text: #e8e8f0;
-  --color-text-secondary: #9ca3af;
-  --color-hover: #2a2a3c;
-  --color-input-bg: #252536;
-  --color-overlay: rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --c-surface: 30 30 46;
+  --c-bg: 18 18 28;
+  --c-border: 46 46 66;
+  --c-text: 232 232 240;
+  --c-muted: 156 163 175;
+  --c-hover: 42 42 60;
+  --c-input: 37 37 54;
+  --c-overlay: 0 0 0;
+  color-scheme: dark;
 }
 
 @layer base {
   body {
     @apply bg-background text-text font-sans antialiased;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  /* Override Tailwind's hardcoded placeholder color */
+  input::placeholder,
+  textarea::placeholder {
+    color: rgb(var(--c-muted));
+    opacity: 1;
+  }
+  /* Override default border color */
+  * {
+    border-color: rgb(var(--c-border));
   }
 }
 
 @layer components {
+  /* Buttons */
   .btn-primary {
     @apply bg-primary text-white px-4 py-2 rounded-btn font-medium
            hover:bg-primary-dark transition-colors
@@ -42,52 +53,78 @@
   }
   .btn-secondary {
     @apply border border-border text-text px-4 py-2 rounded-btn font-medium
-           transition-colors;
-    &:hover {
-      background-color: var(--color-hover);
-    }
+           transition-colors hover:bg-hover;
   }
   .btn-danger {
     @apply border border-danger text-danger px-4 py-2 rounded-btn font-medium
            transition-colors;
-    &:hover {
-      background-color: color-mix(in srgb, var(--color-danger, #e17055) 10%, transparent);
-    }
   }
+  .btn-danger:hover {
+    background-color: rgb(225 112 85 / 0.12);
+  }
+
+  /* Inputs */
   .input {
     @apply w-full border border-border rounded-btn px-3 py-2 text-sm text-text
            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
-    background-color: var(--color-input-bg);
-    &::placeholder {
-      @apply text-text-secondary;
-    }
+    background-color: rgb(var(--c-input));
   }
+  .input::placeholder {
+    @apply text-text-secondary;
+  }
+
+  /* Cards */
   .card {
     @apply border border-border rounded-card p-5;
-    background-color: var(--color-surface);
-    box-shadow: var(--shadow-card);
+    background-color: rgb(var(--c-surface));
+    box-shadow: 0 1px 3px rgb(var(--c-overlay) / 0.06);
   }
+  .dark .card {
+    box-shadow: 0 1px 3px rgb(var(--c-overlay) / 0.25);
+  }
+
+  /* Badges */
   .badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
   }
   .badge-primary {
-    @apply bg-primary/10 text-primary;
+    background-color: rgb(108 92 231 / 0.12);
+    @apply text-primary;
   }
   .badge-success {
-    @apply bg-success/10 text-success;
+    background-color: rgb(0 184 148 / 0.12);
+    @apply text-success;
   }
   .badge-warning {
-    @apply text-yellow-700;
-    background-color: color-mix(in srgb, #fdcb6e 20%, transparent);
-    .dark & {
-      @apply text-yellow-300;
-    }
+    background-color: rgb(253 203 110 / 0.2);
+    @apply text-warning;
+  }
+  .dark .badge-warning {
+    color: rgb(253 224 71);
   }
   .badge-danger {
-    @apply bg-danger/10 text-danger;
+    background-color: rgb(225 112 85 / 0.12);
+    @apply text-danger;
   }
   .badge-neutral {
     @apply text-text-secondary;
-    background-color: var(--color-hover);
+    background-color: rgb(var(--c-hover));
+  }
+
+  /* Modal overlay */
+  .overlay {
+    background-color: rgb(var(--c-overlay) / 0.4);
+  }
+  .dark .overlay {
+    background-color: rgb(var(--c-overlay) / 0.6);
+  }
+
+  /* Sidebar nav link */
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-btn text-sm font-medium
+           transition-colors text-text-secondary hover:bg-hover hover:text-text;
+  }
+  .nav-link-active {
+    @apply bg-primary text-white;
   }
 }

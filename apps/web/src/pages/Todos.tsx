@@ -211,7 +211,7 @@ export function Todos() {
 
       {/* Create form modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
           <div className="bg-surface rounded-card p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Новая задача</h2>
             <form onSubmit={handleCreate} className="space-y-4">
@@ -234,7 +234,7 @@ export function Todos() {
                       className={`flex flex-col items-center gap-1 p-3 rounded-btn border-2 text-sm transition-colors ${
                         assigneeChoice === opt.value
                           ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-border text-text-secondary hover:border-gray-300'
+                          : 'border-border text-text-secondary hover:border-primary/50'
                       }`}
                     >
                       <span className="text-lg">{opt.icon}</span>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
+import { useAuth } from '../app/AuthContext';
 
 const CATEGORY_LABELS: Record<string, string> = {
   CLEANING: 'Уборка',
@@ -22,6 +23,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function Todos() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [assignee, setAssignee] = useState('all');
   const [status, setStatus] = useState('all');
   const [search, setSearch] = useState('');
@@ -29,6 +31,15 @@ export function Todos() {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('OTHER');
   const [dueDate, setDueDate] = useState('');
+  const [assigneeChoice, setAssigneeChoice] = useState<'me' | 'partner' | 'both'>('me');
+
+  const { data: couple } = useQuery({
+    queryKey: ['couple'],
+    queryFn: () => api.get<any>('/couple').catch(() => null),
+    retry: false,
+  });
+
+  const partner = couple?.members?.find((m: any) => m.userId !== user?.id);
 
   const { data: tasks, isLoading } = useQuery({
     queryKey: ['tasks', assignee, status, search],
@@ -46,15 +57,22 @@ export function Todos() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let assigneeId: string | undefined;
+      if (assigneeChoice === 'me') assigneeId = user?.id;
+      else if (assigneeChoice === 'partner') assigneeId = partner?.userId;
+      else assigneeId = undefined; // both → unassigned
+
       await api.post('/tasks', {
         title,
         category,
+        assigneeId,
         dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
       });
       invalidate();
       setShowForm(false);
       setTitle('');
       setDueDate('');
+      setAssigneeChoice('me');
     } catch (err: any) {
       alert(err.message);
     }
@@ -94,7 +112,7 @@ export function Todos() {
             { value: 'all', label: 'Все' },
             { value: 'me', label: 'Мои' },
             { value: 'partner', label: 'Партнёра' },
-            { value: 'unassigned', label: 'Без исполнителя' },
+            { value: 'unassigned', label: 'Для двоих' },
           ].map((s) => (
             <button
               key={s.value}
@@ -157,11 +175,14 @@ export function Todos() {
                 <div className={`font-medium ${task.status === 'DONE' ? 'line-through' : ''}`}>
                   {task.title}
                 </div>
-                {task.dueDate && (
-                  <div className="text-xs text-text-secondary">
-                    Срок: {new Date(task.dueDate).toLocaleDateString('ru-RU')}
-                  </div>
-                )}
+                <div className="flex items-center gap-2 text-xs text-text-secondary">
+                  {task.dueDate && (
+                    <span>Срок: {new Date(task.dueDate).toLocaleDateString('ru-RU')}</span>
+                  )}
+                  {task.assigneeId === user?.id && <span>• Моя</span>}
+                  {task.assigneeId && task.assigneeId !== user?.id && <span>• {partner?.name ?? 'Партнёр'}</span>}
+                  {!task.assigneeId && <span>• Для двоих</span>}
+                </div>
               </div>
 
               <span className="badge bg-gray-100 text-text-secondary">
@@ -197,6 +218,30 @@ export function Todos() {
               <div>
                 <label className="block text-sm font-medium mb-1">Название</label>
                 <input type="text" className="input" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Исполнитель</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: 'me', label: 'Моя', icon: user?.name?.[0] ?? 'Я' },
+                    { value: 'partner', label: 'Партнёра', icon: partner?.name?.[0] ?? 'П' },
+                    { value: 'both', label: 'Для двоих', icon: '👥' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setAssigneeChoice(opt.value as any)}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-btn border-2 text-sm transition-colors ${
+                        assigneeChoice === opt.value
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-border text-text-secondary hover:border-gray-300'
+                      }`}
+                    >
+                      <span className="text-lg">{opt.icon}</span>
+                      <span className="font-medium">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Категория</label>

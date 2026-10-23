@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vaya — пространство для пары</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>" />
+    <script>
+      // Set theme before CSS loads to prevent flash
+      (function () {
+        var t = localStorage.getItem('vaya-theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.classList.toggle('dark', t === 'dark');
+      })();
+    </script>
+    <style>
+      /* Critical theme variables — loaded before Tailwind CSS */
+      :root {
+        --t-bg: #f8f9fa;
+        --t-surface: #ffffff;
+        --t-border: #e5e7eb;
+        --t-text: #1a1a2e;
+        --t-muted: #6b7280;
+        --t-hover: #f3f4f6;
+        --t-input-bg: #ffffff;
+      }
+      html.dark {
+        --t-bg: #0f172a;
+        --t-surface: #1e293b;
+        --t-border: #334155;
+        --t-text: #f1f5f9;
+        --t-muted: #94a3b8;
+        --t-hover: #2d3b52;
+        --t-input-bg: #1e293b;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

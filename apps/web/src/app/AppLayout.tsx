@@ -31,23 +31,23 @@ export function AppLayout() {
   const allNav = [...navItems, ...secondaryNav];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
+    <div className="min-h-screen theme-bg flex flex-col lg:flex-row">
       {/* Mobile top bar */}
-      <header className="lg:hidden sticky top-0 z-40 bg-surface border-b border-border px-4 py-3 flex items-center justify-between">
+      <header className="lg:hidden sticky top-0 z-40 theme-surface border-b theme-border px-4 py-3 flex items-center justify-between">
         <NavLink to="/app" className="text-xl font-bold text-primary">
           Vaya
         </NavLink>
         <div className="flex items-center gap-1">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-btn hover:bg-hover"
+            className="theme-toggle"
             aria-label="Переключить тему"
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 -mr-2 rounded-btn hover:bg-hover"
+            className="theme-toggle -mr-2"
             aria-label="Меню"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -64,16 +64,14 @@ export function AppLayout() {
       {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-[52px] z-30 overlay" onClick={() => setMobileMenuOpen(false)}>
-          <div className="bg-surface border-b border-border p-2" onClick={(e) => e.stopPropagation()}>
+          <div className="theme-surface border-b theme-border p-2" onClick={(e) => e.stopPropagation()}>
             {secondaryNav.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-btn text-sm font-medium ${
-                    isActive ? 'bg-primary text-white' : 'text-text hover:bg-hover'
-                  }`
+                  isActive ? 'nav-item nav-item-active' : 'nav-item'
                 }
               >
                 <span>{item.icon}</span>
@@ -82,7 +80,7 @@ export function AppLayout() {
             ))}
             <button
               onClick={handleLogout}
-              className="w-full text-left px-4 py-3 text-sm text-danger rounded-btn hover:bg-danger/10"
+              className="w-full text-left px-4 py-3 text-sm text-danger rounded-btn theme-hover"
             >
               Выйти
             </button>
@@ -91,7 +89,7 @@ export function AppLayout() {
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-60 bg-surface border-r border-border flex-col flex-shrink-0">
+      <aside className="hidden lg:flex w-60 theme-surface border-r theme-border flex-col flex-shrink-0">
         <div className="p-4">
           <NavLink to="/app" className="text-xl font-bold text-primary">
             Vaya
@@ -105,11 +103,7 @@ export function AppLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-btn text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary text-white'
-                    : 'text-text-secondary hover:bg-hover hover:text-text'
-                }`
+                isActive ? 'nav-item nav-item-active' : 'nav-item'
               }
             >
               <span>{item.icon}</span>
@@ -119,10 +113,10 @@ export function AppLayout() {
         </nav>
 
         {/* User section */}
-        <div className="p-3 border-t border-border">
+        <div className="p-3 border-t theme-border">
           <NavLink
             to="/app/profile"
-            className="flex items-center gap-3 p-2 rounded-btn hover:bg-hover transition-colors"
+            className="flex items-center gap-3 p-2 rounded-btn theme-hover transition-colors"
           >
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
@@ -133,18 +127,18 @@ export function AppLayout() {
             )}
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium truncate">{user?.name}</div>
-              <div className="text-xs text-text-secondary truncate">{user?.email}</div>
+              <div className="text-xs theme-muted truncate">{user?.email}</div>
             </div>
           </NavLink>
           <button
             onClick={handleLogout}
-            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn hover:bg-danger/10 transition-colors"
+            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn theme-hover"
           >
             Выйти
           </button>
           <button
             onClick={toggleTheme}
-            className="w-full text-left px-3 py-2 text-sm text-text-secondary rounded-btn hover:bg-hover transition-colors flex items-center gap-2"
+            className="theme-toggle w-full text-left px-3 py-2 text-sm theme-muted flex items-center gap-2"
           >
             {theme === 'dark' ? '☀️ Светлая тема' : '🌙 Тёмная тема'}
           </button>
@@ -159,7 +153,7 @@ export function AppLayout() {
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-border">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 theme-surface border-t theme-border">
         <div className="flex items-center justify-around h-16 px-2">
           {navItems.map((item) => (
             <NavLink
@@ -167,8 +161,8 @@ export function AppLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-2 py-1 rounded-btn min-w-[56px] ${
-                  isActive ? 'text-primary' : 'text-text-secondary'
+                `flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-btn min-w-[56px] transition-colors ${
+                  isActive ? 'text-primary' : 'theme-muted theme-hover'
                 }`
               }
             >

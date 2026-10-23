@@ -2,135 +2,180 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Theme color tokens (RGB triplets for Tailwind alpha) ────────────────── */
-:root {
-  --c-surface: 255 255 255;
-  --c-bg: 248 249 250;
-  --c-border: 229 231 235;
-  --c-text: 26 26 46;
-  --c-muted: 107 114 128;
-  --c-hover: 243 244 246;
-  --c-input: 255 255 255;
-  --c-overlay: 0 0 0;
-  color-scheme: light;
-}
-
-.dark {
-  --c-surface: 30 30 46;
-  --c-bg: 18 18 28;
-  --c-border: 46 46 66;
-  --c-text: 232 232 240;
-  --c-muted: 156 163 175;
-  --c-hover: 42 42 60;
-  --c-input: 37 37 54;
-  --c-overlay: 0 0 0;
-  color-scheme: dark;
-}
-
 @layer base {
   body {
-    @apply bg-background text-text font-sans antialiased;
+    background-color: var(--t-bg);
+    color: var(--t-text);
+    font-family: 'Inter', system-ui, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
     transition: background-color 0.15s ease, color 0.15s ease;
   }
-  /* Override Tailwind's hardcoded placeholder color */
+
   input::placeholder,
   textarea::placeholder {
-    color: rgb(var(--c-muted));
+    color: var(--t-muted);
     opacity: 1;
   }
-  /* Override default border color */
-  * {
-    border-color: rgb(var(--c-border));
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--t-border);
   }
 }
 
 @layer components {
-  /* Buttons */
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
   .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-btn font-medium
-           hover:bg-primary-dark transition-colors
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-4 py-2 rounded-btn font-medium transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed text-white;
+    background-color: #6c5ce7;
   }
+  .btn-primary:hover {
+    background-color: #5a4bd1;
+  }
+
   .btn-secondary {
-    @apply border border-border text-text px-4 py-2 rounded-btn font-medium transition-colors;
+    @apply px-4 py-2 rounded-btn font-medium transition-colors;
+    border: 1px solid var(--t-border);
+    background-color: var(--t-surface);
+    color: var(--t-text);
   }
   .btn-secondary:hover {
-    background-color: rgb(var(--c-hover));
+    background-color: var(--t-hover);
   }
+
   .btn-danger {
-    @apply border border-danger text-danger px-4 py-2 rounded-btn font-medium
-           transition-colors;
+    @apply px-4 py-2 rounded-btn font-medium transition-colors;
+    border: 1px solid #e17055;
+    color: #e17055;
   }
   .btn-danger:hover {
-    background-color: rgb(225 112 85 / 0.12);
+    background-color: rgba(225, 112, 85, 0.1);
   }
 
-  /* Inputs */
+  /* ── Inputs ──────────────────────────────────────────────────────────── */
   .input {
-    @apply w-full border border-border rounded-btn px-3 py-2 text-sm text-text
+    @apply w-full rounded-btn px-3 py-2 text-sm transition-colors
            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
-    background-color: rgb(var(--c-input));
-  }
-  .input::placeholder {
-    @apply text-text-secondary;
+    border: 1px solid var(--t-border);
+    background-color: var(--t-input-bg);
+    color: var(--t-text);
   }
 
-  /* Cards */
+  /* ── Cards ───────────────────────────────────────────────────────────── */
   .card {
-    @apply border border-border rounded-card p-5;
-    background-color: rgb(var(--c-surface));
-    box-shadow: 0 1px 3px rgb(var(--c-overlay) / 0.06);
+    @apply rounded-card p-5 transition-colors;
+    background-color: var(--t-surface);
+    border: 1px solid var(--t-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
-  .dark .card {
-    box-shadow: 0 1px 3px rgb(var(--c-overlay) / 0.25);
+  html.dark .card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
-  /* Badges */
+  /* ── Badges ──────────────────────────────────────────────────────────── */
   .badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
   }
   .badge-primary {
-    background-color: rgb(108 92 231 / 0.12);
-    @apply text-primary;
+    background-color: rgba(108, 92, 231, 0.12);
+    color: #6c5ce7;
   }
   .badge-success {
-    background-color: rgb(0 184 148 / 0.12);
-    @apply text-success;
+    background-color: rgba(0, 184, 148, 0.12);
+    color: #00b894;
   }
   .badge-warning {
-    background-color: rgb(253 203 110 / 0.2);
-    @apply text-warning;
+    background-color: rgba(253, 203, 110, 0.2);
+    color: #d97706;
   }
-  .dark .badge-warning {
-    color: rgb(253 224 71);
+  html.dark .badge-warning {
+    color: #fbbf24;
   }
   .badge-danger {
-    background-color: rgb(225 112 85 / 0.12);
-    @apply text-danger;
+    background-color: rgba(225, 112, 85, 0.12);
+    color: #e17055;
   }
   .badge-neutral {
-    @apply text-text-secondary;
-    background-color: rgb(var(--c-hover));
+    background-color: var(--t-hover);
+    color: var(--t-muted);
   }
 
-  /* Modal overlay */
+  /* ── Overlay ─────────────────────────────────────────────────────────── */
   .overlay {
-    background-color: rgb(var(--c-overlay) / 0.4);
+    background-color: rgba(0, 0, 0, 0.4);
   }
-  .dark .overlay {
-    background-color: rgb(var(--c-overlay) / 0.6);
+  html.dark .overlay {
+    background-color: rgba(0, 0, 0, 0.6);
   }
+}
 
-  /* Sidebar nav link */
-  .nav-link {
-    @apply flex items-center gap-3 px-3 py-2 rounded-btn text-sm font-medium
-           transition-colors text-text-secondary;
-  }
-  .nav-link:hover {
-    background-color: rgb(var(--c-hover));
-    color: rgb(var(--c-text));
-  }
-  .nav-link-active {
-    @apply bg-primary text-white;
-  }
+/* ── Theme utility classes (override Tailwind bg/text/border) ──────────── */
+/* These use CSS variables and always react to html.dark */
+.theme-bg      { background-color: var(--t-bg); }
+.theme-surface { background-color: var(--t-surface); }
+.theme-border  { border-color: var(--t-border); }
+.theme-text    { color: var(--t-text); }
+.theme-muted   { color: var(--t-muted); }
+.theme-input   { background-color: var(--t-input-bg); color: var(--t-text); border-color: var(--t-border); }
+
+/* Hover states for clickable elements */
+.theme-hover {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.theme-hover:hover {
+  background-color: var(--t-hover);
+  color: var(--t-text);
+}
+
+/* Sidebar nav link */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--t-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.nav-item:hover {
+  background-color: var(--t-hover);
+  color: var(--t-text);
+}
+.nav-item-active {
+  background-color: #6c5ce7;
+  color: #ffffff;
+}
+.nav-item-active:hover {
+  background-color: #5a4bd1;
+  color: #ffffff;
+}
+
+/* Quick link */
+.quick-link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--t-text);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.quick-link:hover {
+  background-color: var(--t-hover);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.theme-toggle:hover {
+  background-color: var(--t-hover);
+}
+.theme-toggle:active {
+  transform: scale(0.95);
 }

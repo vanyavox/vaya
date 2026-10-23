@@ -121,7 +121,7 @@ export function Calendar() {
               key={s}
               onClick={() => setScope(s)}
               className={`px-2 sm:px-3 py-1 rounded-btn text-xs sm:text-sm ${
-                scope === s ? 'bg-primary text-white' : 'bg-surface border border-border text-text-secondary'
+                scope === s ? 'bg-primary text-white' : 'theme-surface border theme-border theme-muted'
               }`}
             >
               {s === 'all' ? 'Все' : s === 'personal' ? 'Личные' : 'Общие'}
@@ -134,7 +134,7 @@ export function Calendar() {
           <button
             onClick={() => setView('month')}
             className={`px-3 py-1 rounded-btn text-xs sm:text-sm ${
-              view === 'month' ? 'bg-primary text-white' : 'bg-surface border border-border text-text-secondary'
+              view === 'month' ? 'bg-primary text-white' : 'theme-surface border theme-border theme-muted'
             }`}
           >
             Месяц
@@ -142,7 +142,7 @@ export function Calendar() {
           <button
             onClick={() => setView('list')}
             className={`px-3 py-1 rounded-btn text-xs sm:text-sm ${
-              view === 'list' ? 'bg-primary text-white' : 'bg-surface border border-border text-text-secondary'
+              view === 'list' ? 'bg-primary text-white' : 'theme-surface border theme-border theme-muted'
             }`}
           >
             Список
@@ -155,9 +155,9 @@ export function Calendar() {
         <div className="card p-0 overflow-x-auto">
           <div className="min-w-[560px]">
             {/* Day headers */}
-            <div className="grid grid-cols-7 bg-background border-b border-border">
+            <div className="grid grid-cols-7 theme-bg border-b theme-border">
               {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((d) => (
-                <div key={d} className="p-2 text-center text-xs font-medium text-text-secondary">
+                <div key={d} className="p-2 text-center text-xs font-medium theme-muted">
                   {d}
                 </div>
               ))}
@@ -173,8 +173,8 @@ export function Calendar() {
                 return (
                   <div
                     key={i}
-                    className={`min-h-[64px] sm:min-h-[100px] border-b border-r border-border p-1 sm:p-2 ${
-                      day ? '' : 'bg-hover'
+                    className={`min-h-[64px] sm:min-h-[100px] border-b border-r theme-border p-1 sm:p-2 ${
+                      day ? '' : 'theme-hover'
                     }`}
                   >
                     {day && (
@@ -197,7 +197,7 @@ export function Calendar() {
                             </div>
                           ))}
                           {dayEvents.length > 1 && (
-                            <div className="text-[9px] sm:text-xs text-text-secondary">+{dayEvents.length - 1}</div>
+                            <div className="text-[9px] sm:text-xs theme-muted">+{dayEvents.length - 1}</div>
                           )}
                           {dayTasks.length > 0 && (
                             <div className="flex gap-0.5">
@@ -229,18 +229,18 @@ export function Calendar() {
                 />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium truncate">{e.title}</div>
-                  <div className="text-xs text-text-secondary">
+                  <div className="text-xs theme-muted">
                     {e.allDay ? 'Весь день' : new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                     {e.location ? ` · ${e.location}` : ''}
                   </div>
                 </div>
-                <div className="text-xs text-text-secondary flex-shrink-0">
+                <div className="text-xs theme-muted flex-shrink-0">
                   {new Date(e.startsAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                 </div>
               </div>
             ))
           ) : (
-            <div className="card text-center py-8 text-text-secondary">Событий нет</div>
+            <div className="card text-center py-8 theme-muted">Событий нет</div>
           )}
         </div>
       )}
@@ -248,7 +248,7 @@ export function Calendar() {
       {/* Event form modal */}
       {showEventForm && (
         <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="bg-surface rounded-card p-6 w-full max-w-md">
+          <div className="theme-surface rounded-card p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Новое событие</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>

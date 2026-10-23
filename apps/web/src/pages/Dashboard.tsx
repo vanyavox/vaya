@@ -161,18 +161,18 @@ export function Dashboard() {
           <div className="card mt-6">
             <h2 className="text-lg font-semibold mb-3">Быстрые ссылки</h2>
             <div className="space-y-2">
-              <Link to="/app/wishes" className="block p-2 rounded-btn hover:theme-bg text-sm">
+              <Link to="/app/wishes" className="quick-link">
                 🎁 Желания
               </Link>
-              <Link to="/app/calendar" className="block p-2 rounded-btn hover:theme-bg text-sm">
+              <Link to="/app/calendar" className="quick-link">
                 📅 Календарь
               </Link>
-              <Link to="/app/todos" className="block p-2 rounded-btn hover:theme-bg text-sm">
+              <Link to="/app/todos" className="quick-link">
                 ✅ Дела
               </Link>
               <Link
                 to="/app/settings/calendar-feed"
-                className="block p-2 rounded-btn hover:theme-bg text-sm"
+                className="quick-link"
               >
                 ⚙️ Подписка на календарь
               </Link>

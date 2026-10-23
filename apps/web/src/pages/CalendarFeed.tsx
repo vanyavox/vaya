@@ -44,21 +44,29 @@ export function CalendarFeed() {
         {/* Feed URL */}
         <div className="card">
           <h2 className="text-lg font-semibold mb-3">Ссылка для подписки</h2>
-          <div className="flex items-center gap-3">
-            <input
-              type="text"
-              className="input flex-1 font-mono text-sm"
+          <div className="space-y-2">
+            <label className="text-sm theme-muted">HTTPS-ссылка</label>
+            <textarea
+              className="input font-mono text-sm resize-none"
+              rows={2}
               value={feed?.feedUrl ?? 'Загрузка...'}
               readOnly
+              onFocus={(e) => e.target.select()}
             />
             <button onClick={handleCopy} className="btn-primary whitespace-nowrap">
               Скопировать
             </button>
           </div>
           {feed?.webcalUrl && (
-            <div className="mt-3">
-              <div className="text-sm theme-muted mb-1">Или webcal-ссылка:</div>
-              <code className="text-xs theme-bg p-2 rounded block">{feed.webcalUrl}</code>
+            <div className="mt-4 space-y-2">
+              <label className="text-sm theme-muted">Или webcal-ссылка:</label>
+              <textarea
+                className="input font-mono text-sm resize-none"
+                rows={2}
+                value={feed.webcalUrl}
+                readOnly
+                onFocus={(e) => e.target.select()}
+              />
             </div>
           )}
         </div>
@@ -84,7 +92,7 @@ export function CalendarFeed() {
         </div>
 
         {/* Warning */}
-        <div className="card border-warning/50 bg-warning/5">
+        <div className="card theme-border">
           <h3 className="font-semibold mb-2">⚠️ Перевыпуск токена</h3>
           <p className="text-sm theme-muted mb-3">
             При перевыпуске старая ссылка перестанет работать. Вам нужно будет заново подписаться в

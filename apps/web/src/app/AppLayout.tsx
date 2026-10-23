@@ -40,14 +40,14 @@ export function AppLayout() {
         <div className="flex items-center gap-1">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-btn theme-hover"
+            className="theme-toggle"
             aria-label="Переключить тему"
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 -mr-2 rounded-btn theme-hover"
+            className="theme-toggle -mr-2"
             aria-label="Меню"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -71,9 +71,7 @@ export function AppLayout() {
                 to={item.to}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-btn text-sm font-medium ${
-                    isActive ? 'bg-primary text-white' : 'theme-text theme-hover'
-                  }`
+                  isActive ? 'nav-item nav-item-active' : 'nav-item'
                 }
               >
                 <span>{item.icon}</span>
@@ -82,7 +80,7 @@ export function AppLayout() {
             ))}
             <button
               onClick={handleLogout}
-              className="w-full text-left px-4 py-3 text-sm text-danger rounded-btn hover:bg-danger/10"
+              className="w-full text-left px-4 py-3 text-sm text-danger rounded-btn theme-hover"
             >
               Выйти
             </button>
@@ -105,11 +103,7 @@ export function AppLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-btn text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary text-white'
-                    : 'theme-muted theme-hover theme-text'
-                }`
+                isActive ? 'nav-item nav-item-active' : 'nav-item'
               }
             >
               <span>{item.icon}</span>
@@ -138,13 +132,13 @@ export function AppLayout() {
           </NavLink>
           <button
             onClick={handleLogout}
-            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn hover:bg-danger/10 transition-colors"
+            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn theme-hover"
           >
             Выйти
           </button>
           <button
             onClick={toggleTheme}
-            className="w-full text-left px-3 py-2 text-sm theme-muted rounded-btn theme-hover transition-colors flex items-center gap-2"
+            className="theme-toggle w-full text-left px-3 py-2 text-sm theme-muted flex items-center gap-2"
           >
             {theme === 'dark' ? '☀️ Светлая тема' : '🌙 Тёмная тема'}
           </button>
@@ -167,8 +161,8 @@ export function AppLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-2 py-1 rounded-btn min-w-[56px] ${
-                  isActive ? 'text-primary' : 'theme-muted'
+                `flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-btn min-w-[56px] transition-colors ${
+                  isActive ? 'text-primary' : 'theme-muted theme-hover'
                 }`
               }
             >

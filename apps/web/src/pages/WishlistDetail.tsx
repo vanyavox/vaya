@@ -74,7 +74,7 @@ export function WishlistDetail() {
 
   return (
     <div>
-      <div className="flex items-center gap-2 text-sm text-text-secondary mb-4">
+      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
         <button onClick={() => navigate('/app/wishes')} className="hover:underline">
           Мои желания
         </button>
@@ -91,7 +91,7 @@ export function WishlistDetail() {
             </span>
           </div>
           {wishlist.description && (
-            <p className="text-text-secondary mt-1">{wishlist.description}</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{wishlist.description}</p>
           )}
         </div>
         <button onClick={handleDelete} className="btn-danger">
@@ -107,7 +107,7 @@ export function WishlistDetail() {
               {wish.imageUrl ? (
                 <img src={wish.imageUrl} alt={wish.title} className="w-full h-32 object-cover rounded-btn mb-3" />
               ) : (
-                <div className="w-full h-32 bg-background rounded-btn mb-3 flex items-center justify-center text-3xl">
+                <div className="w-full h-32 bg-gray-50 dark:bg-gray-950 rounded-btn mb-3 flex items-center justify-center text-3xl">
                   🎁
                 </div>
               )}
@@ -152,7 +152,7 @@ export function WishlistDetail() {
         </div>
       ) : (
         <div className="card border-dashed text-center py-12">
-          <p className="text-text-secondary mb-4">Добавьте первое желание</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">Добавьте первое желание</p>
         </div>
       )}
 
@@ -167,7 +167,7 @@ export function WishlistDetail() {
       {/* Wish form modal */}
       {showWishForm && (
         <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="bg-surface rounded-card p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-card p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Новое желание</h2>
             <form onSubmit={handleCreateWish} className="space-y-4">
               <div>

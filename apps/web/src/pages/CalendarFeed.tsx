@@ -32,7 +32,7 @@ export function CalendarFeed() {
   return (
     <div>
       <h1 className="text-xl sm:text-2xl font-bold mb-2">Подписка на календарь</h1>
-      <p className="text-text-secondary mb-8">
+      <p className="text-gray-500 dark:text-gray-400 mb-8">
         Добавьте календарь Vaya в Apple Calendar, чтобы видеть события на всех устройствах
       </p>
 
@@ -57,8 +57,8 @@ export function CalendarFeed() {
           </div>
           {feed?.webcalUrl && (
             <div className="mt-3">
-              <div className="text-sm text-text-secondary mb-1">Или webcal-ссылка:</div>
-              <code className="text-xs bg-background p-2 rounded block">{feed.webcalUrl}</code>
+              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Или webcal-ссылка:</div>
+              <code className="text-xs bg-gray-50 dark:bg-gray-950 p-2 rounded block">{feed.webcalUrl}</code>
             </div>
           )}
         </div>
@@ -86,7 +86,7 @@ export function CalendarFeed() {
         {/* Warning */}
         <div className="card border-warning/50 bg-warning/5">
           <h3 className="font-semibold mb-2">⚠️ Перевыпуск токена</h3>
-          <p className="text-sm text-text-secondary mb-3">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
             При перевыпуске старая ссылка перестанет работать. Вам нужно будет заново подписаться в
             календаре.
           </p>

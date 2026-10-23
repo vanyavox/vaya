@@ -92,7 +92,7 @@ export function Register() {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-text-secondary">
+      <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
         Уже есть аккаунт?{' '}
         <Link to="/login" className="text-primary hover:underline">
           Войти

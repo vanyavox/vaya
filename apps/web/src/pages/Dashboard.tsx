@@ -37,7 +37,7 @@ export function Dashboard() {
         <h1 className="text-2xl font-bold">
           {greeting}, {user?.name} 👋
         </h1>
-        <p className="text-text-secondary">
+        <p className="text-gray-500 dark:text-gray-400">
           {new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
       </div>
@@ -45,19 +45,19 @@ export function Dashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <div className="card">
-          <div className="text-text-secondary text-xs sm:text-sm">События сегодня</div>
+          <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">События сегодня</div>
           <div className="text-2xl sm:text-3xl font-bold">{events?.length ?? 0}</div>
         </div>
         <div className="card">
-          <div className="text-text-secondary text-xs sm:text-sm">Задачи</div>
+          <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Задачи</div>
           <div className="text-2xl sm:text-3xl font-bold">{tasks?.byStatus?.TODO ?? 0}</div>
         </div>
         <div className="card">
-          <div className="text-text-secondary text-xs sm:text-sm">Выполнено</div>
+          <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Выполнено</div>
           <div className="text-2xl sm:text-3xl font-bold">{tasks?.byStatus?.DONE ?? 0}</div>
         </div>
         <div className="card">
-          <div className="text-text-secondary text-xs sm:text-sm">Всего дел</div>
+          <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Всего дел</div>
           <div className="text-2xl sm:text-3xl font-bold">{tasks?.total ?? 0}</div>
         </div>
       </div>
@@ -75,14 +75,14 @@ export function Dashboard() {
             {events?.length ? (
               <div className="space-y-3">
                 {events.map((e: any) => (
-                  <div key={e.id} className="flex items-center gap-3 p-2 rounded-btn bg-background">
+                  <div key={e.id} className="flex items-center gap-3 p-2 rounded-btn bg-gray-50 dark:bg-gray-950">
                     <div
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: e.color ?? '#6C5CE7' }}
                     />
                     <div>
                       <div className="font-medium">{e.title}</div>
-                      <div className="text-sm text-text-secondary">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {e.allDay
                           ? 'Весь день'
                           : `${new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`}
@@ -93,7 +93,7 @@ export function Dashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-text-secondary">На сегодня событий нет</p>
+              <p className="text-gray-500 dark:text-gray-400">На сегодня событий нет</p>
             )}
           </div>
 
@@ -109,19 +109,19 @@ export function Dashboard() {
               <div className="flex gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-warning">{tasks.byStatus.TODO}</div>
-                  <div className="text-sm text-text-secondary">Ожидают</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">Ожидают</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">{tasks.byStatus.IN_PROGRESS}</div>
-                  <div className="text-sm text-text-secondary">В работе</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">В работе</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-success">{tasks.byStatus.DONE}</div>
-                  <div className="text-sm text-text-secondary">Готово</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">Готово</div>
                 </div>
               </div>
             ) : (
-              <p className="text-text-secondary">Загрузка...</p>
+              <p className="text-gray-500 dark:text-gray-400">Загрузка...</p>
             )}
           </div>
         </div>
@@ -149,7 +149,7 @@ export function Dashboard() {
               </div>
             ) : (
               <div>
-                <p className="text-text-secondary mb-3">Вы ещё не связаны с партнёром</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-3">Вы ещё не связаны с партнёром</p>
                 <Link to="/app/pairing" className="btn-primary text-sm">
                   Связать пару
                 </Link>
@@ -161,18 +161,18 @@ export function Dashboard() {
           <div className="card mt-6">
             <h2 className="text-lg font-semibold mb-3">Быстрые ссылки</h2>
             <div className="space-y-2">
-              <Link to="/app/wishes" className="block p-2 rounded-btn hover:bg-background text-sm">
+              <Link to="/app/wishes" className="block p-2 rounded-btn hover:bg-gray-50 dark:bg-gray-950 text-sm">
                 🎁 Желания
               </Link>
-              <Link to="/app/calendar" className="block p-2 rounded-btn hover:bg-background text-sm">
+              <Link to="/app/calendar" className="block p-2 rounded-btn hover:bg-gray-50 dark:bg-gray-950 text-sm">
                 📅 Календарь
               </Link>
-              <Link to="/app/todos" className="block p-2 rounded-btn hover:bg-background text-sm">
+              <Link to="/app/todos" className="block p-2 rounded-btn hover:bg-gray-50 dark:bg-gray-950 text-sm">
                 ✅ Дела
               </Link>
               <Link
                 to="/app/settings/calendar-feed"
-                className="block p-2 rounded-btn hover:bg-background text-sm"
+                className="block p-2 rounded-btn hover:bg-gray-50 dark:bg-gray-950 text-sm"
               >
                 ⚙️ Подписка на календарь
               </Link>

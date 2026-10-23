@@ -47,7 +47,7 @@ export function Wishlists() {
             className={`px-4 py-2 rounded-btn text-sm font-medium transition-colors ${
               scope === s
                 ? 'bg-primary text-white'
-                : 'bg-surface border border-border text-text-secondary hover:bg-hover'
+                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`}
           >
             {s === 'all' ? 'Все' : s === 'personal' ? 'Личные' : 'Общие'}
@@ -58,7 +58,7 @@ export function Wishlists() {
       {/* Create modal */}
       {showCreate && (
         <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="bg-surface rounded-card p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-card p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Новый список желаний</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -121,9 +121,9 @@ export function Wishlists() {
                   </span>
                 </div>
                 {w.description && (
-                  <p className="text-text-secondary text-sm mb-3">{w.description}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">{w.description}</p>
                 )}
-                <div className="text-sm text-text-secondary">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   {w.wishCount} желаний
                 </div>
               </div>
@@ -132,7 +132,7 @@ export function Wishlists() {
         </div>
       ) : (
         <div className="card border-dashed text-center py-12">
-          <p className="text-text-secondary mb-4">Создайте первый список желаний</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">Создайте первый список желаний</p>
           <button onClick={() => setShowCreate(true)} className="btn-primary text-sm sm:text-base">
             + Новый список
           </button>

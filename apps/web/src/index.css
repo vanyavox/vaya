@@ -111,6 +111,16 @@
   }
 }
 
+/* ── Bottom sheet (Booom Sheet, mobile) ─────────────────────────────────── */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sheet-panel {
+  animation: sheet-up 0.22s ease-out;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
+}
+
 /* ── Theme utility classes (override Tailwind bg/text/border) ──────────── */
 /* These use CSS variables and always react to html.dark */
 .theme-bg      { background-color: var(--t-bg); }

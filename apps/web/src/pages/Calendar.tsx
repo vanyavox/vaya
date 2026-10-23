@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
+import { BooomSheet } from '../app/BooomSheet';
 
 const KIND_COLORS: Record<string, string> = {
   EVENT: '#6C5CE7',
@@ -177,6 +178,166 @@ export function Calendar() {
 
   const monthName = currentDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
 
+  const eventBody = selected
+    ? !isEditing || !draft ? (
+        <>
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: selected.color ?? KIND_COLORS[selected.kind] ?? '#6C5CE7' }}
+              />
+              <h2 className="text-lg font-semibold">{selected.title}</h2>
+            </div>
+            <button onClick={closeModal} className="theme-muted text-xl leading-none px-1" aria-label="Закрыть">
+              ×
+            </button>
+          </div>
+
+          <div className="space-y-3 text-sm">
+            <div>
+              <div className="theme-muted text-xs mb-0.5">Когда</div>
+              <div>
+                {new Date(selected.startsAt).toLocaleDateString('ru-RU', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                })}
+                {!selected.allDay && (
+                  <>
+                    {' · '}
+                    {new Date(selected.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                    {' — '}
+                    {new Date(selected.endsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                  </>
+                )}
+                {selected.allDay && ' · Весь день'}
+              </div>
+            </div>
+
+            {selected.location && (
+              <div>
+                <div className="theme-muted text-xs mb-0.5">Место</div>
+                <div>{selected.location}</div>
+              </div>
+            )}
+
+            {selected.description && (
+              <div>
+                <div className="theme-muted text-xs mb-0.5">Описание</div>
+                <div className="whitespace-pre-wrap">{selected.description}</div>
+              </div>
+            )}
+
+            <div>
+              <div className="theme-muted text-xs mb-0.5">Тип</div>
+              <div>{KIND_LABELS[selected.kind] ?? selected.kind}</div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 mt-6">
+            <button onClick={handleDelete} className="btn-secondary text-sm text-danger">
+              Удалить
+            </button>
+            <button onClick={startEdit} className="btn-primary flex-1">
+              Редактировать
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2 className="text-lg font-semibold mb-4">Редактировать событие</h2>
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Название</label>
+              <input
+                type="text"
+                className="input"
+                value={draft.title}
+                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Описание</label>
+              <textarea
+                className="input"
+                rows={3}
+                value={draft.description}
+                onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Место</label>
+              <input
+                type="text"
+                className="input"
+                value={draft.location}
+                onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Начало</label>
+                <input
+                  type="datetime-local"
+                  className="input"
+                  value={draft.startsAt}
+                  onChange={(e) => setDraft({ ...draft, startsAt: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Окончание</label>
+                <input
+                  type="datetime-local"
+                  className="input"
+                  value={draft.endsAt}
+                  onChange={(e) => setDraft({ ...draft, endsAt: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Тип</label>
+              <select
+                className="input"
+                value={draft.kind}
+                onChange={(e) => setDraft({ ...draft, kind: e.target.value })}
+              >
+                {Object.entries(KIND_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </select>
+            </div>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={draft.allDay}
+                onChange={(e) => setDraft({ ...draft, allDay: e.target.checked })}
+              />
+              <span className="text-sm">Весь день</span>
+            </label>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditing(false);
+                  setDraft(null);
+                }}
+                className="btn-secondary flex-1"
+              >
+                Отмена
+              </button>
+              <button type="submit" className="btn-primary flex-1">
+                Сохранить
+              </button>
+            </div>
+          </form>
+        </>
+      )
+    : null;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -342,170 +503,18 @@ export function Calendar() {
         </div>
       )}
 
-      {/* Event detail / edit modal */}
+      {/* Event detail: Booom Sheet on mobile, modal on desktop */}
+      <BooomSheet open={!!selected} onClose={closeModal}>
+        {eventBody}
+      </BooomSheet>
+
       {selected && (
-        <div className="fixed inset-0 overlay flex items-center justify-center z-50" onClick={closeModal}>
+        <div className="hidden lg:flex fixed inset-0 overlay items-center justify-center z-50" onClick={closeModal}>
           <div
             className="theme-surface rounded-card p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {!isEditing || !draft ? (
-              <>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: selected.color ?? KIND_COLORS[selected.kind] ?? '#6C5CE7' }}
-                    />
-                    <h2 className="text-lg font-semibold">{selected.title}</h2>
-                  </div>
-                  <button onClick={closeModal} className="theme-muted text-xl leading-none px-1" aria-label="Закрыть">
-                    ×
-                  </button>
-                </div>
-
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <div className="theme-muted text-xs mb-0.5">Когда</div>
-                    <div>
-                      {new Date(selected.startsAt).toLocaleDateString('ru-RU', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long',
-                      })}
-                      {!selected.allDay && (
-                        <>
-                          {' · '}
-                          {new Date(selected.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
-                          {' — '}
-                          {new Date(selected.endsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
-                        </>
-                      )}
-                      {selected.allDay && ' · Весь день'}
-                    </div>
-                  </div>
-
-                  {selected.location && (
-                    <div>
-                      <div className="theme-muted text-xs mb-0.5">Место</div>
-                      <div>{selected.location}</div>
-                    </div>
-                  )}
-
-                  {selected.description && (
-                    <div>
-                      <div className="theme-muted text-xs mb-0.5">Описание</div>
-                      <div className="whitespace-pre-wrap">{selected.description}</div>
-                    </div>
-                  )}
-
-                  <div>
-                    <div className="theme-muted text-xs mb-0.5">Тип</div>
-                    <div>{KIND_LABELS[selected.kind] ?? selected.kind}</div>
-                  </div>
-                </div>
-
-                <div className="flex gap-3 mt-6">
-                  <button onClick={handleDelete} className="btn-secondary text-sm text-danger">
-                    Удалить
-                  </button>
-                  <button onClick={startEdit} className="btn-primary flex-1">
-                    Редактировать
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h2 className="text-lg font-semibold mb-4">Редактировать событие</h2>
-                <form onSubmit={handleSave} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Название</label>
-                    <input
-                      type="text"
-                      className="input"
-                      value={draft.title}
-                      onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Описание</label>
-                    <textarea
-                      className="input"
-                      rows={3}
-                      value={draft.description}
-                      onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Место</label>
-                    <input
-                      type="text"
-                      className="input"
-                      value={draft.location}
-                      onChange={(e) => setDraft({ ...draft, location: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Начало</label>
-                      <input
-                        type="datetime-local"
-                        className="input"
-                        value={draft.startsAt}
-                        onChange={(e) => setDraft({ ...draft, startsAt: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Окончание</label>
-                      <input
-                        type="datetime-local"
-                        className="input"
-                        value={draft.endsAt}
-                        onChange={(e) => setDraft({ ...draft, endsAt: e.target.value })}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Тип</label>
-                    <select
-                      className="input"
-                      value={draft.kind}
-                      onChange={(e) => setDraft({ ...draft, kind: e.target.value })}
-                    >
-                      {Object.entries(KIND_LABELS).map(([k, v]) => (
-                        <option key={k} value={k}>{v}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={draft.allDay}
-                      onChange={(e) => setDraft({ ...draft, allDay: e.target.checked })}
-                    />
-                    <span className="text-sm">Весь день</span>
-                  </label>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsEditing(false);
-                        setDraft(null);
-                      }}
-                      className="btn-secondary flex-1"
-                    >
-                      Отмена
-                    </button>
-                    <button type="submit" className="btn-primary flex-1">
-                      Сохранить
-                    </button>
-                  </div>
-                </form>
-              </>
-            )}
+            {eventBody}
           </div>
         </div>
       )}

@@ -9,6 +9,19 @@ const KIND_COLORS: Record<string, string> = {
   HOLIDAY: '#E17055',
 };
 
+const KIND_LABELS: Record<string, string> = {
+  EVENT: 'Событие',
+  MEETING: 'Встреча',
+  DATE: 'Свидание',
+  HOLIDAY: 'Праздник',
+};
+
+function toLocalInput(iso: string) {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function Calendar() {
   const queryClient = useQueryClient();
   const [view, setView] = useState<'month' | 'list'>('month');
@@ -21,6 +34,18 @@ export function Calendar() {
   const [eventLocation, setEventLocation] = useState('');
   const [eventKind, setEventKind] = useState('EVENT');
   const [eventShared, setEventShared] = useState(true);
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState<{
+    title: string;
+    description: string;
+    location: string;
+    startsAt: string;
+    endsAt: string;
+    allDay: boolean;
+    kind: string;
+  } | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -40,6 +65,71 @@ export function Calendar() {
     queryFn: () =>
       api.get<any[]>(`/calendar/tasks?from=${monthStart.toISOString()}&to=${monthEnd.toISOString()}`),
   });
+
+  const selected = selectedId
+    ? events?.find((e: any) => e.id === selectedId) ?? null
+    : null;
+
+  const openEvent = (e: any) => {
+    setSelectedId(e.id);
+    setIsEditing(false);
+    setDraft(null);
+  };
+
+  const startEdit = () => {
+    if (!selected) return;
+    setIsEditing(true);
+    setDraft({
+      title: selected.title,
+      description: selected.description ?? '',
+      location: selected.location ?? '',
+      startsAt: toLocalInput(selected.startsAt),
+      endsAt: toLocalInput(selected.endsAt),
+      allDay: selected.allDay,
+      kind: selected.kind,
+    });
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selected || !draft) return;
+    try {
+      await api.patch(`/calendar/events/${selected.id}`, {
+        title: draft.title,
+        description: draft.description || null,
+        location: draft.location || null,
+        startsAt: new Date(draft.startsAt).toISOString(),
+        endsAt: new Date(draft.endsAt).toISOString(),
+        allDay: draft.allDay,
+        kind: draft.kind,
+      });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      setIsEditing(false);
+      setDraft(null);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selected) return;
+    if (!confirm('Удалить событие?')) return;
+    try {
+      await api.delete(`/calendar/events/${selected.id}`);
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      setSelectedId(null);
+      setIsEditing(false);
+      setDraft(null);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const closeModal = () => {
+    setSelectedId(null);
+    setIsEditing(false);
+    setDraft(null);
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,13 +278,15 @@ export function Calendar() {
                         </div>
                         <div className="space-y-0.5">
                           {dayEvents.slice(0, 1).map((e: any) => (
-                            <div
+                            <button
                               key={e.id}
-                              className="text-[9px] sm:text-xs px-1 py-0.5 rounded truncate text-white"
+                              type="button"
+                              onClick={() => openEvent(e)}
+                              className="w-full text-[9px] sm:text-xs px-1 py-0.5 rounded truncate text-white text-left hover:opacity-80"
                               style={{ backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7' }}
                             >
                               {e.title}
-                            </div>
+                            </button>
                           ))}
                           {dayEvents.length > 1 && (
                             <div className="text-[9px] sm:text-xs theme-muted">+{dayEvents.length - 1}</div>
@@ -222,7 +314,12 @@ export function Calendar() {
         <div className="space-y-2">
           {events?.length ? (
             events.map((e: any) => (
-              <div key={e.id} className="card flex items-center gap-3">
+              <button
+                key={e.id}
+                type="button"
+                onClick={() => openEvent(e)}
+                className="card flex items-center gap-3 w-full text-left theme-hover cursor-pointer"
+              >
                 <div
                   className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7' }}
@@ -237,11 +334,179 @@ export function Calendar() {
                 <div className="text-xs theme-muted flex-shrink-0">
                   {new Date(e.startsAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                 </div>
-              </div>
+              </button>
             ))
           ) : (
             <div className="card text-center py-8 theme-muted">Событий нет</div>
           )}
+        </div>
+      )}
+
+      {/* Event detail / edit modal */}
+      {selected && (
+        <div className="fixed inset-0 overlay flex items-center justify-center z-50" onClick={closeModal}>
+          <div
+            className="theme-surface rounded-card p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!isEditing || !draft ? (
+              <>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: selected.color ?? KIND_COLORS[selected.kind] ?? '#6C5CE7' }}
+                    />
+                    <h2 className="text-lg font-semibold">{selected.title}</h2>
+                  </div>
+                  <button onClick={closeModal} className="theme-muted text-xl leading-none px-1" aria-label="Закрыть">
+                    ×
+                  </button>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <div className="theme-muted text-xs mb-0.5">Когда</div>
+                    <div>
+                      {new Date(selected.startsAt).toLocaleDateString('ru-RU', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                      })}
+                      {!selected.allDay && (
+                        <>
+                          {' · '}
+                          {new Date(selected.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                          {' — '}
+                          {new Date(selected.endsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                        </>
+                      )}
+                      {selected.allDay && ' · Весь день'}
+                    </div>
+                  </div>
+
+                  {selected.location && (
+                    <div>
+                      <div className="theme-muted text-xs mb-0.5">Место</div>
+                      <div>{selected.location}</div>
+                    </div>
+                  )}
+
+                  {selected.description && (
+                    <div>
+                      <div className="theme-muted text-xs mb-0.5">Описание</div>
+                      <div className="whitespace-pre-wrap">{selected.description}</div>
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="theme-muted text-xs mb-0.5">Тип</div>
+                    <div>{KIND_LABELS[selected.kind] ?? selected.kind}</div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <button onClick={handleDelete} className="btn-secondary text-sm text-danger">
+                    Удалить
+                  </button>
+                  <button onClick={startEdit} className="btn-primary flex-1">
+                    Редактировать
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-lg font-semibold mb-4">Редактировать событие</h2>
+                <form onSubmit={handleSave} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Название</label>
+                    <input
+                      type="text"
+                      className="input"
+                      value={draft.title}
+                      onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Описание</label>
+                    <textarea
+                      className="input"
+                      rows={3}
+                      value={draft.description}
+                      onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Место</label>
+                    <input
+                      type="text"
+                      className="input"
+                      value={draft.location}
+                      onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Начало</label>
+                      <input
+                        type="datetime-local"
+                        className="input"
+                        value={draft.startsAt}
+                        onChange={(e) => setDraft({ ...draft, startsAt: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Окончание</label>
+                      <input
+                        type="datetime-local"
+                        className="input"
+                        value={draft.endsAt}
+                        onChange={(e) => setDraft({ ...draft, endsAt: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Тип</label>
+                    <select
+                      className="input"
+                      value={draft.kind}
+                      onChange={(e) => setDraft({ ...draft, kind: e.target.value })}
+                    >
+                      {Object.entries(KIND_LABELS).map(([k, v]) => (
+                        <option key={k} value={k}>{v}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={draft.allDay}
+                      onChange={(e) => setDraft({ ...draft, allDay: e.target.checked })}
+                    />
+                    <span className="text-sm">Весь день</span>
+                  </label>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setDraft(null);
+                      }}
+                      className="btn-secondary flex-1"
+                    >
+                      Отмена
+                    </button>
+                    <button type="submit" className="btn-primary flex-1">
+                      Сохранить
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
         </div>
       )}
 

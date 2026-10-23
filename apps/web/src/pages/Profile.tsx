@@ -64,7 +64,7 @@ export function Profile() {
                 <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </label>
             </div>
-            {uploading && <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Загрузка...</p>}
+            {uploading && <p className="text-sm theme-muted mt-2">Загрузка...</p>}
           </div>
 
           <form onSubmit={handleSave} className="space-y-4">
@@ -107,7 +107,7 @@ export function Profile() {
         {/* Danger zone */}
         <div className="card mt-6 border-danger/30">
           <h3 className="font-semibold mb-3">Выход из аккаунта</h3>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
+          <p className="theme-muted text-sm mb-3">
             Вы выйдете из аккаунта на этом устройстве
           </p>
           <button onClick={logout} className="btn-danger">

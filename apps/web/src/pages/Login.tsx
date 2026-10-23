@@ -62,7 +62,7 @@ export function Login() {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+      <p className="mt-4 text-center text-sm theme-muted">
         Нет аккаунта?{' '}
         <Link to="/register" className="text-primary hover:underline">
           Зарегистрироваться

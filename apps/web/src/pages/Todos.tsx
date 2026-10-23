@@ -118,7 +118,7 @@ export function Todos() {
               key={s.value}
               onClick={() => setAssignee(s.value)}
               className={`px-3 py-1.5 rounded-btn text-sm ${
-                assignee === s.value ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400'
+                assignee === s.value ? 'bg-primary text-white' : 'theme-surface border theme-border theme-muted'
               }`}
             >
               {s.label}
@@ -165,7 +165,7 @@ export function Todos() {
                 className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                   task.status === 'DONE'
                     ? 'bg-success border-success text-white'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-primary'
+                    : 'theme-border hover:border-primary'
                 }`}
               >
                 {task.status === 'DONE' && '✓'}
@@ -175,7 +175,7 @@ export function Todos() {
                 <div className={`font-medium ${task.status === 'DONE' ? 'line-through' : ''}`}>
                   {task.title}
                 </div>
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-2 text-xs theme-muted">
                   {task.dueDate && (
                     <span>Срок: {new Date(task.dueDate).toLocaleDateString('ru-RU')}</span>
                   )}
@@ -205,14 +205,14 @@ export function Todos() {
         </div>
       ) : (
         <div className="card border-dashed text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">Задач нет</p>
+          <p className="theme-muted">Задач нет</p>
         </div>
       )}
 
       {/* Create form modal */}
       {showForm && (
         <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-card p-6 w-full max-w-md">
+          <div className="theme-surface rounded-card p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Новая задача</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -234,7 +234,7 @@ export function Todos() {
                       className={`flex flex-col items-center gap-1 p-3 rounded-btn border-2 text-sm transition-colors ${
                         assigneeChoice === opt.value
                           ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-primary/50'
+                          : 'theme-border theme-muted hover:border-primary/50'
                       }`}
                     >
                       <span className="text-lg">{opt.icon}</span>

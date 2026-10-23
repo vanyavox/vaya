@@ -4,71 +4,74 @@
 
 @layer base {
   body {
-    @apply font-sans antialiased bg-gray-50 text-gray-900;
-  }
-  .dark body {
-    @apply bg-gray-950 text-gray-100;
+    background-color: var(--t-bg);
+    color: var(--t-text);
+    font-family: 'Inter', system-ui, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.15s ease, color 0.15s ease;
   }
 
   input::placeholder,
   textarea::placeholder {
-    @apply text-gray-400;
-  }
-  .dark input::placeholder,
-  .dark textarea::placeholder {
-    @apply text-gray-500;
+    color: var(--t-muted);
+    opacity: 1;
   }
 
-  /* Default border color */
   *,
   ::before,
   ::after {
-    border-color: #e5e7eb;
-  }
-  .dark *,
-  .dark ::before,
-  .dark ::after {
-    border-color: #374151;
+    border-color: var(--t-border);
   }
 }
 
 @layer components {
   /* ── Buttons ─────────────────────────────────────────────────────────── */
   .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-btn font-medium
-           hover:bg-primary-dark transition-colors
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-4 py-2 rounded-btn font-medium transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed text-white;
+    background-color: #6c5ce7;
   }
+  .btn-primary:hover {
+    background-color: #5a4bd1;
+  }
+
   .btn-secondary {
-    @apply border border-gray-300 text-gray-800 px-4 py-2 rounded-btn font-medium
-           transition-colors bg-white hover:bg-gray-50;
+    @apply px-4 py-2 rounded-btn font-medium transition-colors;
+    border: 1px solid var(--t-border);
+    background-color: var(--t-surface);
+    color: var(--t-text);
   }
-  .dark .btn-secondary {
-    @apply border-gray-600 text-gray-200 bg-gray-800 hover:bg-gray-700;
+  .btn-secondary:hover {
+    background-color: var(--t-hover);
   }
+
   .btn-danger {
-    @apply border border-red-300 text-red-600 px-4 py-2 rounded-btn font-medium
-           transition-colors hover:bg-red-50;
+    @apply px-4 py-2 rounded-btn font-medium transition-colors;
+    border: 1px solid #e17055;
+    color: #e17055;
   }
-  .dark .btn-danger {
-    @apply border-red-700 text-red-400 hover:bg-red-950;
+  .btn-danger:hover {
+    background-color: rgba(225, 112, 85, 0.1);
   }
 
   /* ── Inputs ──────────────────────────────────────────────────────────── */
   .input {
-    @apply w-full border border-gray-300 rounded-btn px-3 py-2 text-sm text-gray-900 bg-white
+    @apply w-full rounded-btn px-3 py-2 text-sm transition-colors
            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
-  }
-  .dark .input {
-    @apply border-gray-600 text-gray-100 bg-gray-800;
+    border: 1px solid var(--t-border);
+    background-color: var(--t-input-bg);
+    color: var(--t-text);
   }
 
   /* ── Cards ───────────────────────────────────────────────────────────── */
   .card {
-    @apply border border-gray-200 rounded-card p-5 bg-white shadow-sm;
+    @apply rounded-card p-5 transition-colors;
+    background-color: var(--t-surface);
+    border: 1px solid var(--t-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
-  .dark .card {
-    @apply border-gray-700 bg-gray-800 shadow-none;
+  html.dark .card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
   /* ── Badges ──────────────────────────────────────────────────────────── */
@@ -76,38 +79,44 @@
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
   }
   .badge-primary {
-    @apply bg-primary/10 text-primary;
+    background-color: rgba(108, 92, 231, 0.12);
+    color: #6c5ce7;
   }
   .badge-success {
-    @apply bg-emerald-100 text-emerald-700;
-  }
-  .dark .badge-success {
-    @apply bg-emerald-900 text-emerald-300;
+    background-color: rgba(0, 184, 148, 0.12);
+    color: #00b894;
   }
   .badge-warning {
-    @apply bg-amber-100 text-amber-700;
+    background-color: rgba(253, 203, 110, 0.2);
+    color: #d97706;
   }
-  .dark .badge-warning {
-    @apply bg-amber-900 text-amber-300;
+  html.dark .badge-warning {
+    color: #fbbf24;
   }
   .badge-danger {
-    @apply bg-red-100 text-red-700;
-  }
-  .dark .badge-danger {
-    @apply bg-red-900 text-red-300;
+    background-color: rgba(225, 112, 85, 0.12);
+    color: #e17055;
   }
   .badge-neutral {
-    @apply bg-gray-100 text-gray-600;
-  }
-  .dark .badge-neutral {
-    @apply bg-gray-700 text-gray-300;
+    background-color: var(--t-hover);
+    color: var(--t-muted);
   }
 
   /* ── Overlay ─────────────────────────────────────────────────────────── */
   .overlay {
-    @apply bg-black/40;
+    background-color: rgba(0, 0, 0, 0.4);
   }
-  .dark .overlay {
-    @apply bg-black/60;
+  html.dark .overlay {
+    background-color: rgba(0, 0, 0, 0.6);
   }
 }
+
+/* ── Theme utility classes (override Tailwind bg/text/border) ──────────── */
+/* These use CSS variables and always react to html.dark */
+.theme-bg      { background-color: var(--t-bg); }
+.theme-surface { background-color: var(--t-surface); }
+.theme-border  { border-color: var(--t-border); }
+.theme-text    { color: var(--t-text); }
+.theme-muted   { color: var(--t-muted); }
+.theme-hover:hover { background-color: var(--t-hover); }
+.theme-input   { background-color: var(--t-input-bg); color: var(--t-text); border-color: var(--t-border); }

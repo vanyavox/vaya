@@ -87,7 +87,7 @@ export function Pairing() {
                     </div>
                   )}
                   <span className="mt-2 font-medium">{m.name}</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{m.role === 'OWNER' ? 'Владелец' : 'Партнёр'}</span>
+                  <span className="text-xs theme-muted">{m.role === 'OWNER' ? 'Владелец' : 'Партнёр'}</span>
                 </div>
               ))}
               <div className="text-3xl text-danger">♥</div>
@@ -98,7 +98,7 @@ export function Pairing() {
             <div className="card mt-6">
               <h3 className="font-semibold mb-3">Код приглашения</h3>
               <div className="flex items-center gap-3">
-                <code className="flex-1 p-3 bg-gray-50 dark:bg-gray-950 rounded-btn font-mono text-xl tracking-widest text-center">
+                <code className="flex-1 p-3 theme-bg rounded-btn font-mono text-xl tracking-widest text-center">
                   {couple.inviteCode}
                 </code>
                 <button onClick={handleCopy} className="btn-secondary">
@@ -115,7 +115,7 @@ export function Pairing() {
         <div className="max-w-lg space-y-6">
           <div className="card">
             <h2 className="text-lg font-semibold mb-3">Создать пару</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
+            <p className="theme-muted mb-4">
               Создайте пару и поделитесь кодом с партнёром
             </p>
             <button onClick={handleCreate} className="btn-primary" disabled={loading}>
@@ -125,7 +125,7 @@ export function Pairing() {
 
           <div className="card">
             <h2 className="text-lg font-semibold mb-3">Присоединиться</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
+            <p className="theme-muted mb-4">
               Введите код приглашения от партнёра
             </p>
             <form onSubmit={handleJoin} className="flex gap-3">

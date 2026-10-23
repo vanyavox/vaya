@@ -5,14 +5,14 @@ export function Landing() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen theme-bg">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-8 py-4">
         <div className="text-2xl font-bold text-primary">Vaya</div>
         <div className="flex items-center gap-2">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-btn hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-btn theme-hover transition-colors"
             aria-label="Переключить тему"
           >
             {theme === 'dark' ? '☀️' : '🌙'}
@@ -31,7 +31,7 @@ export function Landing() {
         <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">
           Пространство для <span className="text-primary">вас двоих</span>
         </h1>
-        <p className="text-base sm:text-xl text-gray-500 dark:text-gray-400 mb-8 sm:mb-10 max-w-2xl mx-auto">
+        <p className="text-base sm:text-xl theme-muted mb-8 sm:mb-10 max-w-2xl mx-auto">
           Желания, планы и дела — всё в одном месте для вашей пары.
           Никаких разрозненных заметок и календарей.
         </p>
@@ -51,21 +51,21 @@ export function Landing() {
           <div className="card text-center">
             <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🎁</div>
             <h3 className="text-lg font-semibold mb-2">Списки желаний</h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+            <p className="theme-muted text-sm sm:text-base">
               Личные и общие виш-листы. Партнёр может зарезервировать подарок-сюрприз.
             </p>
           </div>
           <div className="card text-center">
             <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">📅</div>
             <h3 className="text-lg font-semibold mb-2">Общий календарь</h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+            <p className="theme-muted text-sm sm:text-base">
               Встречи, свидания и планы. Подписка на Apple Calendar из коробки.
             </p>
           </div>
           <div className="card text-center">
             <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">✅</div>
             <h3 className="text-lg font-semibold mb-2">Дела по дому</h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+            <p className="theme-muted text-sm sm:text-base">
               Задачи с фильтрами по исполнителю и категории. Всё под контролем.
             </p>
           </div>
@@ -73,7 +73,7 @@ export function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-700 py-6 sm:py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+      <footer className="border-t theme-border py-6 sm:py-8 text-center theme-muted text-sm">
         © 2026 Vaya — пространство для пары
       </footer>
     </div>

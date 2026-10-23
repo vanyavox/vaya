@@ -10,6 +10,13 @@ export function Profile() {
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
 
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -36,6 +43,37 @@ export function Profile() {
       setMessage(err.message ?? 'Ошибка загрузки');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordMessage('');
+    setPasswordError(false);
+
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage('Пароли не совпадают');
+      setPasswordError(true);
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordMessage('Новый пароль — минимум 8 символов');
+      setPasswordError(true);
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      await api.post('/users/me/password', { currentPassword, newPassword });
+      setPasswordMessage('Пароль изменён');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordMessage(err.message ?? 'Ошибка смены пароля');
+      setPasswordError(true);
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -100,6 +138,65 @@ export function Profile() {
 
             <button type="submit" className="btn-primary w-full" disabled={saving}>
               {saving ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </form>
+        </div>
+
+        {/* Change password */}
+        <div className="card mt-6">
+          <h3 className="font-semibold mb-1">Смена пароля</h3>
+          <p className="theme-muted text-sm mb-4">
+            Сменить пароль можете только вы
+          </p>
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Текущий пароль</label>
+              <input
+                type="password"
+                className="input"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Новый пароль</label>
+              <input
+                type="password"
+                className="input"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Повторите новый пароль</label>
+              <input
+                type="password"
+                className="input"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+            </div>
+
+            {passwordMessage && (
+              <div
+                className={`p-2 rounded-btn text-sm ${
+                  passwordError ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'
+                }`}
+              >
+                {passwordMessage}
+              </div>
+            )}
+
+            <button type="submit" className="btn-primary w-full" disabled={changingPassword}>
+              {changingPassword ? 'Сохранение...' : 'Изменить пароль'}
             </button>
           </form>
         </div>

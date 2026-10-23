@@ -12,12 +12,23 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { IsString, MinLength } from 'class-validator';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { CurrentUser, CurrentUserPayload } from '../../common/decorators/current-user.decorator';
+
+class ChangePasswordDto {
+  @IsString()
+  @MinLength(1)
+  currentPassword: string;
+
+  @IsString()
+  @MinLength(8)
+  newPassword: string;
+}
 
 const ALLOWED_MIME = ['image/png', 'image/jpeg', 'image/webp'];
 
@@ -57,6 +68,15 @@ export class UsersController {
     @Body() body: { name?: string; email?: string; timezone?: string },
   ) {
     return this.usersService.updateProfile(user.id, body);
+  }
+
+  @Post('me/password')
+  @ApiOperation({ summary: 'Смена пароля текущего пользователя' })
+  changePassword(
+    @CurrentUser() user: CurrentUserPayload,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.usersService.changePassword(user.id, dto);
   }
 
   @Post('me/avatar')

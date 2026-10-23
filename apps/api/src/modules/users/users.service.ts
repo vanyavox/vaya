@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import * as argon2 from 'argon2';
 import { PrismaService } from '../../prisma/prisma.service';
 import { existsSync, unlinkSync, mkdirSync } from 'fs';
 import { join } from 'path';
@@ -33,6 +34,34 @@ export class UsersService {
       },
     });
     return this.toDto(user);
+  }
+
+  async changePassword(userId: string, data: { currentPassword: string; newPassword: string }) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'User not found' });
+
+    const valid = await argon2.verify(user.passwordHash, data.currentPassword);
+    if (!valid) {
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Current password is incorrect' });
+    }
+
+    if (data.newPassword.length < 8) {
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'New password must be at least 8 characters' });
+    }
+
+    const passwordHash = await argon2.hash(data.newPassword);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    // Invalidate other sessions
+    await this.prisma.refreshToken.updateMany({
+      where: { userId },
+      data: { revokedAt: new Date() },
+    });
+
+    return { success: true };
   }
 
   async setAvatar(userId: string, file: Express.Multer.File) {

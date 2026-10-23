@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
     background-color: var(--t-bg);
     color: var(--t-text);
@@ -15,6 +22,23 @@
   textarea::placeholder {
     color: var(--t-muted);
     opacity: 1;
+  }
+
+  /* Native datetime/date picker icons: color-scheme drives their color.
+     Do NOT invert here — with color-scheme: dark the icons are already light,
+     and filter: invert(1) would flip them back to black. */
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.75;
+    filter: none;
+  }
+  html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+  html.dark input[type="time"]::-webkit-calendar-picker-indicator {
+    opacity: 0.9;
+    filter: none;
   }
 
   *,

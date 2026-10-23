@@ -185,7 +185,7 @@ export function Todos() {
                 </div>
               </div>
 
-              <span className="badge bg-gray-100 text-text-secondary">
+              <span className="badge badge-neutral">
                 {CATEGORY_LABELS[task.category] ?? task.category}
               </span>
 

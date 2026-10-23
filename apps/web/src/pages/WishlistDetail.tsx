@@ -121,7 +121,7 @@ export function WishlistDetail() {
                 <span className={`badge ${STATUS_LABELS[wish.status]?.class ?? 'badge-primary'}`}>
                   {STATUS_LABELS[wish.status]?.label ?? wish.status}
                 </span>
-                <span className="badge bg-gray-100 text-text-secondary">
+                <span className="badge badge-neutral">
                   {PRIORITY_LABELS[wish.priority] ?? wish.priority}
                 </span>
               </div>

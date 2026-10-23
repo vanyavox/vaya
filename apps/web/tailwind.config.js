@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -9,13 +10,14 @@ export default {
           light: '#A29BFE',
           dark: '#5A4BD1',
         },
-        surface: '#FFFFFF',
-        background: '#F8F9FA',
-        border: '#E5E7EB',
+        surface: 'var(--color-surface)',
+        background: 'var(--color-background)',
+        border: 'var(--color-border)',
         text: {
-          DEFAULT: '#1A1A2E',
-          secondary: '#6B7280',
+          DEFAULT: 'var(--color-text)',
+          secondary: 'var(--color-text-secondary)',
         },
+        hover: 'var(--color-hover)',
         success: '#00B894',
         warning: '#FDCB6E',
         danger: '#E17055',

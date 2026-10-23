@@ -47,7 +47,7 @@ export function Wishlists() {
             className={`px-4 py-2 rounded-btn text-sm font-medium transition-colors ${
               scope === s
                 ? 'bg-primary text-white'
-                : 'bg-surface border border-border text-text-secondary hover:bg-gray-50'
+                : 'bg-surface border border-border text-text-secondary hover:bg-hover'
             }`}
           >
             {s === 'all' ? 'Все' : s === 'personal' ? 'Личные' : 'Общие'}

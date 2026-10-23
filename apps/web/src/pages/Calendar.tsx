@@ -174,7 +174,7 @@ export function Calendar() {
                   <div
                     key={i}
                     className={`min-h-[64px] sm:min-h-[100px] border-b border-r border-border p-1 sm:p-2 ${
-                      day ? '' : 'bg-gray-50'
+                      day ? '' : 'bg-hover'
                     }`}
                   >
                     {day && (

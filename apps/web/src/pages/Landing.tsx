@@ -1,19 +1,29 @@
 import { Link } from 'react-router-dom';
+import { useTheme } from '../app/ThemeContext';
 
 export function Landing() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-8 py-4">
         <div className="text-2xl font-bold text-primary">Vaya</div>
-        <nav className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-btn hover:bg-hover transition-colors"
+            aria-label="Переключить тему"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <Link to="/login" className="btn-secondary text-sm sm:text-base px-3 sm:px-4">
             Войти
           </Link>
           <Link to="/register" className="btn-primary text-sm sm:text-base px-3 sm:px-4">
             Начать
           </Link>
-        </nav>
+        </div>
       </header>
 
       {/* Hero */}

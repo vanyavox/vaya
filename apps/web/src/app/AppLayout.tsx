@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { useTheme } from './ThemeContext';
 
 export function AppLayout() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -36,19 +37,28 @@ export function AppLayout() {
         <NavLink to="/app" className="text-xl font-bold text-primary">
           Vaya
         </NavLink>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 -mr-2 rounded-btn hover:bg-gray-100"
-          aria-label="Меню"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {mobileMenuOpen ? (
-              <path d="M6 6l12 12M6 18L18 6" />
-            ) : (
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-btn hover:bg-hover"
+            aria-label="Переключить тему"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 -mr-2 rounded-btn hover:bg-hover"
+            aria-label="Меню"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {mobileMenuOpen ? (
+                <path d="M6 6l12 12M6 18L18 6" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
       </header>
 
       {/* Mobile dropdown menu */}
@@ -62,7 +72,7 @@ export function AppLayout() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-btn text-sm font-medium ${
-                    isActive ? 'bg-primary text-white' : 'text-text hover:bg-gray-50'
+                    isActive ? 'bg-primary text-white' : 'text-text hover:bg-hover'
                   }`
                 }
               >
@@ -98,7 +108,7 @@ export function AppLayout() {
                 `flex items-center gap-3 px-3 py-2 rounded-btn text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-primary text-white'
-                    : 'text-text-secondary hover:bg-gray-50 hover:text-text'
+                    : 'text-text-secondary hover:bg-hover hover:text-text'
                 }`
               }
             >
@@ -112,7 +122,7 @@ export function AppLayout() {
         <div className="p-3 border-t border-border">
           <NavLink
             to="/app/profile"
-            className="flex items-center gap-3 p-2 rounded-btn hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-3 p-2 rounded-btn hover:bg-hover transition-colors"
           >
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
@@ -128,9 +138,15 @@ export function AppLayout() {
           </NavLink>
           <button
             onClick={handleLogout}
-            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn hover:bg-red-50 transition-colors"
+            className="w-full text-left px-3 py-2 text-sm text-danger rounded-btn hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
             Выйти
+          </button>
+          <button
+            onClick={toggleTheme}
+            className="w-full text-left px-3 py-2 text-sm text-text-secondary rounded-btn hover:bg-hover transition-colors flex items-center gap-2"
+          >
+            {theme === 'dark' ? '☀️ Светлая тема' : '🌙 Тёмная тема'}
           </button>
         </div>
       </aside>

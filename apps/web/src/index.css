@@ -2,9 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme variables ─────────────────────────────────────────────────────── */
+:root {
+  --color-surface: #ffffff;
+  --color-background: #f8f9fa;
+  --color-border: #e5e7eb;
+  --color-text: #1a1a2e;
+  --color-text-secondary: #6b7280;
+  --color-hover: #f3f4f6;
+  --color-input-bg: #ffffff;
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dark {
+  --color-surface: #1e1e2e;
+  --color-background: #12121c;
+  --color-border: #2e2e42;
+  --color-text: #e8e8f0;
+  --color-text-secondary: #9ca3af;
+  --color-hover: #2a2a3c;
+  --color-input-bg: #252536;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 @layer base {
   body {
     @apply bg-background text-text font-sans antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
@@ -16,19 +42,30 @@
   }
   .btn-secondary {
     @apply border border-border text-text px-4 py-2 rounded-btn font-medium
-           hover:bg-gray-50 transition-colors;
+           transition-colors;
+    &:hover {
+      background-color: var(--color-hover);
+    }
   }
   .btn-danger {
     @apply border border-danger text-danger px-4 py-2 rounded-btn font-medium
-           hover:bg-red-50 transition-colors;
+           transition-colors;
+    &:hover {
+      background-color: color-mix(in srgb, var(--color-danger, #e17055) 10%, transparent);
+    }
   }
   .input {
-    @apply w-full border border-border rounded-btn px-3 py-2 text-sm
-           focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
-           placeholder:text-text-secondary;
+    @apply w-full border border-border rounded-btn px-3 py-2 text-sm text-text
+           focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+    background-color: var(--color-input-bg);
+    &::placeholder {
+      @apply text-text-secondary;
+    }
   }
   .card {
-    @apply bg-surface border border-border rounded-card p-5;
+    @apply border border-border rounded-card p-5;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-card);
   }
   .badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
@@ -40,9 +77,17 @@
     @apply bg-success/10 text-success;
   }
   .badge-warning {
-    @apply bg-warning/20 text-yellow-700;
+    @apply text-yellow-700;
+    background-color: color-mix(in srgb, #fdcb6e 20%, transparent);
+    .dark & {
+      @apply text-yellow-300;
+    }
   }
   .badge-danger {
     @apply bg-danger/10 text-danger;
+  }
+  .badge-neutral {
+    @apply text-text-secondary;
+    background-color: var(--color-hover);
   }
 }

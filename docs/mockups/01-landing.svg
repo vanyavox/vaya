@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <title>Vaya — Landing page</title>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Page title -->
+  <text x="40" y="36" font-size="13" fill="#6B7280" letter-spacing="1">01 · Landing</text>
+
+  <!-- Header -->
+  <rect x="0" y="56" width="1440" height="72" fill="#FFFFFF"/>
+  <line x1="0" y1="128" x2="1440" y2="128" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Logo -->
+  <rect x="80" y="80" width="28" height="28" rx="8" fill="#6C5CE7"/>
+  <text x="94" y="99" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">V</text>
+  <text x="118" y="100" font-size="22" font-weight="700" fill="#1A1A2E">Vaya</text>
+
+  <!-- Nav links -->
+  <text x="560" y="98" font-size="15" fill="#1A1A2E">Возможности</text>
+  <text x="700" y="98" font-size="15" fill="#1A1A2E">Тарифы</text>
+
+  <!-- Header buttons -->
+  <rect x="1180" y="76" width="90" height="40" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="1225" y="101" font-size="14" font-weight="600" fill="#1A1A2E" text-anchor="middle">Войти</text>
+
+  <rect x="1286" y="76" width="90" height="40" rx="8" fill="#6C5CE7"/>
+  <text x="1331" y="101" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">Начать</text>
+
+  <!-- Hero -->
+  <text x="720" y="250" font-size="52" font-weight="700" fill="#1A1A2E" text-anchor="middle">Пространство для вас двоих</text>
+  <text x="720" y="302" font-size="20" fill="#6B7280" text-anchor="middle">Желания, планы и дела — всё в одном месте для вашей пары</text>
+
+  <!-- Hero CTAs -->
+  <rect x="560" y="350" width="180" height="52" rx="8" fill="#6C5CE7"/>
+  <text x="650" y="382" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">Начать бесплатно</text>
+
+  <rect x="760" y="350" width="160" height="52" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="840" y="382" font-size="16" font-weight="600" fill="#1A1A2E" text-anchor="middle">Узнать больше</text>
+
+  <!-- Feature cards -->
+  <!-- Card 1 -->
+  <rect x="160" y="470" width="350" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="212" cy="530" r="24" fill="#EDEBFF"/>
+  <path d="M204 530 l6 6 l12 -14" stroke="#6C5CE7" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="192" y="592" font-size="20" font-weight="600" fill="#1A1A2E">Списки желаний</text>
+  <text x="192" y="628" font-size="15" fill="#6B7280">Делитесь мечтами и отмечайте</text>
+  <text x="192" y="652" font-size="15" fill="#6B7280">подарки друг для друга</text>
+
+  <!-- Card 2 -->
+  <rect x="545" y="470" width="350" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="597" cy="530" r="24" fill="#EDEBFF"/>
+  <rect x="587" y="520" width="20" height="18" rx="3" stroke="#6C5CE7" stroke-width="2" fill="none"/>
+  <line x1="587" y1="526" x2="607" y2="526" stroke="#6C5CE7" stroke-width="2"/>
+  <line x1="592" y1="516" x2="592" y2="522" stroke="#6C5CE7" stroke-width="2" stroke-linecap="round"/>
+  <line x1="602" y1="516" x2="602" y2="522" stroke="#6C5CE7" stroke-width="2" stroke-linecap="round"/>
+  <text x="577" y="592" font-size="20" font-weight="600" fill="#1A1A2E">Общий календарь</text>
+  <text x="577" y="628" font-size="15" fill="#6B7280">Планируйте встречи, даты</text>
+  <text x="577" y="652" font-size="15" fill="#6B7280">и важные события вместе</text>
+
+  <!-- Card 3 -->
+  <rect x="930" y="470" width="350" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="982" cy="530" r="24" fill="#EDEBFF"/>
+  <rect x="972" y="522" width="20" height="16" rx="2" stroke="#6C5CE7" stroke-width="2" fill="none"/>
+  <line x1="976" y1="528" x2="988" y2="528" stroke="#6C5CE7" stroke-width="1.5"/>
+  <line x1="976" y1="533" x2="988" y2="533" stroke="#6C5CE7" stroke-width="1.5"/>
+  <text x="962" y="592" font-size="20" font-weight="600" fill="#1A1A2E">Дела по дому</text>
+  <text x="962" y="628" font-size="15" fill="#6B7280">Делите быт справедливо</text>
+  <text x="962" y="652" font-size="15" fill="#6B7280">и следите за выполнением</text>
+
+  <!-- Footer -->
+  <line x1="0" y1="790" x2="1440" y2="790" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="80" y="838" font-size="14" fill="#6B7280">© 2026 Vaya</text>
+  <text x="1100" y="838" font-size="14" fill="#6B7280">Конфиденциальность</text>
+  <text x="1240" y="838" font-size="14" fill="#6B7280">Условия</text>
+  <text x="1330" y="838" font-size="14" fill="#6B7280">Поддержка</text>
+</svg>

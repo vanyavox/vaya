@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <title>Vaya — Связка пары</title>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Page title -->
+  <text x="280" y="36" font-size="13" fill="#6B7280" letter-spacing="1">06 · Связка пары</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="240" height="900" fill="#FFFFFF"/>
+  <line x1="240" y1="0" x2="240" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Logo -->
+  <rect x="24" y="28" width="32" height="32" rx="9" fill="#6C5CE7"/>
+  <text x="40" y="50" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">V</text>
+  <text x="66" y="51" font-size="20" font-weight="700" fill="#1A1A2E">Vaya</text>
+
+  <!-- Nav items -->
+  <rect x="32" y="110" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="60" y="124" font-size="15" fill="#6B7280">Дашборд</text>
+
+  <rect x="32" y="166" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="60" y="180" font-size="15" fill="#6B7280">Желания</text>
+
+  <rect x="32" y="218" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <line x1="32" y1="224" x2="48" y2="224" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="60" y="232" font-size="15" fill="#6B7280">Календарь</text>
+
+  <rect x="32" y="270" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <path d="M35 278 l3 3 l6 -7" stroke="#6B7280" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <text x="60" y="284" font-size="15" fill="#6B7280">Дела</text>
+
+  <!-- Настройки (active - pairing lives under settings) -->
+  <rect x="16" y="308" width="208" height="44" rx="8" fill="#EDEBFF"/>
+  <rect x="32" y="322" width="16" height="16" rx="3" fill="#6C5CE7"/>
+  <text x="60" y="336" font-size="15" font-weight="600" fill="#6C5CE7">Настройки</text>
+
+  <!-- User at bottom -->
+  <line x1="16" y1="820" x2="224" y2="820" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="48" cy="856" r="18" fill="#A29BFE"/>
+  <text x="48" y="861" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">А</text>
+  <text x="76" y="852" font-size="14" font-weight="600" fill="#1A1A2E">Аня</text>
+  <text x="76" y="870" font-size="12" fill="#6B7280">аня@email.com</text>
+
+  <!-- Header -->
+  <text x="280" y="72" font-size="28" font-weight="700" fill="#1A1A2E">Связка пары</text>
+  <text x="280" y="100" font-size="15" fill="#6B7280">Подключите партнёра к общему пространству</text>
+
+  <!-- Left card: Ваша пара (paired state shown) -->
+  <rect x="280" y="130" width="540" height="320" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="304" y="172" font-size="20" font-weight="600" fill="#1A1A2E">Ваша пара</text>
+
+  <!-- Two avatars connected by heart -->
+  <circle cx="420" cy="270" r="48" fill="#A29BFE"/>
+  <text x="420" y="282" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">А</text>
+
+  <!-- Heart -->
+  <path d="M522 262 c10 -18 38 -18 38 4 c0 18 -24 32 -38 42 c-14 -10 -38 -24 -38 -42 c0 -22 28 -22 38 -4 z" fill="#E17055"/>
+  <line x1="470" y1="270" x2="500" y2="270" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="4 3"/>
+  <line x1="544" y1="270" x2="574" y2="270" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="4 3"/>
+
+  <circle cx="620" cy="270" r="48" fill="#6C5CE7"/>
+  <text x="620" y="282" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">М</text>
+
+  <text x="420" y="348" font-size="15" font-weight="600" fill="#1A1A2E" text-anchor="middle">Аня</text>
+  <text x="620" y="348" font-size="15" font-weight="600" fill="#1A1A2E" text-anchor="middle">Максим</text>
+
+  <!-- Status -->
+  <rect x="460" y="372" width="120" height="30" rx="15" fill="#E6F8F3"/>
+  <text x="520" y="392" font-size="13" font-weight="600" fill="#00B894" text-anchor="middle">Вы в паре</text>
+
+  <!-- Right card: Присоединиться -->
+  <rect x="850" y="130" width="530" height="320" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="874" y="172" font-size="20" font-weight="600" fill="#1A1A2E">Присоединиться</text>
+  <text x="874" y="202" font-size="15" fill="#6B7280">Введите код приглашения от партнёра</text>
+
+  <!-- Invite code input -->
+  <text x="874" y="252" font-size="13" font-weight="600" fill="#1A1A2E">Код приглашения</text>
+  <rect x="874" y="266" width="482" height="52" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="894" y="298" font-size="18" font-family="'JetBrains Mono', 'SF Mono', Menlo, monospace" fill="#6B7280" letter-spacing="2">XXXXXXXX</text>
+
+  <!-- Join button -->
+  <rect x="874" y="342" width="220" height="48" rx="8" fill="#6C5CE7"/>
+  <text x="984" y="372" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle">Присоединиться</text>
+
+  <!-- Hint -->
+  <text x="874" y="418" font-size="13" fill="#6B7280">Код состоит из 8 символов</text>
+
+  <!-- Below: Ваш код приглашения -->
+  <rect x="280" y="480" width="1100" height="220" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="304" y="522" font-size="20" font-weight="600" fill="#1A1A2E">Ваш код приглашения</text>
+
+  <!-- Big monospace code -->
+  <rect x="304" y="550" width="620" height="80" rx="10" fill="#F8F9FA" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="614" y="600" font-size="36" font-family="'JetBrains Mono', 'SF Mono', Menlo, monospace" font-weight="700" fill="#1A1A2E" text-anchor="middle" letter-spacing="4">VAYA-2026</text>
+
+  <!-- Copy button -->
+  <rect x="950" y="550" width="180" height="48" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="1040" y="580" font-size="15" font-weight="600" fill="#1A1A2E" text-anchor="middle">Скопировать</text>
+
+  <!-- Regenerate button -->
+  <rect x="950" y="610" width="180" height="48" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="1.5"/>
+  <text x="1040" y="640" font-size="15" font-weight="600" fill="#6C5CE7" text-anchor="middle">Сгенерировать</text>
+
+  <!-- Info text -->
+  <text x="304" y="676" font-size="14" fill="#6B7280">Поделитесь кодом с партнёром, чтобы начать совместное пространство</text>
+
+  <!-- Empty / not-paired alternative hint -->
+  <rect x="280" y="730" width="1100" height="70" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="6 4"/>
+  <text x="830" y="772" font-size="14" fill="#6B7280" text-anchor="middle">Состояние «не в паре»: вместо аватаров — кнопка «Создать пару»</text>
+</svg>

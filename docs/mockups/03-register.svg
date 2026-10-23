@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <title>Vaya — Регистрация</title>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Page title -->
+  <text x="40" y="36" font-size="13" fill="#6B7280" letter-spacing="1">03 · Регистрация</text>
+
+  <!-- Logo above card -->
+  <rect x="682" y="78" width="36" height="36" rx="10" fill="#6C5CE7"/>
+  <text x="700" y="103" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">V</text>
+  <text x="728" y="105" font-size="28" font-weight="700" fill="#1A1A2E">Vaya</text>
+
+  <!-- Card -->
+  <rect x="520" y="150" width="400" height="640" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="720" y="210" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">Создать аккаунт</text>
+  <text x="720" y="242" font-size="15" fill="#6B7280" text-anchor="middle">Начните совместное пространство</text>
+
+  <!-- Name field -->
+  <text x="552" y="288" font-size="13" font-weight="600" fill="#1A1A2E">Имя</text>
+  <rect x="552" y="300" width="336" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="568" y="329" font-size="15" fill="#6B7280">Аня</text>
+
+  <!-- Email field -->
+  <text x="552" y="378" font-size="13" font-weight="600" fill="#1A1A2E">Email</text>
+  <rect x="552" y="390" width="336" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="568" y="419" font-size="15" fill="#6B7280">you@email.com</text>
+
+  <!-- Password field -->
+  <text x="552" y="468" font-size="13" font-weight="600" fill="#1A1A2E">Пароль</text>
+  <rect x="552" y="480" width="336" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="568" y="509" font-size="15" fill="#6B7280">••••••••</text>
+  <ellipse cx="858" cy="503" rx="9" ry="6" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <circle cx="858" cy="503" r="2.5" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+
+  <!-- Confirm password field -->
+  <text x="552" y="558" font-size="13" font-weight="600" fill="#1A1A2E">Подтверждение пароля</text>
+  <rect x="552" y="570" width="336" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="568" y="599" font-size="15" fill="#6B7280">••••••••</text>
+  <ellipse cx="858" cy="593" rx="9" ry="6" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <circle cx="858" cy="593" r="2.5" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+
+  <!-- Primary button -->
+  <rect x="552" y="645" width="336" height="48" rx="8" fill="#6C5CE7"/>
+  <text x="720" y="675" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">Зарегистрироваться</text>
+
+  <!-- Link -->
+  <text x="720" y="730" font-size="14" fill="#6B7280" text-anchor="middle">Уже есть аккаунт?</text>
+  <text x="828" y="730" font-size="14" font-weight="600" fill="#6C5CE7">Войти</text>
+</svg>

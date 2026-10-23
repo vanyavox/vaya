@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="240" height="900" fill="#FFFFFF"/>
+  <line x1="240" y1="0" x2="240" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Logo -->
+  <rect x="24" y="28" width="36" height="36" rx="10" fill="#6C5CE7"/>
+  <circle cx="42" cy="46" r="8" fill="#FFFFFF" opacity="0.9"/>
+  <text x="72" y="52" font-size="20" font-weight="600" fill="#1A1A2E">Vaya</text>
+
+  <!-- Nav -->
+  <rect x="16" y="100" width="208" height="44" rx="8" fill="#F3F0FF"/>
+  <circle cx="40" cy="122" r="8" fill="#6C5CE7"/>
+  <text x="64" y="128" font-size="15" font-weight="500" fill="#6C5CE7">Дашборд</text>
+
+  <rect x="16" y="152" width="208" height="44" rx="8" fill="#6C5CE7"/>
+  <circle cx="40" cy="174" r="8" fill="#FFFFFF"/>
+  <text x="64" y="180" font-size="15" font-weight="500" fill="#FFFFFF">Желания</text>
+
+  <circle cx="40" cy="226" r="8" fill="#6B7280"/>
+  <text x="64" y="232" font-size="15" fill="#6B7280">Календарь</text>
+
+  <circle cx="40" cy="278" r="8" fill="#6B7280"/>
+  <text x="64" y="284" font-size="15" fill="#6B7280">Дела</text>
+
+  <circle cx="40" cy="330" r="8" fill="#6B7280"/>
+  <text x="64" y="336" font-size="15" fill="#6B7280">Настройки</text>
+
+  <!-- User -->
+  <line x1="16" y1="820" x2="224" y2="820" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="48" cy="860" r="20" fill="#A29BFE"/>
+  <text x="48" y="865" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">АК</text>
+  <text x="80" y="856" font-size="14" font-weight="500" fill="#1A1A2E">Анна К.</text>
+  <text x="80" y="874" font-size="12" fill="#6B7280">В паре с Ильей</text>
+
+  <!-- Header -->
+  <text x="280" y="64" font-size="28" font-weight="600" fill="#1A1A2E">Мои желания</text>
+  <text x="280" y="90" font-size="14" fill="#6B7280">Управляйте списками желаний в паре</text>
+
+  <!-- Primary button -->
+  <rect x="1220" y="36" width="180" height="44" rx="8" fill="#6C5CE7"/>
+  <text x="1310" y="63" font-size="15" font-weight="500" fill="#FFFFFF" text-anchor="middle">+ Новый список</text>
+
+  <!-- Tabs -->
+  <rect x="280" y="120" width="340" height="44" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="284" y="124" width="108" height="36" rx="8" fill="#6C5CE7"/>
+  <text x="338" y="147" font-size="14" font-weight="500" fill="#FFFFFF" text-anchor="middle">Личные</text>
+  <text x="446" y="147" font-size="14" fill="#6B7280" text-anchor="middle">Общие</text>
+  <text x="554" y="147" font-size="14" fill="#6B7280" text-anchor="middle">Все</text>
+
+  <!-- Card 1 -->
+  <rect x="280" y="196" width="356" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <!-- icon -->
+  <rect x="304" y="220" width="44" height="44" rx="10" fill="#F3F0FF"/>
+  <circle cx="326" cy="242" r="10" fill="#6C5CE7"/>
+  <!-- badge -->
+  <rect x="530" y="228" width="82" height="28" rx="14" fill="#EDEBFF"/>
+  <text x="571" y="246" font-size="12" font-weight="500" fill="#6C5CE7" text-anchor="middle">Общий</text>
+  <text x="304" y="296" font-size="18" font-weight="600" fill="#1A1A2E">День рождения</text>
+  <text x="304" y="322" font-size="13" fill="#6B7280">Подарки на день рождения для</text>
+  <text x="304" y="342" font-size="13" fill="#6B7280">друг друга и друзей</text>
+  <!-- stats -->
+  <text x="304" y="378" font-size="13" fill="#6B7280">5 желаний</text>
+  <rect x="388" y="362" width="132" height="26" rx="13" fill="#FDF6E3"/>
+  <text x="454" y="379" font-size="12" fill="#B7791F" text-anchor="middle">2 зарезервировано</text>
+  <!-- partner avatars -->
+  <circle cx="320" cy="408" r="16" fill="#A29BFE"/>
+  <text x="320" y="413" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">АК</text>
+  <circle cx="344" cy="408" r="16" fill="#6C5CE7" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="344" y="413" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">ИС</text>
+
+  <!-- Card 2 -->
+  <rect x="660" y="196" width="356" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="684" y="220" width="44" height="44" rx="10" fill="#E8F8F5"/>
+  <circle cx="706" cy="242" r="10" fill="#00B894"/>
+  <rect x="912" y="228" width="80" height="28" rx="14" fill="#F3F4F6"/>
+  <text x="952" y="246" font-size="12" font-weight="500" fill="#6B7280" text-anchor="middle">Личный</text>
+  <text x="684" y="296" font-size="18" font-weight="600" fill="#1A1A2E">На Новый год</text>
+  <text x="684" y="322" font-size="13" fill="#6B7280">Список подарков и идей для</text>
+  <text x="684" y="342" font-size="13" fill="#6B7280">новогодних праздников</text>
+  <text x="684" y="378" font-size="13" fill="#6B7280">8 желаний</text>
+  <circle cx="700" cy="408" r="16" fill="#A29BFE"/>
+  <text x="700" y="413" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">АК</text>
+
+  <!-- Card 3 -->
+  <rect x="1040" y="196" width="356" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="1064" y="220" width="44" height="44" rx="10" fill="#FDF6E3"/>
+  <circle cx="1086" cy="242" r="10" fill="#FDCB6E"/>
+  <rect x="1292" y="228" width="82" height="28" rx="14" fill="#EDEBFF"/>
+  <text x="1333" y="246" font-size="12" font-weight="500" fill="#6C5CE7" text-anchor="middle">Общий</text>
+  <text x="1064" y="296" font-size="18" font-weight="600" fill="#1A1A2E">Мечты о путешествии</text>
+  <text x="1064" y="322" font-size="13" fill="#6B7280">Места, куда хотим поехать</text>
+  <text x="1064" y="342" font-size="13" fill="#6B7280">вместе в ближайший год</text>
+  <text x="1064" y="378" font-size="13" fill="#6B7280">3 желания</text>
+  <circle cx="1080" cy="408" r="16" fill="#A29BFE"/>
+  <text x="1080" y="413" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">АК</text>
+  <circle cx="1104" cy="408" r="16" fill="#6C5CE7" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="1104" y="413" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">ИС</text>
+
+  <!-- Empty state callout -->
+  <rect x="280" y="476" width="1116" height="140" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-dasharray="8 6"/>
+  <circle cx="360" cy="546" r="28" fill="#F3F0FF"/>
+  <text x="360" y="554" font-size="22" fill="#6C5CE7" text-anchor="middle">+</text>
+  <text x="412" y="538" font-size="16" font-weight="600" fill="#1A1A2E">Создайте первый список желаний</text>
+  <text x="412" y="564" font-size="14" fill="#6B7280">Собирайте идеи подарков и делитесь ими с партнёром</text>
+  <rect x="412" y="580" width="160" height="36" rx="8" fill="#6C5CE7"/>
+  <text x="492" y="603" font-size="13" font-weight="500" fill="#FFFFFF" text-anchor="middle">Создать список</text>
+</svg>

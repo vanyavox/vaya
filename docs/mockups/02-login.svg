@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <title>Vaya — Вход</title>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Page title -->
+  <text x="40" y="36" font-size="13" fill="#6B7280" letter-spacing="1">02 · Вход</text>
+
+  <!-- Logo above card -->
+  <rect x="682" y="148" width="36" height="36" rx="10" fill="#6C5CE7"/>
+  <text x="700" y="173" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">V</text>
+  <text x="728" y="175" font-size="28" font-weight="700" fill="#1A1A2E">Vaya</text>
+
+  <!-- Card -->
+  <rect x="520" y="230" width="400" height="470" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="720" y="290" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">С возвращением</text>
+  <text x="720" y="322" font-size="15" fill="#6B7280" text-anchor="middle">Войдите в свой аккаунт</text>
+
+  <!-- Email field -->
+  <text x="552" y="368" font-size="13" font-weight="600" fill="#1A1A2E">Email</text>
+  <rect x="552" y="380" width="336" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="568" y="409" font-size="15" fill="#6B7280">you@email.com</text>
+
+  <!-- Password field -->
+  <text x="552" y="458" font-size="13" font-weight="600" fill="#1A1A2E">Пароль</text>
+  <rect x="552" y="470" width="336" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="568" y="499" font-size="15" fill="#6B7280">••••••••</text>
+  <!-- Eye icon -->
+  <ellipse cx="858" cy="493" rx="9" ry="6" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <circle cx="858" cy="493" r="2.5" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+
+  <!-- Primary button -->
+  <rect x="552" y="540" width="336" height="48" rx="8" fill="#6C5CE7"/>
+  <text x="720" y="570" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">Войти</text>
+
+  <!-- Link -->
+  <text x="720" y="620" font-size="14" fill="#6B7280" text-anchor="middle">Нет аккаунта?</text>
+  <text x="818" y="620" font-size="14" font-weight="600" fill="#6C5CE7">Зарегистрироваться</text>
+
+  <!-- Error slot -->
+  <rect x="552" y="645" width="336" height="36" rx="8" fill="#FFF5F3" stroke="#E17055" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="720" y="668" font-size="12" fill="#E17055" text-anchor="middle" font-style="italic">ошибка авторизации</text>
+</svg>

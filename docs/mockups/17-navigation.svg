@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <style>
+      text { font-family: Inter, Arial, sans-serif; fill: #1A1A2E; }
+      .muted { fill: #6B7280; }
+      .white { fill: #FFFFFF; }
+      .primary { fill: #6C5CE7; }
+      .danger { fill: #E17055; }
+      .annotation { fill: #6B7280; font-size: 13px; }
+    </style>
+  </defs>
+
+  <!-- Light gray canvas -->
+  <rect x="0" y="0" width="1440" height="900" fill="#F3F4F6"/>
+
+  <!-- Page title -->
+  <text x="48" y="52" font-size="22" font-weight="700">Навигация — состояния</text>
+  <text x="48" y="78" font-size="14" class="muted">Компонент сайдбара и пользовательского меню</text>
+
+  <!-- ============ SIDEBAR COMPONENT (isolated) ============ -->
+  <!-- Container shadow-ish border -->
+  <rect x="80" y="110" width="240" height="700" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+
+  <!-- Logo -->
+  <rect x="104" y="138" width="32" height="32" rx="8" fill="#6C5CE7"/>
+  <text x="148" y="161" font-size="20" font-weight="700" class="primary">Vaya</text>
+
+  <!-- Nav item: Дашборд — default -->
+  <rect x="96" y="210" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="108" y="222" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="140" y="239" font-size="15" class="muted">Дашборд</text>
+
+  <!-- Nav item: Желания — hover (light purple bg) -->
+  <rect x="96" y="262" width="208" height="44" rx="8" fill="#EDE9FE"/>
+  <rect x="108" y="274" width="20" height="20" rx="5" fill="#A29BFE"/>
+  <text x="140" y="291" font-size="15" class="primary">Желания</text>
+
+  <!-- Nav item: Календарь — active (purple bg, white) -->
+  <rect x="96" y="314" width="208" height="44" rx="8" fill="#6C5CE7"/>
+  <rect x="108" y="326" width="20" height="20" rx="5" fill="#FFFFFF" opacity="0.35"/>
+  <text x="140" y="343" font-size="15" class="white" font-weight="600">Календарь</text>
+
+  <!-- Nav item: Дела — default -->
+  <rect x="96" y="366" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="108" y="378" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="140" y="395" font-size="15" class="muted">Дела</text>
+
+  <!-- Nav item: Настройки — default -->
+  <rect x="96" y="418" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="108" y="430" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="140" y="447" font-size="15" class="muted">Настройки</text>
+
+  <!-- User section at bottom -->
+  <line x1="96" y1="740" x2="304" y2="740" stroke="#E5E7EB"/>
+  <circle cx="128" cy="778" r="18" fill="#A29BFE"/>
+  <text x="128" y="783" font-size="13" text-anchor="middle" class="white" font-weight="600">А</text>
+  <text x="158" y="783" font-size="14" font-weight="600">Аня</text>
+  <text x="290" y="783" font-size="12" class="muted">⌄</text>
+
+  <!-- ============ ANNOTATIONS (left, pointing at nav items) ============ -->
+
+  <!-- Default annotation → Дашборд -->
+  <line x1="340" y1="232" x2="400" y2="232" stroke="#9CA3AF" stroke-width="1.5"/>
+  <path d="M400 232 L392 228 L392 236 Z" fill="#9CA3AF"/>
+  <text x="412" y="237" class="annotation">Default</text>
+
+  <!-- Hover annotation → Желания -->
+  <line x1="340" y1="284" x2="400" y2="284" stroke="#9CA3AF" stroke-width="1.5"/>
+  <path d="M400 284 L392 280 L392 288 Z" fill="#9CA3AF"/>
+  <text x="412" y="289" class="annotation">Hover</text>
+
+  <!-- Active annotation → Календарь -->
+  <line x1="340" y1="336" x2="400" y2="336" stroke="#9CA3AF" stroke-width="1.5"/>
+  <path d="M400 336 L392 332 L392 340 Z" fill="#9CA3AF"/>
+  <text x="412" y="341" class="annotation">Active</text>
+
+  <!-- ============ DROPDOWN MENU (floating card, right side) ============ -->
+  <!-- Anchored near user section — shown open on right side of canvas -->
+  <rect x="720" y="200" width="320" height="340" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <!-- soft shadow via slightly larger offset rect behind -->
+  <rect x="716" y="204" width="328" height="348" rx="14" fill="#1A1A2E" opacity="0.04"/>
+
+  <!-- User info header -->
+  <circle cx="760" cy="248" r="24" fill="#A29BFE"/>
+  <text x="760" y="254" font-size="15" text-anchor="middle" class="white" font-weight="600">А</text>
+  <text x="798" y="242" font-size="16" font-weight="600">Аня</text>
+  <text x="798" y="264" font-size="13" class="muted">anya@vaya.app</text>
+
+  <line x1="720" y1="288" x2="1040" y2="288" stroke="#E5E7EB"/>
+
+  <!-- Menu item: Профиль -->
+  <rect x="736" y="300" width="288" height="40" rx="8" fill="#FFFFFF"/>
+  <rect x="752" y="312" width="16" height="16" rx="4" fill="#E5E7EB"/>
+  <text x="780" y="325" font-size="14">Профиль</text>
+
+  <!-- Menu item: Связка пары -->
+  <rect x="736" y="348" width="288" height="40" rx="8" fill="#FFFFFF"/>
+  <rect x="752" y="360" width="16" height="16" rx="4" fill="#E5E7EB"/>
+  <text x="780" y="373" font-size="14">Связка пары</text>
+
+  <!-- Menu item: Настройки календаря -->
+  <rect x="736" y="396" width="288" height="40" rx="8" fill="#FFFFFF"/>
+  <rect x="752" y="408" width="16" height="16" rx="4" fill="#E5E7EB"/>
+  <text x="780" y="421" font-size="14">Настройки календаря</text>
+
+  <!-- Separator -->
+  <line x1="736" y1="452" x2="1024" y2="452" stroke="#E5E7EB"/>
+
+  <!-- Menu item: Выйти (danger) -->
+  <rect x="736" y="468" width="288" height="40" rx="8" fill="#FFFFFF"/>
+  <rect x="752" y="480" width="16" height="16" rx="4" fill="#E17055" opacity="0.35"/>
+  <text x="780" y="493" font-size="14" class="danger">Выйти</text>
+
+  <!-- Dropdown annotation -->
+  <line x1="720" y1="220" x2="660" y2="220" stroke="#9CA3AF" stroke-width="1.5"/>
+  <path d="M660 220 L668 216 L668 224 Z" fill="#9CA3AF"/>
+  <text x="520" y="225" class="annotation">Dropdown menu</text>
+
+  <!-- Optional connector: dropdown originates from user section -->
+  <path d="M304 778 C 480 778, 560 400, 720 360" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="6 4"/>
+</svg>

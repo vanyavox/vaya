@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="240" height="900" fill="#FFFFFF"/>
+  <line x1="240" y1="0" x2="240" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Logo -->
+  <rect x="24" y="28" width="36" height="36" rx="10" fill="#6C5CE7"/>
+  <circle cx="42" cy="46" r="8" fill="#FFFFFF" opacity="0.9"/>
+  <text x="72" y="52" font-size="20" font-weight="600" fill="#1A1A2E">Vaya</text>
+
+  <!-- Nav -->
+  <circle cx="40" cy="122" r="8" fill="#6B7280"/>
+  <text x="64" y="128" font-size="15" fill="#6B7280">Дашборд</text>
+
+  <circle cx="40" cy="174" r="8" fill="#6B7280"/>
+  <text x="64" y="180" font-size="15" fill="#6B7280">Желания</text>
+
+  <rect x="16" y="204" width="208" height="44" rx="8" fill="#6C5CE7"/>
+  <circle cx="40" cy="226" r="8" fill="#FFFFFF"/>
+  <text x="64" y="232" font-size="15" font-weight="500" fill="#FFFFFF">Календарь</text>
+
+  <circle cx="40" cy="278" r="8" fill="#6B7280"/>
+  <text x="64" y="284" font-size="15" fill="#6B7280">Дела</text>
+
+  <circle cx="40" cy="330" r="8" fill="#6B7280"/>
+  <text x="64" y="336" font-size="15" fill="#6B7280">Настройки</text>
+
+  <!-- User -->
+  <line x1="16" y1="820" x2="224" y2="820" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="48" cy="860" r="20" fill="#A29BFE"/>
+  <text x="48" y="865" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">АК</text>
+  <text x="80" y="856" font-size="14" font-weight="500" fill="#1A1A2E">Анна К.</text>
+  <text x="80" y="874" font-size="12" fill="#6B7280">В паре с Ильей</text>
+
+  <!-- Header -->
+  <text x="280" y="64" font-size="28" font-weight="600" fill="#1A1A2E">Календарь</text>
+
+  <!-- View switcher -->
+  <rect x="280" y="88" width="280" height="40" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="284" y="92" width="90" height="32" rx="8" fill="#6C5CE7"/>
+  <text x="329" y="113" font-size="13" font-weight="500" fill="#FFFFFF" text-anchor="middle">Месяц</text>
+  <text x="419" y="113" font-size="13" fill="#6B7280" text-anchor="middle">Неделя</text>
+  <text x="509" y="113" font-size="13" fill="#6B7280" text-anchor="middle">Список</text>
+
+  <!-- Month nav -->
+  <text x="720" y="113" font-size="18" fill="#6B7280" text-anchor="middle">‹</text>
+  <text x="820" y="113" font-size="18" font-weight="600" fill="#1A1A2E" text-anchor="middle">Июль 2026</text>
+  <text x="920" y="113" font-size="18" fill="#6B7280" text-anchor="middle">›</text>
+
+  <!-- Primary button -->
+  <rect x="1196" y="88" width="200" height="40" rx="8" fill="#6C5CE7"/>
+  <text x="1296" y="113" font-size="14" font-weight="500" fill="#FFFFFF" text-anchor="middle">+ Новое событие</text>
+
+  <!-- Filter bar -->
+  <rect x="280" y="152" width="80" height="32" rx="16" fill="#6C5CE7"/>
+  <text x="320" y="173" font-size="13" font-weight="500" fill="#FFFFFF" text-anchor="middle">Все</text>
+  <rect x="372" y="152" width="100" height="32" rx="16" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="422" y="173" font-size="13" fill="#6B7280" text-anchor="middle">Личные</text>
+  <rect x="484" y="152" width="100" height="32" rx="16" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="534" y="173" font-size="13" fill="#6B7280" text-anchor="middle">Общие</text>
+
+  <!-- Legend -->
+  <circle cx="900" cy="168" r="5" fill="#6C5CE7"/>
+  <text x="912" y="173" font-size="12" fill="#6B7280">Встреча</text>
+  <circle cx="990" cy="168" r="5" fill="#FD79A8"/>
+  <text x="1002" y="173" font-size="12" fill="#6B7280">Свидание</text>
+  <circle cx="1090" cy="168" r="5" fill="#FDCB6E"/>
+  <text x="1102" y="173" font-size="12" fill="#6B7280">Праздник</text>
+  <circle cx="1185" cy="168" r="5" fill="#6B7280"/>
+  <text x="1197" y="173" font-size="12" fill="#6B7280">Задача</text>
+
+  <!-- Day headers -->
+  <rect x="280" y="200" width="1120" height="36" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="360" y="223" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">Пн</text>
+  <text x="520" y="223" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">Вт</text>
+  <text x="680" y="223" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">Ср</text>
+  <text x="840" y="223" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">Чт</text>
+  <text x="1000" y="223" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">Пт</text>
+  <text x="1160" y="223" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">Сб</text>
+  <text x="1320" y="223" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">Вс</text>
+
+  <!-- Month grid -->
+  <!-- Row 1: empty, empty, 1, 2, 3, 4, 5 -->
+  <rect x="280" y="240" width="1120" height="118" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <line x1="440" y1="240" x2="440" y2="862" stroke="#E5E7EB"/>
+  <line x1="600" y1="240" x2="600" y2="862" stroke="#E5E7EB"/>
+  <line x1="760" y1="240" x2="760" y2="862" stroke="#E5E7EB"/>
+  <line x1="920" y1="240" x2="920" y2="862" stroke="#E5E7EB"/>
+  <line x1="1080" y1="240" x2="1080" y2="862" stroke="#E5E7EB"/>
+  <line x1="1240" y1="240" x2="1240" y2="862" stroke="#E5E7EB"/>
+  <line x1="280" y1="358" x2="1400" y2="358" stroke="#E5E7EB"/>
+  <line x1="280" y1="476" x2="1400" y2="476" stroke="#E5E7EB"/>
+  <line x1="280" y1="594" x2="1400" y2="594" stroke="#E5E7EB"/>
+  <line x1="280" y1="712" x2="1400" y2="712" stroke="#E5E7EB"/>
+
+  <!-- Row 1 days -->
+  <rect x="608" y="250" width="28" height="28" rx="14" fill="#E5E7EB"/>
+  <text x="622" y="269" font-size="13" fill="#6B7280" text-anchor="middle">1</text>
+  <!-- 2nd: Ужин с друзьями -->
+  <text x="768" y="269" font-size="13" fill="#1A1A2E">2</text>
+  <rect x="768" y="280" width="140" height="24" rx="6" fill="#EDEBFF"/>
+  <circle cx="780" cy="292" r="4" fill="#6C5CE7"/>
+  <text x="790" y="296" font-size="11" fill="#1A1A2E">Ужин с друзьями</text>
+  <text x="928" y="269" font-size="13" fill="#1A1A2E">3</text>
+  <text x="1088" y="269" font-size="13" fill="#1A1A2E">4</text>
+  <text x="1248" y="269" font-size="13" fill="#1A1A2E">5</text>
+
+  <!-- Row 2 days: 6-12 -->
+  <text x="288" y="387" font-size="13" fill="#1A1A2E">6</text>
+  <text x="448" y="387" font-size="13" fill="#1A1A2E">7</text>
+  <text x="608" y="387" font-size="13" fill="#1A1A2E">8</text>
+  <text x="768" y="387" font-size="13" fill="#1A1A2E">9</text>
+  <!-- 10th: Годовщина (all-day) -->
+  <text x="928" y="387" font-size="13" fill="#1A1A2E">10</text>
+  <rect x="928" y="398" width="140" height="24" rx="6" fill="#FFE5EF"/>
+  <circle cx="940" cy="410" r="4" fill="#FD79A8"/>
+  <text x="950" y="414" font-size="11" font-weight="500" fill="#1A1A2E">Годовщина</text>
+  <text x="1088" y="387" font-size="13" fill="#1A1A2E">11</text>
+  <!-- 12th: Стоматолог 14:00 -->
+  <text x="1248" y="387" font-size="13" fill="#1A1A2E">12</text>
+  <rect x="1248" y="398" width="140" height="24" rx="6" fill="#EDEBFF"/>
+  <circle cx="1260" cy="410" r="4" fill="#6C5CE7"/>
+  <text x="1270" y="414" font-size="11" fill="#1A1A2E">Стоматолог 14:00</text>
+
+  <!-- Row 3 days: 13-19 -->
+  <text x="288" y="505" font-size="13" fill="#1A1A2E">13</text>
+  <text x="448" y="505" font-size="13" fill="#1A1A2E">14</text>
+  <text x="608" y="505" font-size="13" fill="#1A1A2E">15</text>
+  <!-- 16th: Today -->
+  <circle cx="782" cy="500" r="16" fill="#6C5CE7"/>
+  <text x="782" y="505" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">16</text>
+  <text x="768" y="530" font-size="10" font-weight="500" fill="#6C5CE7">Сегодня</text>
+  <text x="928" y="505" font-size="13" fill="#1A1A2E">17</text>
+  <!-- 18th: Свидание -->
+  <text x="1088" y="505" font-size="13" fill="#1A1A2E">18</text>
+  <rect x="1088" y="516" width="140" height="24" rx="6" fill="#FFE5EF"/>
+  <circle cx="1100" cy="528" r="4" fill="#FD79A8"/>
+  <text x="1110" y="532" font-size="11" fill="#1A1A2E">Свидание</text>
+  <text x="1248" y="505" font-size="13" fill="#1A1A2E">19</text>
+
+  <!-- Row 4 days: 20-26 -->
+  <text x="288" y="623" font-size="13" fill="#1A1A2E">20</text>
+  <text x="448" y="623" font-size="13" fill="#1A1A2E">21</text>
+  <!-- 22nd: Покупки (task, gray dot) -->
+  <text x="608" y="623" font-size="13" fill="#1A1A2E">22</text>
+  <rect x="608" y="634" width="140" height="24" rx="6" fill="#F3F4F6"/>
+  <circle cx="620" cy="646" r="4" fill="#6B7280"/>
+  <text x="630" y="650" font-size="11" fill="#1A1A2E">Покупки</text>
+  <text x="768" y="623" font-size="13" fill="#1A1A2E">23</text>
+  <text x="928" y="623" font-size="13" fill="#1A1A2E">24</text>
+  <!-- 25th: День рождения Ани -->
+  <text x="1088" y="623" font-size="13" fill="#1A1A2E">25</text>
+  <rect x="1088" y="634" width="140" height="24" rx="6" fill="#FDF6E3"/>
+  <circle cx="1100" cy="646" r="4" fill="#FDCB6E"/>
+  <text x="1110" y="650" font-size="11" fill="#1A1A2E">День рождения Ани</text>
+  <text x="1248" y="623" font-size="13" fill="#1A1A2E">26</text>
+
+  <!-- Row 5 days: 27-31 -->
+  <text x="288" y="741" font-size="13" fill="#1A1A2E">27</text>
+  <text x="448" y="741" font-size="13" fill="#1A1A2E">28</text>
+  <text x="608" y="741" font-size="13" fill="#1A1A2E">29</text>
+  <text x="768" y="741" font-size="13" fill="#1A1A2E">30</text>
+  <text x="928" y="741" font-size="13" fill="#1A1A2E">31</text>
+
+  <!-- Task dots under dates with due dates -->
+  <circle cx="296" cy="760" r="3" fill="#6B7280"/>
+  <circle cx="308" cy="760" r="3" fill="#6B7280"/>
+  <circle cx="456" cy="760" r="3" fill="#6B7280"/>
+  <circle cx="616" cy="760" r="3" fill="#6B7280"/>
+  <circle cx="776" cy="760" r="3" fill="#6B7280"/>
+  <circle cx="936" cy="760" r="3" fill="#6B7280"/>
+  <circle cx="1096" cy="760" r="3" fill="#6B7280"/>
+  <circle cx="1256" cy="760" r="3" fill="#6B7280"/>
+</svg>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Sidebar (under dim) -->
+  <rect x="0" y="0" width="240" height="900" fill="#FFFFFF"/>
+  <line x1="240" y1="0" x2="240" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="24" y="28" width="36" height="36" rx="10" fill="#6C5CE7"/>
+  <text x="72" y="52" font-size="20" font-weight="600" fill="#1A1A2E">Vaya</text>
+  <rect x="16" y="152" width="208" height="44" rx="8" fill="#6C5CE7"/>
+  <text x="64" y="180" font-size="15" font-weight="500" fill="#FFFFFF">Желания</text>
+  <text x="64" y="128" font-size="15" fill="#6B7280">Дашборд</text>
+  <text x="64" y="232" font-size="15" fill="#6B7280">Календарь</text>
+  <text x="64" y="284" font-size="15" fill="#6B7280">Дела</text>
+  <text x="64" y="336" font-size="15" fill="#6B7280">Настройки</text>
+
+  <!-- Dashboard shapes underneath -->
+  <rect x="280" y="48" width="220" height="28" rx="6" fill="#D1D5DB"/>
+  <rect x="1200" y="48" width="180" height="36" rx="8" fill="#C4B5FD"/>
+  <rect x="280" y="120" width="340" height="40" rx="10" fill="#E5E7EB"/>
+  <rect x="280" y="196" width="356" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="304" y="220" width="44" height="44" rx="10" fill="#D1D5DB"/>
+  <rect x="304" y="292" width="180" height="16" rx="4" fill="#D1D5DB"/>
+  <rect x="304" y="320" width="240" height="12" rx="4" fill="#E5E7EB"/>
+  <rect x="660" y="196" width="356" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="684" y="220" width="44" height="44" rx="10" fill="#D1D5DB"/>
+  <rect x="684" y="292" width="180" height="16" rx="4" fill="#D1D5DB"/>
+  <rect x="684" y="320" width="240" height="12" rx="4" fill="#E5E7EB"/>
+  <rect x="1040" y="196" width="356" height="240" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="1064" y="220" width="44" height="44" rx="10" fill="#D1D5DB"/>
+  <rect x="1064" y="292" width="180" height="16" rx="4" fill="#D1D5DB"/>
+  <rect x="1064" y="320" width="240" height="12" rx="4" fill="#E5E7EB"/>
+
+  <!-- Dim overlay -->
+  <rect x="0" y="0" width="1440" height="900" fill="#1A1A2E" opacity="0.45"/>
+
+  <!-- Modal card -->
+  <rect x="470" y="36" width="500" height="828" rx="16" fill="#FFFFFF"/>
+
+  <!-- Modal header -->
+  <text x="500" y="82" font-size="20" font-weight="600" fill="#1A1A2E">Новое желание</text>
+  <text x="500" y="106" font-size="13" fill="#6B7280">Добавьте желание в список «День рождения»</text>
+  <line x1="470" y1="126" x2="970" y2="126" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Название -->
+  <text x="500" y="158" font-size="13" font-weight="500" fill="#1A1A2E">Название</text>
+  <rect x="500" y="170" width="440" height="44" rx="8" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="1.5"/>
+  <text x="516" y="198" font-size="14" fill="#1A1A2E">Наушники Sony</text>
+
+  <!-- Описание -->
+  <text x="500" y="246" font-size="13" font-weight="500" fill="#1A1A2E">Описание</text>
+  <rect x="500" y="258" width="440" height="84" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="516" y="284" font-size="14" fill="#6B7280">Беспроводные наушники с шумоподавлением,</text>
+  <text x="516" y="306" font-size="14" fill="#6B7280">чёрный цвет, модель 2024 года…</text>
+
+  <!-- Цена + Валюта -->
+  <text x="500" y="374" font-size="13" font-weight="500" fill="#1A1A2E">Цена</text>
+  <rect x="500" y="386" width="280" height="44" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="516" y="414" font-size="14" fill="#1A1A2E">25000</text>
+  <text x="800" y="374" font-size="13" font-weight="500" fill="#1A1A2E">Валюта</text>
+  <rect x="800" y="386" width="140" height="44" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="816" y="414" font-size="14" fill="#1A1A2E">RUB</text>
+  <path d="M916 402 L922 410 L928 402" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+
+  <!-- Ссылка -->
+  <text x="500" y="462" font-size="13" font-weight="500" fill="#1A1A2E">Ссылка на товар</text>
+  <rect x="500" y="474" width="440" height="44" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="516" y="502" font-size="14" fill="#6B7280">https://shop.example.com/sony-wh1000xm5</text>
+
+  <!-- Изображение -->
+  <text x="500" y="550" font-size="13" font-weight="500" fill="#1A1A2E">Изображение</text>
+  <rect x="500" y="562" width="440" height="80" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-dasharray="6 4"/>
+  <circle cx="720" cy="592" r="14" fill="#E5E7EB"/>
+  <text x="720" y="598" font-size="14" fill="#6B7280" text-anchor="middle">↑</text>
+  <text x="720" y="622" font-size="12" fill="#6B7280" text-anchor="middle">Перетащите файл или нажмите для загрузки</text>
+
+  <!-- Приоритет -->
+  <text x="500" y="674" font-size="13" font-weight="500" fill="#1A1A2E">Приоритет</text>
+  <circle cx="514" cy="704" r="9" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="532" y="709" font-size="14" fill="#6B7280">Низкий</text>
+  <circle cx="624" cy="704" r="9" fill="#FFFFFF" stroke="#6C5CE7" stroke-width="1.5"/>
+  <circle cx="624" cy="704" r="5" fill="#6C5CE7"/>
+  <text x="642" y="709" font-size="14" font-weight="500" fill="#1A1A2E">Средний</text>
+  <circle cx="734" cy="704" r="9" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="752" y="709" font-size="14" fill="#6B7280">Высокий</text>
+
+  <!-- Статус -->
+  <text x="500" y="754" font-size="13" font-weight="500" fill="#1A1A2E">Статус</text>
+  <rect x="500" y="764" width="120" height="28" rx="14" fill="#E8F8F5"/>
+  <text x="560" y="782" font-size="12" font-weight="500" fill="#00B894" text-anchor="middle">Доступно</text>
+  <text x="632" y="782" font-size="11" fill="#6B7280">недоступно для партнёра</text>
+
+  <!-- Footer -->
+  <line x1="470" y1="800" x2="970" y2="800" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="630" y="816" width="110" height="40" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="685" y="841" font-size="14" font-weight="500" fill="#1A1A2E" text-anchor="middle">Отмена</text>
+  <rect x="760" y="816" width="150" height="40" rx="8" fill="#6C5CE7"/>
+  <text x="835" y="841" font-size="14" font-weight="500" fill="#FFFFFF" text-anchor="middle">Сохранить</text>
+</svg>

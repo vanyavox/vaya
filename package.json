@@ -1,0 +1,30 @@
+{
+  "name": "vaya",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vaya — пространство для пары: желания, календарь, дела",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev -w @vaya/api\" \"npm run dev -w @vaya/web\"",
+    "dev:api": "npm run dev -w @vaya/api",
+    "dev:web": "npm run dev -w @vaya/web",
+    "build": "npm run build -w @vaya/shared && npm run build -w @vaya/api && npm run build -w @vaya/web",
+    "lint": "eslint apps packages --ext .ts,.tsx",
+    "test": "npm run test -w @vaya/api",
+    "prisma:migrate": "npm run prisma:migrate -w @vaya/api",
+    "prisma:seed": "npm run prisma:seed -w @vaya/api",
+    "prisma:studio": "npm run prisma:studio -w @vaya/api",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

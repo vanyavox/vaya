@@ -1,0 +1,834 @@
+================================================================================
+                    ТЕХНИЧЕСКОЕ ЗАДАНИЕ
+                    Приложение «Vaya» — пространство для пары
+                    Версия 1.0 (MVP)
+================================================================================
+
+Дата: 2026-07-16
+Статус: утверждено к разработке
+
+================================================================================
+1. ОБЩИЕ СВЕДЕНИЯ
+================================================================================
+
+1.1. Название и назначение системы
+--------------------------------------------------------------------------------
+Название продукта: Vaya (Вая)
+Назначение: веб-приложение для пары (мужчина и женщина), объединяющее
+в одном пространстве:
+  - списки желаний (личные и общие);
+  - общий и личный календарь (встречи, планы, задачи);
+  - список бытовых и семейных дел;
+  - профили участников.
+
+Продукт закрывает потребность пары вести совместный быт и планирование
+без внешних инструментов (чат, заметки, разрозненные календари).
+
+1.2. Целевая аудитория
+--------------------------------------------------------------------------------
+Основная ЦА: пары (супруги, сожители, партнёры), совместно ведущие быт.
+Пользовательский уровень: начальный — интерфейс должен быть интуитивным,
+без обучения. Основной язык интерфейса — русский.
+
+1.3. Глоссарий
+--------------------------------------------------------------------------------
+Пара (Couple)     — общее пространство двух зарегистрированных пользователей.
+Участник пары     — пользователь, привязанный к паре через invite-код.
+Владелец (OWNER)  — создатель пары.
+Партнёр (PARTNER) — второй участник пары.
+Виш-лист          — список желаний (Wishlist).
+Желание (Wish)    — элемент виш-листа (товар, впечатление, цель).
+Событие           — запись в календаре (встреча, свидание, план).
+Задача (Task)     — бытовое/семейное дело (уборка, покупки, ремонт).
+ICS               — стандарт iCalendar (.ics) для обмена календарными данными.
+Feed (подписка)   — секретный URL с календарём в формате ICS для Apple Calendar.
+
+================================================================================
+2. ЦЕЛИ И ОГРАНИЧЕНИЯ MVP
+================================================================================
+
+2.1. Бизнес-цели MVP
+--------------------------------------------------------------------------------
+  G1. Обеспечить паре единое пространство для желаний, планов и дел.
+  G2. Сократить время на координацию быта («кто что делает», «что подарить»).
+  G3. Обеспечить видимость общего календаря с телефона через Apple Calendar.
+  G4. Поддержать сценарий «сюрприз»: партнёр резервирует желание,
+      владелец не видит, что оно зарезервировано.
+
+2.2. В рамках MVP
+--------------------------------------------------------------------------------
+  [x] Регистрация и авторизация (email + пароль, JWT).
+  [x] Профиль: имя, аватар, email, часовой пояс.
+  [x] Связка пары по invite-коду.
+  [x] Виш-листы: личные и общие; желания со статусами и приоритетами.
+  [x] Календарь: личные и общие события; фильтры; месячная/недельная/списочная
+      витрина; отображение задач с датой выполнения.
+  [x] Туду-лист: бытовые задачи с фильтрами (исполнитель, категория, статус).
+  [x] ICS-экспорт и ICS-подписка (односторонняя интеграция с Apple Calendar).
+
+2.3. Вне рамок MVP (backlog)
+--------------------------------------------------------------------------------
+  [ ] Двусторонняя синхронизация CalDAV с Apple/Google Calendar.
+  [ ] Push-уведомления и email-рассылки.
+  [ ] Мобильные нативные приложения (iOS/Android).
+  [ ] Совместный бюджет / учёт расходов.
+  [ ] Чат внутри пары.
+  [ ] Фотогалерея.
+  [ ] Роли более 2 участников (семья, дети).
+  [ ] Локализация на английский и другие языки.
+  [ ] PWA / офлайн-режим.
+
+================================================================================
+3. ПЕРСОНЫ И РОЛИ
+================================================================================
+
+3.1. Участник пары
+--------------------------------------------------------------------------------
+  - Зарегистрирован, имеет профиль (имя, email, аватар).
+  - Создаёт пару (становится OWNER) или входит по invite-коду (PARTNER).
+  - Полный доступ к общим данным пары.
+  - Владеет личными виш-листами и личными событиями.
+
+3.2. Незарегистрированный посетитель
+--------------------------------------------------------------------------------
+  - Видит только лендинг (/) и страницы входа/регистрации.
+  - API-эндпоинты, кроме /auth/*, /health, /calendar/feed/:token.ics, закрыты.
+
+3.3. Матрица прав доступа
+--------------------------------------------------------------------------------
+Ресурс                  | Владелец          | Партнёр           | Гость
+------------------------|-------------------|-------------------|--------
+Личный виш-лист         | CRUD              | нет доступа       | нет
+Общий виш-лист          | CRUD              | чтение + резерв   | нет
+Желание в общем списке  | CRUD (своё)       | резерв/подарок    | нет
+Личное событие          | CRUD              | нет доступа       | нет
+Общее событие           | CRUD              | чтение + CRUD*    | нет
+Бытовая задача          | CRUD              | CRUD + выполнение | нет
+Профиль                 | своё              | нет               | нет
+Профиль партнёра        | чтение            | своё CRUD         | нет
+ICS-подписка            | своя              | своя              | по токену
+
+  * Общее событие: создать может любой участник пары; редактировать/удалять —
+    создатель или OWNER.
+
+================================================================================
+4. ФУНКЦИОНАЛЬНЫЕ ТРЕБОВАНИЯ
+================================================================================
+
+4.1. Авторизация
+--------------------------------------------------------------------------------
+F-AUTH-01  Регистрация: email (уникальный), пароль (мин. 8 символов), имя.
+           Пароль хешируется (argon2). Возвращает access-токен и refresh-токен.
+F-AUTH-02  Вход: email + пароль. При успехе — access + refresh.
+F-AUTH-03  Access-токен: JWT, срок жизни 15 минут, передаётся в
+           Authorization: Bearer.
+F-AUTH-04  Refresh-токен: httpOnly cookie, срок 30 дней, ротация при
+           обновлении (старый отзывается). Хранится хеш в БД.
+F-AUTH-05  Выход: отзыв текущего refresh-токена.
+F-AUTH-06  GET /auth/me: возвращает текущего пользователя.
+F-AUTH-07  Ошибки: 401 UNAUTHORIZED (неверные данные, протухший токен),
+           409 CONFLICT (email занят).
+
+4.2. Профиль
+--------------------------------------------------------------------------------
+F-PROF-01  GET /users/me: id, name, email, avatarUrl, timezone, createdAt.
+F-PROF-02  PATCH /users/me: изменение name, email, timezone.
+F-PROF-03  POST /users/me/avatar: загрузка изображения (PNG/JPEG/WebP,
+           ≤ 2 МБ). Возвращает avatarUrl. Старый аватар удаляется.
+F-PROF-04  DELETE /users/me/avatar: удаление аватара (возвращается null).
+F-PROF-05  Часовой пояс: IANA-строка (например, Europe/Moscow). Используется
+           при отображении календаря и генерации ICS.
+
+4.3. Связка пары
+--------------------------------------------------------------------------------
+F-PAIR-01  POST /couple: создание пары первым пользователем. Генерируется
+           invite-код (8 символов, A-Z0-9, уникальный).
+F-PAIR-02  POST /couple/invite: перевыпуск invite-кода (старый перестаёт
+           действовать).
+F-PAIR-03  POST /couple/join {inviteCode}: присоединение второго участника.
+           Максимум 2 участника. Код одноразовый для третьего пользователя.
+F-PAIR-04  GET /couple: данные пары + список участников (id, имя, аватар).
+           Если пара не создана — 404.
+F-PAIR-05  DELETE /couple/leave: выход из пары (доступно MVP, но не
+           обязательно к UI в первой итерации).
+
+4.4. Виш-листы и желания
+--------------------------------------------------------------------------------
+F-WISH-01  Wishlist: title (обязательно), description?, visibility
+           (PERSONAL | SHARED), coupleId? (для SHARED).
+F-WISH-02  Wish: title, description?, price? (Decimal 10,2), currency
+           (default RUB), url? (ссылка на товар), imageUrl?, priority
+           (LOW | MEDIUM | HIGH), status (AVAILABLE | RESERVED | GIFTED |
+           RECEIVED), sortOrder.
+F-WISH-03  Статусы желания (машина состояний):
+             AVAILABLE  → RESERVED   (партнёр: «Зарезервировать»)
+             RESERVED   → AVAILABLE  (партнёр: «Снять резерв»)
+             RESERVED   → GIFTED     (партнёр: «Подарено»)
+             GIFTED     → RECEIVED   (владелец: «Получено»)
+           Свободный PATCH статуса запрещён — только доменные операции.
+
+F-WISH-04  Scope-фильтр GET /wishlists?scope=personal|shared|all.
+F-WISH-05  Фильтр GET /wishes?wishlistId=&status=&hideReserved=.
+           hideReserved=true — режим сюрприза: владелец не видит
+           зарезервированные партнёром желания.
+F-WISH-06  Порядок: PATCH /wishlists/:id/reorder {order: [wishId, ...]}.
+F-WISH-07  Удаление списка — каскадное удаление желаний.
+
+4.5. Календарь
+--------------------------------------------------------------------------------
+F-CAL-01   Событие (CalendarEvent): title, description?, location?,
+           startsAt (UTC), endsAt (UTC), allDay, timezone (IANA),
+           kind (EVENT | MEETING | DATE | HOLIDAY), color?,
+           reminderMinutesBefore?, coupleId? (null = личное).
+F-CAL-02   icsUid: UUID, генерируется при создании события, неизменяем.
+           Используется как UID в ICS — обеспечивает идентичность события
+           в Apple Calendar при обновлениях.
+F-CAL-03   GET /calendar/events?from=&to=&scope=personal|shared|all —
+           события в диапазоне дат.
+F-CAL-04   GET /calendar/tasks?from=&to= — задачи с dueDate в диапазоне
+           (для отображения точек/маркеров в календаре).
+F-CAL-05   Витрины: месяц (сетка), неделя, список. Переключение на клиенте.
+F-CAL-06   Фильтры: Все / Личные / Общие. Цветовая дифференциация по kind.
+
+4.6. Список дел (To-do)
+--------------------------------------------------------------------------------
+F-TODO-01  Task: title, description?, assigneeId? (null = не назначено),
+           category (CLEANING | COOKING | SHOPPING | REPAIRS | DOCS | PET |
+           FINANCE | OTHER), status (TODO | IN_PROGRESS | DONE | CANCELLED),
+           priority (LOW | MEDIUM | HIGH), dueDate?, completedAt?.
+F-TODO-02  Фильтры GET /tasks:
+             assignee=me|partner|unassigned|all
+             category=<enum|all>
+             status=<enum|all>
+             q=<текстовый поиск по title/description>
+             due=today|week|overdue|all
+F-TODO-03  POST /tasks/:id/complete → status=DONE, completedAt=now().
+           POST /tasks/:id/reopen → status=TODO, completedAt=null.
+F-TODO-04  GET /tasks/stats — агрегаты по статусам и категориям
+           (для дашборда).
+
+4.7. Экспорт и подписка календаря (ICS)
+--------------------------------------------------------------------------------
+F-ICS-01   GET /calendar/export.ics?from=&to=&scope= — разовый экспорт
+           (требует авторизации). Content-Type: text/calendar.
+F-ICS-02   GET /calendar/feed/:token.ics — подписка (без JWT, авторизация
+           по секрету в URL). Cache-Control: no-cache.
+F-ICS-03   Формат VCALENDAR: METHOD:PUBLISH, PRODID:-//vaya//RU.
+           Каждое событие — VEVENT: UID (=icsUid), SEQUENCE, DTSTAMP,
+           DTSTART/DTEND (UTC, с Z), SUMMARY, DESCRIPTION, LOCATION.
+F-ICS-04   Задачи с dueDate при includeTodos=true — как all-day VEVENT
+           с префиксом «[Задача] ». (VTODO в Apple Calendar поддерживается
+           ненадёжно.)
+F-ICS-05   GET/POST /calendar/feed-token — создание/перевыпуск токена,
+           настройки scope и includeTodos.
+F-ICS-06   Ссылка для подписки: webcal://<host>/api/v1/calendar/feed/<token>.ics
+           (и https-вариант). UI показывает инструкцию для Apple Calendar.
+
+================================================================================
+5. НЕФУНКЦИОНАЛЬНЫЕ ТРЕБОВАНИЯ
+================================================================================
+
+5.1. Производительность
+--------------------------------------------------------------------------------
+  NFR-01  Время отклика API (p95) — ≤ 300 мс на CRUD-операции.
+  NFR-02  Первая загрузка SPA — ≤ 2 секунды на соединении 10 Мбит/с.
+  NFR-03  Календарь месячной сетки — отрисовка ≤ 100 мс после загрузки данных.
+
+5.2. Безопасность
+--------------------------------------------------------------------------------
+  NFR-04  Пароли хешируются argon2id (или bcrypt, cost ≥ 12).
+  NFR-05  JWT: алгоритм HS256, секрет из env (мин. 32 символа).
+  NFR-06  Refresh-токены хранятся как хеш; ротация при каждом обновлении.
+  NFR-07  Rate limit на /auth/*: 10 запросов / минуту / IP.
+  NFR-08  Загрузка файлов: только image/png, image/jpeg, image/webp;
+           максимум 2 МБ; переименование в UUID; без выполнения.
+  NFR-09  CORS: разрешённые origin из env.
+  NFR-10  Helmet: стандартные security-заголовки.
+  NFR-11  Валидация всех входных DTO (class-validator / Zod).
+  NFR-12  ICS feed token: минимум 32 байта энтропии (base64url).
+  NFR-13  SQL-инъекции исключены (Prisma параметризованные запросы).
+  NFR-14  XSS: React-экранирование; dangerousSetInnerHTML не используется.
+
+5.3. Доступность и совместимость
+--------------------------------------------------------------------------------
+  NFR-15  Браузеры: Chrome 110+, Safari 16+, Firefox 110+, Edge 110+.
+  NFR-16  Адаптивность: desktop ≥ 1280px (основной), tablet 768–1279px,
+          mobile 360–767px (дашборд, виш-листы, задачи — обязательно).
+  NFR-17  Клавиатурная навигация по основным формам.
+  NFR-18  Контраст текста — ≥ 4.5:1 (WCAG AA).
+
+5.4. Локализация и время
+--------------------------------------------------------------------------------
+  NFR-19  UI — русский язык. Строки вынесены в словарь (i18n-ready).
+  NFR-20  Хранение дат — UTC. Отображение — в часовом поясе пользователя.
+  NFR-21  Часовой пояс пользователя — IANA (Europe/Moscow по умолчанию).
+
+5.5. Надёжность
+--------------------------------------------------------------------------------
+  NFR-22  БД PostgreSQL; ежедневный бэкап (pg_dump или managed-бэкап).
+  NFR-23  Graceful shutdown API (закрытие пула Prisma).
+  NFR-24  Health-check: GET /health → 200 {status:"ok", db:"up"}.
+
+================================================================================
+6. МОДЕЛЬ ДАННЫХ
+================================================================================
+
+6.1. Сущности и связи
+--------------------------------------------------------------------------------
+
+  [User] 1──* [RefreshToken]
+  [User] 1──* [CoupleMember] *──1 [Couple]
+  [User] 1──* [CalendarEvent] (как creator)
+  [User] 1──* [Task] (как creator / assignee)
+  [User] 1──* [Wishlist] (как owner)
+  [User] 1──1 [CalendarFeedToken]
+  [Couple] 1──* [Wishlist] (shared)
+  [Couple] 1──* [CalendarEvent] (shared)
+  [Couple] 1──* [Task]
+  [Wishlist] 1──* [Wish]
+
+6.2. Описание таблиц
+--------------------------------------------------------------------------------
+
+User
+  id            UUID      PK
+  email         VARCHAR   UNIQUE NOT NULL
+  passwordHash  VARCHAR   NOT NULL
+  name          VARCHAR   NOT NULL
+  avatarUrl     VARCHAR   NULL
+  timezone      VARCHAR   DEFAULT 'Europe/Moscow'
+  createdAt     TIMESTAMP DEFAULT now()
+  updatedAt     TIMESTAMP
+
+Couple
+  id            UUID      PK
+  name          VARCHAR   NULL          -- например, «Вая»
+  inviteCode    VARCHAR   UNIQUE NOT NULL
+  createdAt     TIMESTAMP DEFAULT now()
+
+CoupleMember
+  id            UUID      PK
+  userId        UUID      FK → User
+  coupleId      UUID      FK → Couple
+  role          ENUM      OWNER | PARTNER  DEFAULT PARTNER
+  joinedAt      TIMESTAMP DEFAULT now()
+  UNIQUE (userId, coupleId)
+
+RefreshToken
+  id            UUID      PK
+  userId        UUID      FK → User
+  tokenHash     VARCHAR   NOT NULL      -- хеш, не raw
+  expiresAt     TIMESTAMP NOT NULL
+  revokedAt     TIMESTAMP NULL
+  createdAt     TIMESTAMP DEFAULT now()
+
+Wishlist
+  id            UUID      PK
+  ownerId       UUID      FK → User
+  coupleId      UUID      FK → Couple NULL   -- NULL = личный
+  title         VARCHAR   NOT NULL
+  description   TEXT      NULL
+  visibility    ENUM      PERSONAL | SHARED
+  createdAt     TIMESTAMP DEFAULT now()
+  updatedAt     TIMESTAMP
+
+Wish
+  id            UUID      PK
+  wishlistId    UUID      FK → Wishlist (CASCADE)
+  title         VARCHAR   NOT NULL
+  description   TEXT      NULL
+  price         DECIMAL(10,2) NULL
+  currency      VARCHAR   DEFAULT 'RUB'
+  url           VARCHAR   NULL
+  imageUrl      VARCHAR   NULL
+  priority      ENUM      LOW | MEDIUM | HIGH  DEFAULT MEDIUM
+  status        ENUM      AVAILABLE | RESERVED | GIFTED | RECEIVED
+                          DEFAULT AVAILABLE
+  reservedById  UUID      FK → User NULL
+  reservedAt    TIMESTAMP NULL
+  sortOrder     INT       DEFAULT 0
+  createdAt     TIMESTAMP DEFAULT now()
+  updatedAt     TIMESTAMP
+
+CalendarEvent
+  id            UUID      PK
+  icsUid        UUID      UNIQUE NOT NULL   -- неизменяемый UID для ICS
+  creatorId     UUID      FK → User
+  coupleId      UUID      FK → Couple NULL  -- NULL = личное
+  title         VARCHAR   NOT NULL
+  description   TEXT      NULL
+  location      VARCHAR   NULL
+  startsAt      TIMESTAMP NOT NULL          -- UTC
+  endsAt        TIMESTAMP NOT NULL          -- UTC
+  allDay        BOOLEAN   DEFAULT false
+  timezone      VARCHAR   NOT NULL          -- IANA, исходный TZ
+  kind          ENUM      EVENT | MEETING | DATE | HOLIDAY  DEFAULT EVENT
+  color         VARCHAR   NULL
+  reminderMinutesBefore INT NULL
+  createdAt     TIMESTAMP DEFAULT now()
+  updatedAt     TIMESTAMP
+
+Task
+  id            UUID      PK
+  coupleId      UUID      FK → Couple NOT NULL
+  creatorId     UUID      FK → User
+  assigneeId    UUID      FK → User NULL
+  title         VARCHAR   NOT NULL
+  description   TEXT      NULL
+  category      ENUM      CLEANING | COOKING | SHOPPING | REPAIRS | DOCS |
+                          PET | FINANCE | OTHER  DEFAULT OTHER
+  status        ENUM      TODO | IN_PROGRESS | DONE | CANCELLED  DEFAULT TODO
+  priority      ENUM      LOW | MEDIUM | HIGH  DEFAULT MEDIUM
+  dueDate       TIMESTAMP NULL
+  completedAt   TIMESTAMP NULL
+  createdAt     TIMESTAMP DEFAULT now()
+  updatedAt     TIMESTAMP
+
+CalendarFeedToken
+  id            UUID      PK
+  userId        UUID      FK → User UNIQUE
+  token         VARCHAR   UNIQUE NOT NULL
+  scope         ENUM      ALL | PERSONAL | SHARED  DEFAULT ALL
+  includeTodos  BOOLEAN   DEFAULT true
+  createdAt     TIMESTAMP DEFAULT now()
+  lastAccessAt  TIMESTAMP NULL
+
+6.3. Справочники (enum'ы)
+--------------------------------------------------------------------------------
+  Role         : OWNER, PARTNER
+  Visibility   : PERSONAL, SHARED
+  Priority     : LOW, MEDIUM, HIGH
+  WishStatus   : AVAILABLE, RESERVED, GIFTED, RECEIVED
+  EventKind    : EVENT, MEETING, DATE, HOLIDAY
+  TaskCategory : CLEANING, COOKING, SHOPPING, REPAIRS, DOCS, PET, FINANCE, OTHER
+  TaskStatus   : TODO, IN_PROGRESS, DONE, CANCELLED
+  FeedScope    : ALL, PERSONAL, SHARED
+
+================================================================================
+7. ИНТЕРФЕЙС API
+================================================================================
+
+7.1. Общие соглашения
+--------------------------------------------------------------------------------
+  Базовый путь:     /api/v1
+  Формат:           JSON (request/response), UTF-8
+  Авторизация:      Authorization: Bearer <access_token>
+  Ошибки:           { "statusCode": 400, "code": "VALIDATION_ERROR",
+                      "message": "...", "details": [...] }
+  Пагинация:        ?page=1&limit=20  →  { items, total, page, limit }
+  Даты:             ISO 8601 (UTC) — 2026-07-16T12:00:00Z
+  Версионирование:  /api/v1 (в URL)
+
+Коды ошибок (стабильные):
+  UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION_ERROR, CONFLICT,
+  RATE_LIMITED, INTERNAL_ERROR
+
+7.2. Auth
+--------------------------------------------------------------------------------
+  POST   /auth/register     {email, password, name} → {user, accessToken}
+                                              Set-Cookie: refresh
+  POST   /auth/login        {email, password} → {user, accessToken}
+  POST   /auth/refresh      (cookie) → {accessToken} + rotate refresh
+  POST   /auth/logout       → 204
+  GET    /auth/me           → {user}
+
+7.3. Users
+--------------------------------------------------------------------------------
+  GET    /users/me          → {user}
+  PATCH  /users/me          {name?, email?, timezone?} → {user}
+  POST   /users/me/avatar   multipart file → {avatarUrl}
+  DELETE /users/me/avatar   → 204
+
+7.4. Couple
+--------------------------------------------------------------------------------
+  GET    /couple            → {couple, members[]} | 404
+  POST   /couple            {name?} → {couple, inviteCode}
+  POST   /couple/invite     → {inviteCode}
+  POST   /couple/join       {inviteCode} → {couple}
+  DELETE /couple/leave      → 204
+
+7.5. Wishlists & Wishes
+--------------------------------------------------------------------------------
+  GET    /wishlists?scope=  → {items: Wishlist[]}
+  POST   /wishlists         {title, description?, visibility} → {Wishlist}
+  GET    /wishlists/:id     → {Wishlist, wishes: Wish[]}
+  PATCH  /wishlists/:id     {title?, description?} → {Wishlist}
+  DELETE /wishlists/:id     → 204
+  PATCH  /wishlists/:id/reorder  {order: [wishId]} → 204
+
+  POST   /wishlists/:id/wishes  {Wish fields} → {Wish}
+  GET    /wishes?wishlistId=&status=&hideReserved= → {items: Wish[]}
+  GET    /wishes/:id        → {Wish}
+  PATCH  /wishes/:id        {title?, description?, price?, url?, imageUrl?,
+                             priority?, sortOrder?} → {Wish}
+  DELETE /wishes/:id        → 204
+  POST   /wishes/:id/reserve    → {Wish}   (status → RESERVED)
+  POST   /wishes/:id/unreserve  → {Wish}   (status → AVAILABLE)
+  POST   /wishes/:id/gift       → {Wish}   (status → GIFTED)
+  POST   /wishes/:id/receive    → {Wish}   (status → RECEIVED)
+
+7.6. Calendar
+--------------------------------------------------------------------------------
+  GET    /calendar/events?from=&to=&scope= → {items: Event[]}
+  POST   /calendar/events   {Event fields, coupleId?} → {Event}
+  GET    /calendar/events/:id → {Event}
+  PATCH  /calendar/events/:id {fields} → {Event}   (icsUid сохраняется)
+  DELETE /calendar/events/:id → 204
+
+  GET    /calendar/tasks?from=&to= → {items: Task[]}
+
+  GET    /calendar/export.ics?from=&to=&scope= → text/calendar
+  GET    /calendar/feed/:token.ics → text/calendar   (без JWT)
+  GET    /calendar/feed-token  → {token, feedUrl, scope, includeTodos}
+  POST   /calendar/feed-token  {scope?, includeTodos?} → {token, feedUrl}
+
+7.7. Tasks
+--------------------------------------------------------------------------------
+  GET    /tasks?assignee=&category=&status=&q=&due= → {items: Task[]}
+  POST   /tasks             {Task fields} → {Task}
+  GET    /tasks/:id         → {Task}
+  PATCH  /tasks/:id         {fields} → {Task}
+  DELETE /tasks/:id         → 204
+  POST   /tasks/:id/complete → {Task}
+  POST   /tasks/:id/reopen   → {Task}
+  GET    /tasks/stats        → {byStatus: {...}, byCategory: {...}}
+
+7.8. System
+--------------------------------------------------------------------------------
+  GET    /health            → {status: "ok", db: "up", version: "1.0.0"}
+  GET    /docs              → Swagger UI
+
+7.9. Примеры запросов/ответов
+--------------------------------------------------------------------------------
+
+POST /api/v1/auth/register
+  Request:
+    { "email": "yana@example.com", "password": "secret123", "name": "Яна" }
+  Response 201:
+    {
+      "user": {
+        "id": "uuid", "email": "yana@example.com",
+        "name": "Яна", "avatarUrl": null, "timezone": "Europe/Moscow"
+      },
+      "accessToken": "eyJhbGciOi..."
+    }
+  Set-Cookie: refresh=...; HttpOnly; Secure; Path=/api/v1/auth; Max-Age=2592000
+
+GET /api/v1/calendar/events?from=2026-07-01&to=2026-07-31&scope=all
+  Response 200:
+    {
+      "items": [
+        {
+          "id": "uuid",
+          "icsUid": "550e8400-e29b-41d4-a716-446655440000",
+          "title": "Ужин в кафе",
+          "startsAt": "2026-07-18T18:00:00Z",
+          "endsAt": "2026-07-18T20:00:00Z",
+          "allDay": false,
+          "kind": "DATE",
+          "coupleId": "uuid-or-null",
+          "location": "Тверская 12"
+        }
+      ]
+    }
+
+================================================================================
+8. ПОЛЬЗОВАТЕЛЬСКИЙ ИНТЕРФЕЙС
+================================================================================
+
+8.1. Карта экранов
+--------------------------------------------------------------------------------
+  Публичные:
+    /                Лендинг
+    /login           Вход
+    /register        Регистрация
+
+  Защищённые (SPA layout с сайдбаром):
+    /app                     Дашборд
+    /app/profile             Профиль
+    /app/pairing             Связка пары
+    /app/wishes              Списки желаний
+    /app/wishes/:id          Детали списка желаний
+    /app/calendar            Календарь
+    /app/todos               Список дел
+    /app/settings/calendar-feed   Подписка Apple Calendar
+
+  Системные:
+    *                    404
+
+8.2. Wireframes (макеты)
+--------------------------------------------------------------------------------
+  Макеты расположены в docs/mockups/ (формат SVG):
+    01-landing.svg              — Лендинг
+    02-login.svg                — Вход
+    03-register.svg             — Регистрация
+    04-dashboard.svg            — Дашборд
+    05-profile.svg              — Профиль
+    06-pairing.svg              — Связка пары
+    07-wishlists.svg            — Списки желаний (индекс)
+    08-wishlist-detail.svg      — Детали виш-листа
+    09-wish-form.svg            — Форма желания (модалка)
+    10-calendar-month.svg       — Календарь (месяц)
+    11-calendar-event-form.svg  — Форма события (модалка)
+    12-todos.svg                — Список дел
+    13-todo-form.svg            — Форма задачи (модалка)
+    14-calendar-feed.svg        — Настройки ICS-подписки
+    15-mobile-dashboard.svg     — Дашборд (mobile)
+    16-mobile-wishes.svg        — Виш-листы (mobile)
+    17-navigation.svg           — Сайдбар и состояния навигации
+
+8.3. Ключевые сценарии (user flows)
+--------------------------------------------------------------------------------
+
+  Сценарий A: «Подарок-сюрприз»
+    1. Яна регистрируется, создаёт пару, копирует invite-код.
+    2. Макс регистрируется, входит по коду.
+    3. Яна создаёт общий виш-лист «День рождения» и желание «Книга X».
+    4. Макс открывает список, видит «Книга X», жмёт «Зарезервировать».
+    5. Яна (hideReserved=true) не видит зарезервированное желание.
+    6. Макс покупает, жмёт «Подарено».
+    7. Яна после получения жмёт «Получено».
+
+  Сценарий B: «План на неделю»
+    1. Макс открывает Календарь, создаёт общее событие «Свидание» на субботу.
+    2. Яна видит событие в общем календаре.
+    3. Яна подписывается на ICS-feed в Apple Calendar — событие с телефона.
+
+  Сценарий C: «Бытовые дела»
+    1. Яна создаёт задачу «Купить продукты», категория Покупки, срок сегодня,
+       исполнитель Макс.
+    2. Макс видит задачу в фильтре «Мои / Сегодня», отмечает выполненной.
+    3. Дашборд показывает статистику.
+
+================================================================================
+9. ИНТЕГРАЦИЯ С APPLE CALENDAR
+================================================================================
+
+9.1. Этап 1 (в рамках MVP) — односторонняя подписка ICS
+--------------------------------------------------------------------------------
+  Принцип: Apple Calendar «подтягивает» календарь по секретному URL.
+
+  a) Идентичность событий:
+     - CalendarEvent.icsUid — UUID, создаётся один раз при создании события.
+     - При редактировании UID не меняется → Apple обновляет событие,
+       а не дублирует.
+
+  b) Эндпоинт подписки:
+     GET /api/v1/calendar/feed/<token>.ics
+     - Авторизация по токену в URL (не JWT).
+     - Content-Type: text/calendar; charset=utf-8
+     - Cache-Control: no-cache
+     - Горизонт: от −30 дней до +365 дней от текущей даты.
+
+  c) Формат ICS:
+     BEGIN:VCALENDAR
+     VERSION:2.0
+     PRODID:-//vaya//RU
+     METHOD:PUBLISH
+     BEGIN:VEVENT
+     UID:<icsUid>
+     SEQUENCE:<номер ревизии>
+     DTSTAMP:<дата генерации>
+     DTSTART:20260718T180000Z
+     DTEND:20260718T200000Z
+     SUMMARY:Ужин в кафе
+     DESCRIPTION:...
+     LOCATION:Тверская 12
+     STATUS:CONFIRMED
+     END:VEVENT
+     ...
+     END:VCALENDAR
+
+  d) Задачи: при includeTodos=true — как all-day VEVENT:
+     SUMMARY:[Задача] Купить продукты
+     DTSTART;VALUE=DATE:20260716
+     DTEND;VALUE=DATE:20260717
+
+  e) Настройки пользователя (/app/settings/calendar-feed):
+     - Ссылка webcal:// и https://
+     - Кнопка «Скопировать»
+     - Кнопка «Перевыпустить токен» (старая ссылка перестаёт работать)
+     - Переключатели: scope (Все/Личные/Общие), включать задачи
+     - Инструкция для Apple Calendar (на русском):
+       «На iPhone: Настройки → Календарь → Учетные записи → Добавить
+       подписку календаря → вставьте ссылку.
+       На Mac: Календарь → Файл → Новая подписка календаря → вставьте ссылку.»
+
+9.2. Этап 2 (вне MVP) — двусторонняя синхронизация CalDAV
+--------------------------------------------------------------------------------
+  Нереализуемые в MVP, но спроектированные точки расширения:
+  - Поля etag, href, syncToken в CalendarEvent.
+  - Soft-delete (tombstones) вместо hard-delete.
+  - Конфликты: last-write-wins + SEQUENCE.
+  - CalDAV-эндпоинты (RFC 4791): PROPFIND, REPORT calendar-query,
+    PUT/DELETE calendar objects, ETag/CTag/sync-token.
+  - Альтернатива: iOS/macOS-клиент (EventKit / Shortcut), который
+    шлёт изменения в REST API Vaya.
+
+================================================================================
+10. АРХИТЕКТУРА ПРИЛОЖЕНИЯ
+================================================================================
+
+10.1. Компоненты
+--------------------------------------------------------------------------------
+
+  ┌──────────────┐     HTTPS      ┌───────────────┐
+  │  React SPA   │ ─────────────► │   NestJS API  │
+  │  (Vite)      │   /api/v1      │   (Node.js)   │
+  └──────────────┘                └───────┬───────┘
+                                          │ Prisma
+                                          ▼
+                                  ┌───────────────┐
+                                  │  PostgreSQL   │
+                                  └───────────────┘
+                                          ▲
+  ┌──────────────┐                        │
+  │ Apple Cal    │ ──── ICS feed ─────────┘
+  │ (подписка)   │     /calendar/feed/:token.ics
+  └──────────────┘
+
+  Загрузки (аватары): apps/api/uploads/ (dev), S3-совместимое хранилище (prod).
+
+10.2. Стек
+--------------------------------------------------------------------------------
+  Frontend:  React 18, TypeScript, Vite, React Router 6, TanStack Query,
+             React Hook Form, Zod, Tailwind CSS
+  Backend:   NestJS 10, TypeScript, Prisma 6, class-validator,
+             @nestjs/jwt, @nestjs/swagger, argon2
+  БД:        PostgreSQL 16
+  Инфра:     Docker Compose (postgres), npm workspaces
+  CI/CD:     (вне MVP) GitHub Actions
+
+  Обоснование NestJS: модульная архитектура, DI, встроенные guard'ы/DTO,
+  Swagger из коробки — лучшая поддерживаемость и масштабируемость
+  по сравнению с Express (нет структуры) и Fastify (нет каркаса).
+
+10.3. Структура репозитория
+--------------------------------------------------------------------------------
+  vaya/
+  ├── package.json              # workspaces: apps/*, packages/*
+  ├── tsconfig.base.json
+  ├── docker-compose.yml
+  ├── .env.example
+  ├── README.md
+  ├── docs/
+  │   ├── TZ.txt                # настоящий документ
+  │   └── mockups/              # SVG wireframes
+  ├── packages/
+  │   └── shared/               # @vaya/shared: DTO, enums, error codes
+  └── apps/
+      ├── api/                  # NestJS
+      │   ├── prisma/schema.prisma
+      │   └── src/modules/
+      │       ├── auth/  users/  couples/  wishlists/  wishes/
+      │       ├── calendar/  tasks/  health/
+      └── web/                  # Vite + React
+          └── src/
+              ├── app/          # routes, layouts, providers
+              ├── pages/
+              ├── features/     # auth, profile, wishes, calendar, todos
+              └── shared/       # ui-kit, api-client, lib
+
+================================================================================
+11. ЭТАПЫ РЕАЛИЗАЦИИ
+================================================================================
+
+  Фаза 0  Scaffold: workspaces, NestJS, Vite, shared, docker-compose      0.5 дн
+  Фаза 1  Prisma schema + миграция + seed                                 0.5 дн
+  Фаза 2  Auth: register/login/refresh/logout/me                          1.0 дн
+  Фаза 3  Профиль + аватары                                               0.5 дн
+  Фаза 4  Связка пары (invite)                                            0.5 дн
+  Фаза 5  Виш-листы + желания + резерв/подарок                            1.5 дн
+  Фаза 6  Задачи (To-do) + фильтры + stats                                1.0 дн
+  Фаза 7  Календарь + ICS feed                                            1.5 дн
+  Фаза 8  Frontend: shell + auth                                          1.5 дн
+  Фаза 9  Frontend: фичи (дашборд, wishes, calendar, todos)               3.0 дн
+  Фаза 10 Документация: TZ + макеты                                       1.0 дн
+  Фаза 11 Hardening: rate-limit, helmet, CORS, checklist                  1.0 дн
+
+  Итого: ~12.5 человеко-дней.
+
+================================================================================
+12. КРИТЕРИИ ПРИЁМКИ MVP
+================================================================================
+
+  [ ] Пользователь может зарегистрироваться, войти, выйти.
+  [ ] JWT защищает все приватные эндпоинты; протухший токен → 401.
+  [ ] Профиль: изменение имени, загрузка/удаление аватара.
+  [ ] Два пользователя связываются в пару по invite-коду.
+  [ ] Создание личного и общего виш-листа; CRUD желаний.
+  [ ] Партнёр резервирует желание; владелец не видит его при hideReserved.
+  [ ] Календарь: создание личных и общих событий, фильтр scope.
+  [ ] Задачи: создание, фильтры (исполнитель, категория, статус), выполнение.
+  [ ] ICS-подписка: Apple Calendar успешно подписывается и отображает
+      события; правка события обновляет его в Apple (тот же UID).
+  [ ] ТЗ (docs/TZ.txt) и макеты (docs/mockups/*.svg) присутствуют и полны.
+
+================================================================================
+13. РИСКИ И ОГРАНИЧЕНИЯ
+================================================================================
+
+  R1. Apple Calendar может обновлять подписку с задержкой (от минут до часов).
+      Mitigation: Cache-Control: no-cache; документировать для пользователя.
+  R2. Протухание refresh-токена → разлогин. Mitigation: silent refresh
+      перехватчиком на клиенте при 401.
+  R3. Конфликт часовых поясов при вводе событий на разных устройствах.
+      Mitigation: хранение UTC + отображение в tz пользователя.
+  R4. Сюрприз-режим может быть «сломан» прямым API-запросом партнёра.
+      Mitigation: серверная фильтрация hideReserved на уровне API.
+  R5. Потеря invite-кода. Mitigation: кнопка перевыпуска.
+  R6. Размер MVP: 12.5 дней — при просрочке резать UI-полировку,
+      не функциональность.
+
+================================================================================
+14. ПРИЛОЖЕНИЯ
+================================================================================
+
+14.1. Полный список enum'ов
+--------------------------------------------------------------------------------
+  Role           = OWNER | PARTNER
+  Visibility     = PERSONAL | SHARED
+  Priority       = LOW | MEDIUM | HIGH
+  WishStatus     = AVAILABLE | RESERVED | GIFTED | RECEIVED
+  EventKind      = EVENT | MEETING | DATE | HOLIDAY
+  TaskCategory   = CLEANING | COOKING | SHOPPING | REPAIRS | DOCS | PET |
+                   FINANCE | OTHER
+  TaskStatus     = TODO | IN_PROGRESS | DONE | CANCELLED
+  FeedScope      = ALL | PERSONAL | SHARED
+
+14.2. Пример ICS-файла
+--------------------------------------------------------------------------------
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//vaya//RU
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:550e8400-e29b-41d4-a716-446655440000
+SEQUENCE:0
+DTSTAMP:20260716T090000Z
+DTSTART:20260718T180000Z
+DTEND:20260718T200000Z
+SUMMARY:Ужин в кафе
+DESCRIPTION:Годовщина. Бронь на 18:00.
+LOCATION:Тверская 12
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:6ba7b810-9dad-11d1-80b4-00c04fd430c8
+SEQUENCE:0
+DTSTAMP:20260716T090000Z
+DTSTART;VALUE=DATE:20260716
+DTEND;VALUE=DATE:20260717
+SUMMARY:[Задача] Купить продукты
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR
+
+14.3. Ссылки на макеты
+--------------------------------------------------------------------------------
+  Все wireframes: docs/mockups/
+  Оглавление:     docs/mockups/README.md
+
+================================================================================
+                         КОНЕЦ ТЕХНИЧЕСКОГО ЗАДАНИЯ
+================================================================================

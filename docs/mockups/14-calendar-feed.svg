@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <style>
+      text { font-family: Inter, Arial, sans-serif; fill: #1A1A2E; }
+      .muted { fill: #6B7280; }
+      .white { fill: #FFFFFF; }
+      .primary { fill: #6C5CE7; }
+      .danger { fill: #E17055; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- ============ SIDEBAR ============ -->
+  <rect x="0" y="0" width="240" height="900" fill="#FFFFFF"/>
+  <line x1="240" y1="0" x2="240" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Logo -->
+  <rect x="24" y="28" width="32" height="32" rx="8" fill="#6C5CE7"/>
+  <text x="68" y="51" font-size="20" font-weight="700" class="primary">Vaya</text>
+
+  <!-- Nav items -->
+  <rect x="16" y="100" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="112" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="129" font-size="15" class="muted">Дашборд</text>
+
+  <rect x="16" y="152" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="164" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="181" font-size="15" class="muted">Желания</text>
+
+  <rect x="16" y="204" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="216" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="233" font-size="15" class="muted">Календарь</text>
+
+  <rect x="16" y="256" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="268" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="285" font-size="15" class="muted">Дела</text>
+
+  <!-- Настройки (active) -->
+  <rect x="16" y="308" width="208" height="44" rx="8" fill="#6C5CE7"/>
+  <rect x="28" y="320" width="20" height="20" rx="5" fill="#FFFFFF" opacity="0.35"/>
+  <text x="60" y="337" font-size="15" class="white" font-weight="600">Настройки</text>
+
+  <!-- User -->
+  <line x1="16" y1="820" x2="224" y2="820" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="48" cy="858" r="18" fill="#A29BFE"/>
+  <text x="48" y="863" font-size="13" text-anchor="middle" class="white" font-weight="600">А</text>
+  <text x="78" y="854" font-size="14" font-weight="600">Аня</text>
+  <text x="78" y="872" font-size="12" class="muted">anya@vaya.app</text>
+  <text x="210" y="864" font-size="12" class="muted">⌄</text>
+
+  <!-- ============ HEADER ============ -->
+  <text x="272" y="62" font-size="28" font-weight="700">Подписка на календарь</text>
+
+  <!-- Intro text -->
+  <text x="272" y="100" font-size="15" class="muted">Добавьте календарь Vaya в Apple Calendar, чтобы видеть события на всех устройствах</text>
+
+  <!-- ============ MAIN CARD: subscription link ============ -->
+  <rect x="272" y="132" width="1136" height="148" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="296" y="168" font-size="13" class="muted">Ссылка для подписки</text>
+  <!-- Readonly input with URL -->
+  <rect x="296" y="184" width="780" height="44" rx="8" fill="#F8F9FA" stroke="#E5E7EB"/>
+  <text x="312" y="211" font-size="14" class="muted">webcal://vaya.app/api/v1/calendar/feed/abc123def456.ics</text>
+
+  <!-- Buttons -->
+  <rect x="1092" y="184" width="140" height="44" rx="8" fill="#6C5CE7"/>
+  <text x="1162" y="211" font-size="14" text-anchor="middle" class="white" font-weight="600">Скопировать</text>
+  <!-- outlined secondary - moved below or side -->
+  <rect x="1244" y="184" width="140" height="44" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="1314" y="211" font-size="13" text-anchor="middle">Открыть в браузере</text>
+
+  <!-- Hint under input -->
+  <text x="296" y="252" font-size="12" class="muted">Ссылка содержит секретный токен — не передавайте её посторонним</text>
+
+  <!-- ============ SETTINGS CARD ============ -->
+  <rect x="272" y="300" width="556" height="248" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="296" y="336" font-size="16" font-weight="600">Что включать</text>
+
+  <!-- Toggle: Все события (ON) -->
+  <text x="296" y="380" font-size="14">Все события</text>
+  <rect x="748" y="362" width="48" height="28" rx="14" fill="#6C5CE7"/>
+  <circle cx="782" cy="376" r="11" fill="#FFFFFF"/>
+  <line x1="296" y1="400" x2="804" y2="400" stroke="#E5E7EB"/>
+
+  <!-- Toggle: Личные (OFF) -->
+  <text x="296" y="432" font-size="14">Личные</text>
+  <rect x="748" y="414" width="48" height="28" rx="14" fill="#E5E7EB"/>
+  <circle cx="762" cy="428" r="11" fill="#FFFFFF"/>
+  <line x1="296" y1="452" x2="804" y2="452" stroke="#E5E7EB"/>
+
+  <!-- Toggle: Общие (ON) -->
+  <text x="296" y="484" font-size="14">Общие</text>
+  <rect x="748" y="466" width="48" height="28" rx="14" fill="#6C5CE7"/>
+  <circle cx="782" cy="480" r="11" fill="#FFFFFF"/>
+  <line x1="296" y1="504" x2="804" y2="504" stroke="#E5E7EB"/>
+
+  <!-- Toggle: Включать задачи (ON) -->
+  <text x="296" y="536" font-size="14">Включать задачи</text>
+  <rect x="748" y="518" width="48" height="28" rx="14" fill="#6C5CE7"/>
+  <circle cx="782" cy="532" r="11" fill="#FFFFFF"/>
+
+  <!-- ============ INSTRUCTIONS CARD (right column top) ============ -->
+  <rect x="852" y="300" width="556" height="248" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="876" y="336" font-size="16" font-weight="600">Как добавить в Apple Calendar:</text>
+
+  <!-- Step 1 -->
+  <circle cx="888" cy="372" r="10" fill="#EEF0FF"/>
+  <text x="888" y="377" font-size="11" text-anchor="middle" class="primary" font-weight="600">1</text>
+  <text x="908" y="370" font-size="13" font-weight="600">На iPhone:</text>
+  <text x="908" y="390" font-size="13" class="muted">Настройки → Календарь → Учетные записи →</text>
+  <text x="908" y="408" font-size="13" class="muted">Добавить подписку календаря</text>
+
+  <!-- Step 2 -->
+  <circle cx="888" cy="444" r="10" fill="#EEF0FF"/>
+  <text x="888" y="449" font-size="11" text-anchor="middle" class="primary" font-weight="600">2</text>
+  <text x="908" y="442" font-size="13" font-weight="600">На Mac:</text>
+  <text x="908" y="462" font-size="13" class="muted">Календарь → Файл → Новая подписка календаря</text>
+
+  <!-- Step 3 -->
+  <circle cx="888" cy="500" r="10" fill="#EEF0FF"/>
+  <text x="888" y="505" font-size="11" text-anchor="middle" class="primary" font-weight="600">3</text>
+  <text x="908" y="505" font-size="13" class="muted">Вставьте ссылку и нажмите «Подписаться»</text>
+
+  <!-- ============ WARNING CARD ============ -->
+  <rect x="272" y="572" width="1136" height="100" rx="12" fill="#FEF6E7" stroke="#FDCB6E"/>
+  <text x="296" y="616" font-size="15">⚠️ Перевыпуск токена — старая ссылка перестанет работать</text>
+  <text x="296" y="642" font-size="13" class="muted">После перевыпуска обновите подписку на всех устройствах</text>
+
+  <!-- Danger outlined button -->
+  <rect x="1120" y="600" width="264" height="44" rx="8" fill="#FFFFFF" stroke="#E17055" stroke-width="1.5"/>
+  <text x="1252" y="628" font-size="14" text-anchor="middle" class="danger" font-weight="600">Перевыпустить токен</text>
+</svg>

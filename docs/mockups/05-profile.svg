@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, Arial, sans-serif">
+  <title>Vaya — Профиль</title>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- Page title -->
+  <text x="280" y="36" font-size="13" fill="#6B7280" letter-spacing="1">05 · Профиль</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="240" height="900" fill="#FFFFFF"/>
+  <line x1="240" y1="0" x2="240" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Logo -->
+  <rect x="24" y="28" width="32" height="32" rx="9" fill="#6C5CE7"/>
+  <text x="40" y="50" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">V</text>
+  <text x="66" y="51" font-size="20" font-weight="700" fill="#1A1A2E">Vaya</text>
+
+  <!-- Nav items -->
+  <rect x="32" y="110" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="60" y="124" font-size="15" fill="#6B7280">Дашборд</text>
+
+  <rect x="32" y="166" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="60" y="180" font-size="15" fill="#6B7280">Желания</text>
+
+  <rect x="32" y="218" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <line x1="32" y1="224" x2="48" y2="224" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="60" y="232" font-size="15" fill="#6B7280">Календарь</text>
+
+  <rect x="32" y="270" width="16" height="16" rx="3" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <path d="M35 278 l3 3 l6 -7" stroke="#6B7280" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <text x="60" y="284" font-size="15" fill="#6B7280">Дела</text>
+
+  <!-- Настройки (active) -->
+  <rect x="16" y="308" width="208" height="44" rx="8" fill="#EDEBFF"/>
+  <rect x="32" y="322" width="16" height="16" rx="3" fill="#6C5CE7"/>
+  <text x="60" y="336" font-size="15" font-weight="600" fill="#6C5CE7">Настройки</text>
+
+  <!-- User at bottom -->
+  <line x1="16" y1="820" x2="224" y2="820" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="48" cy="856" r="18" fill="#A29BFE"/>
+  <text x="48" y="861" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">А</text>
+  <text x="76" y="852" font-size="14" font-weight="600" fill="#1A1A2E">Аня</text>
+  <text x="76" y="870" font-size="12" fill="#6B7280">аня@email.com</text>
+
+  <!-- Header -->
+  <text x="280" y="72" font-size="28" font-weight="700" fill="#1A1A2E">Профиль</text>
+  <text x="280" y="100" font-size="15" fill="#6B7280">Личные данные и настройки аккаунта</text>
+
+  <!-- Main profile card -->
+  <rect x="280" y="130" width="720" height="560" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Avatar with upload -->
+  <circle cx="640" cy="230" r="60" fill="#A29BFE"/>
+  <text x="640" y="246" font-size="40" font-weight="700" fill="#FFFFFF" text-anchor="middle">А</text>
+  <circle cx="684" cy="272" r="18" fill="#6C5CE7"/>
+  <rect x="676" y="266" width="16" height="12" rx="2" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+  <circle cx="684" cy="272" r="3" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+  <text x="640" y="318" font-size="13" fill="#6B7280" text-anchor="middle">Нажмите, чтобы загрузить фото</text>
+
+  <!-- Name field -->
+  <text x="340" y="368" font-size="13" font-weight="600" fill="#1A1A2E">Имя</text>
+  <rect x="340" y="380" width="600" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="356" y="409" font-size="15" fill="#1A1A2E">Аня</text>
+
+  <!-- Email field -->
+  <text x="340" y="458" font-size="13" font-weight="600" fill="#1A1A2E">Email</text>
+  <rect x="340" y="470" width="600" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="356" y="499" font-size="15" fill="#1A1A2E">аня@email.com</text>
+
+  <!-- Timezone select -->
+  <text x="340" y="548" font-size="13" font-weight="600" fill="#1A1A2E">Часовой пояс</text>
+  <rect x="340" y="560" width="600" height="46" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/>
+  <text x="356" y="589" font-size="15" fill="#1A1A2E">Europe/Moscow (UTC+3)</text>
+  <!-- Chevron -->
+  <path d="M906 580 l8 8 l8 -8" stroke="#6B7280" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Save button -->
+  <rect x="340" y="630" width="180" height="48" rx="8" fill="#6C5CE7"/>
+  <text x="430" y="660" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">Сохранить</text>
+
+  <!-- Logout button -->
+  <rect x="340" y="720" width="220" height="48" rx="8" fill="#FFFFFF" stroke="#E17055" stroke-width="1.5"/>
+  <text x="450" y="750" font-size="15" font-weight="600" fill="#E17055" text-anchor="middle">Выйти из аккаунта</text>
+
+  <!-- Partner card (right) -->
+  <rect x="1030" y="130" width="350" height="220" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="1054" y="168" font-size="18" font-weight="600" fill="#1A1A2E">Партнёр</text>
+
+  <circle cx="1110" cy="230" r="36" fill="#A29BFE"/>
+  <text x="1110" y="240" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">М</text>
+
+  <text x="1162" y="222" font-size="18" font-weight="600" fill="#1A1A2E">Максим</text>
+  <text x="1162" y="248" font-size="13" fill="#6B7280">максим@email.com</text>
+
+  <rect x="1054" y="290" width="110" height="28" rx="14" fill="#E6F8F3"/>
+  <text x="1109" y="308" font-size="12" font-weight="600" fill="#00B894" text-anchor="middle">Партнёр</text>
+  <circle cx="1220" cy="304" r="5" fill="#00B894"/>
+  <text x="1234" y="309" font-size="12" fill="#6B7280">в сети</text>
+
+  <!-- Unpair hint -->
+  <rect x="1030" y="370" width="350" height="100" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="1054" y="408" font-size="14" font-weight="600" fill="#1A1A2E">Управление связкой</text>
+  <text x="1054" y="432" font-size="13" fill="#6B7280">Вы в паре с Максимом</text>
+  <text x="1054" y="454" font-size="13" font-weight="600" fill="#E17055">Отключить пару →</text>
+</svg>

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <style>
+      text { font-family: Inter, Arial, sans-serif; fill: #1A1A2E; }
+      .muted { fill: #6B7280; }
+      .white { fill: #FFFFFF; }
+      .primary { fill: #6C5CE7; }
+      .danger { fill: #E17055; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1440" height="900" fill="#F8F9FA"/>
+
+  <!-- ============ SIDEBAR ============ -->
+  <rect x="0" y="0" width="240" height="900" fill="#FFFFFF"/>
+  <line x1="240" y1="0" x2="240" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Logo -->
+  <rect x="24" y="28" width="32" height="32" rx="8" fill="#6C5CE7"/>
+  <text x="68" y="51" font-size="20" font-weight="700" class="primary">Vaya</text>
+
+  <!-- Nav items -->
+  <!-- Дашборд -->
+  <rect x="16" y="100" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="112" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="129" font-size="15" class="muted">Дашборд</text>
+
+  <!-- Желания -->
+  <rect x="16" y="152" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="164" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="181" font-size="15" class="muted">Желания</text>
+
+  <!-- Календарь -->
+  <rect x="16" y="204" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="216" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="233" font-size="15" class="muted">Календарь</text>
+
+  <!-- Дела (active) -->
+  <rect x="16" y="256" width="208" height="44" rx="8" fill="#6C5CE7"/>
+  <rect x="28" y="268" width="20" height="20" rx="5" fill="#FFFFFF" opacity="0.35"/>
+  <text x="60" y="285" font-size="15" class="white" font-weight="600">Дела</text>
+
+  <!-- Настройки -->
+  <rect x="16" y="308" width="208" height="44" rx="8" fill="#FFFFFF"/>
+  <rect x="28" y="320" width="20" height="20" rx="5" fill="#E5E7EB"/>
+  <text x="60" y="337" font-size="15" class="muted">Настройки</text>
+
+  <!-- User at bottom of sidebar -->
+  <line x1="16" y1="820" x2="224" y2="820" stroke="#E5E7EB" stroke-width="1"/>
+  <circle cx="48" cy="858" r="18" fill="#A29BFE"/>
+  <text x="48" y="863" font-size="13" text-anchor="middle" class="white" font-weight="600">А</text>
+  <text x="78" y="854" font-size="14" font-weight="600">Аня</text>
+  <text x="78" y="872" font-size="12" class="muted">anya@vaya.app</text>
+  <text x="210" y="864" font-size="12" class="muted">⌄</text>
+
+  <!-- ============ HEADER ============ -->
+  <text x="272" y="62" font-size="28" font-weight="700">Дела</text>
+  <!-- + Новая задача button -->
+  <rect x="1220" y="32" width="188" height="44" rx="8" fill="#6C5CE7"/>
+  <text x="1314" y="60" font-size="15" text-anchor="middle" class="white" font-weight="600">+ Новая задача</text>
+
+  <!-- ============ FILTER BAR ROW 1 ============ -->
+  <!-- Assignee chips -->
+  <!-- Все (active) -->
+  <rect x="272" y="100" width="112" height="36" rx="18" fill="#6C5CE7"/>
+  <circle cx="294" cy="118" r="10" fill="#FFFFFF" opacity="0.35"/>
+  <text x="312" y="123" font-size="13" class="white" font-weight="600">Все</text>
+
+  <!-- Мои -->
+  <rect x="396" y="100" width="112" height="36" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <circle cx="418" cy="118" r="10" fill="#A29BFE"/>
+  <text x="436" y="123" font-size="13" class="muted">Мои</text>
+
+  <!-- Партнёра -->
+  <rect x="520" y="100" width="136" height="36" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <circle cx="542" cy="118" r="10" fill="#00B894"/>
+  <text x="560" y="123" font-size="13" class="muted">Партнёра</text>
+
+  <!-- Без исполнителя -->
+  <rect x="668" y="100" width="180" height="36" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <circle cx="690" cy="118" r="10" fill="#E5E7EB"/>
+  <text x="708" y="123" font-size="13" class="muted">Без исполнителя</text>
+
+  <!-- ============ FILTER BAR ROW 2 ============ -->
+  <!-- Category select -->
+  <rect x="272" y="156" width="200" height="40" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="288" y="181" font-size="14" class="muted">Все категории</text>
+  <text x="452" y="181" font-size="12" class="muted">⌄</text>
+
+  <!-- Status tabs -->
+  <!-- Все (12) -->
+  <rect x="496" y="156" width="110" height="40" rx="8" fill="#6C5CE7"/>
+  <text x="551" y="181" font-size="13" text-anchor="middle" class="white" font-weight="600">Все (12)</text>
+
+  <!-- В работе (3) -->
+  <rect x="614" y="156" width="130" height="40" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="679" y="181" font-size="13" text-anchor="middle" class="muted">В работе (3)</text>
+
+  <!-- Выполнено (7) -->
+  <rect x="752" y="156" width="140" height="40" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="822" y="181" font-size="13" text-anchor="middle" class="muted">Выполнено (7)</text>
+
+  <!-- Отменено (2) -->
+  <rect x="900" y="156" width="130" height="40" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <text x="965" y="181" font-size="13" text-anchor="middle" class="muted">Отменено (2)</text>
+
+  <!-- Search input -->
+  <rect x="1080" y="156" width="328" height="40" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <circle cx="1104" cy="176" r="7" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+  <line x1="1109" y1="181" x2="1115" y2="187" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="1126" y="181" font-size="14" class="muted">Поиск...</text>
+
+  <!-- ============ TASK LIST ============ -->
+  <!-- Column headers -->
+  <text x="320" y="232" font-size="12" class="muted">ЗАДАЧА</text>
+  <text x="720" y="232" font-size="12" class="muted">КАТЕГОРИЯ</text>
+  <text x="900" y="232" font-size="12" class="muted">ИСПОЛНИТЕЛЬ</text>
+  <text x="1080" y="232" font-size="12" class="muted">СРОК</text>
+  <text x="1220" y="232" font-size="12" class="muted">ПРИОРИТЕТ</text>
+  <line x1="272" y1="248" x2="1408" y2="248" stroke="#E5E7EB"/>
+
+  <!-- Task 1: empty, HIGH -->
+  <rect x="272" y="260" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="284" width="20" height="20" rx="4" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="336" y="298" font-size="15">Купить продукты на неделю</text>
+  <rect x="720" y="282" width="90" height="26" rx="13" fill="#EEF0FF"/>
+  <text x="765" y="299" font-size="12" text-anchor="middle" class="primary">Покупки</text>
+  <circle cx="916" cy="292" r="14" fill="#A29BFE"/>
+  <text x="916" y="297" font-size="11" text-anchor="middle" class="white">А</text>
+  <text x="940" y="297" font-size="13" class="muted">Аня</text>
+  <text x="1080" y="297" font-size="13">Сегодня</text>
+  <circle cx="1230" cy="292" r="5" fill="#E17055"/>
+  <text x="1244" y="297" font-size="11" class="muted" font-weight="600">HIGH</text>
+  <text x="1380" y="298" font-size="16" class="muted">⋮</text>
+
+  <!-- Task 2: empty, overdue, LOW -->
+  <rect x="272" y="336" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="360" width="20" height="20" rx="4" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="336" y="374" font-size="15">Вынести мусор</text>
+  <rect x="720" y="358" width="90" height="26" rx="13" fill="#F3F4F6"/>
+  <text x="765" y="375" font-size="12" text-anchor="middle" class="muted">Другое</text>
+  <circle cx="916" cy="368" r="14" fill="#00B894"/>
+  <text x="916" y="373" font-size="11" text-anchor="middle" class="white">М</text>
+  <text x="940" y="373" font-size="13" class="muted">Макс</text>
+  <text x="1080" y="373" font-size="13" class="danger" font-weight="600">Вчера</text>
+  <circle cx="1230" cy="368" r="5" fill="#00B894"/>
+  <text x="1244" y="373" font-size="11" class="muted" font-weight="600">LOW</text>
+  <text x="1380" y="374" font-size="16" class="muted">⋮</text>
+
+  <!-- Task 3: empty, MEDIUM -->
+  <rect x="272" y="412" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="436" width="20" height="20" rx="4" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="336" y="450" font-size="15">Записаться к стоматологу</text>
+  <rect x="720" y="434" width="90" height="26" rx="13" fill="#E8F8F3"/>
+  <text x="765" y="451" font-size="12" text-anchor="middle" fill="#00B894">Здоровье</text>
+  <circle cx="916" cy="444" r="14" fill="#A29BFE"/>
+  <text x="916" y="449" font-size="11" text-anchor="middle" class="white">А</text>
+  <text x="940" y="449" font-size="13" class="muted">Аня</text>
+  <text x="1080" y="449" font-size="13">20.07</text>
+  <circle cx="1230" cy="444" r="5" fill="#FDCB6E"/>
+  <text x="1244" y="449" font-size="11" class="muted" font-weight="600">MEDIUM</text>
+  <text x="1380" y="450" font-size="16" class="muted">⋮</text>
+
+  <!-- Task 4: empty, HIGH -->
+  <rect x="272" y="488" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="512" width="20" height="20" rx="4" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="336" y="526" font-size="15">Починить кран на кухне</text>
+  <rect x="720" y="510" width="90" height="26" rx="13" fill="#FFF4E6"/>
+  <text x="765" y="527" font-size="12" text-anchor="middle" fill="#FDCB6E">Ремонт</text>
+  <circle cx="916" cy="520" r="14" fill="#00B894"/>
+  <text x="916" y="525" font-size="11" text-anchor="middle" class="white">М</text>
+  <text x="940" y="525" font-size="13" class="muted">Макс</text>
+  <text x="1080" y="525" font-size="13">25.07</text>
+  <circle cx="1230" cy="520" r="5" fill="#E17055"/>
+  <text x="1244" y="525" font-size="11" class="muted" font-weight="600">HIGH</text>
+  <text x="1380" y="526" font-size="16" class="muted">⋮</text>
+
+  <!-- Task 5: checked, done strikethrough, MEDIUM -->
+  <rect x="272" y="564" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="588" width="20" height="20" rx="4" fill="#00B894" stroke="#00B894" stroke-width="1.5"/>
+  <path d="M301 598 L305 602 L312 593" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="336" y="602" font-size="15" class="muted" text-decoration="line-through">Убрать квартиру</text>
+  <rect x="720" y="586" width="90" height="26" rx="13" fill="#F3F4F6"/>
+  <text x="765" y="603" font-size="12" text-anchor="middle" class="muted">Уборка</text>
+  <circle cx="916" cy="596" r="14" fill="#A29BFE"/>
+  <text x="916" y="601" font-size="11" text-anchor="middle" class="white">А</text>
+  <text x="940" y="601" font-size="13" class="muted">Аня</text>
+  <text x="1080" y="601" font-size="13" class="muted">15.07</text>
+  <circle cx="1230" cy="596" r="5" fill="#FDCB6E"/>
+  <text x="1244" y="601" font-size="11" class="muted" font-weight="600">MEDIUM</text>
+  <text x="1380" y="602" font-size="16" class="muted">⋮</text>
+
+  <!-- Task 6: empty, LOW -->
+  <rect x="272" y="640" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="664" width="20" height="20" rx="4" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="336" y="678" font-size="15">Оплатить интернет</text>
+  <rect x="720" y="662" width="90" height="26" rx="13" fill="#EEF0FF"/>
+  <text x="765" y="679" font-size="12" text-anchor="middle" class="primary">Финансы</text>
+  <circle cx="916" cy="672" r="14" fill="#00B894"/>
+  <text x="916" y="677" font-size="11" text-anchor="middle" class="white">М</text>
+  <text x="940" y="677" font-size="13" class="muted">Макс</text>
+  <text x="1080" y="677" font-size="13">28.07</text>
+  <circle cx="1230" cy="672" r="5" fill="#00B894"/>
+  <text x="1244" y="677" font-size="11" class="muted" font-weight="600">LOW</text>
+  <text x="1380" y="678" font-size="16" class="muted">⋮</text>
+
+  <!-- Task 7: checked, done, LOW -->
+  <rect x="272" y="716" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="740" width="20" height="20" rx="4" fill="#00B894" stroke="#00B894" stroke-width="1.5"/>
+  <path d="M301 750 L305 754 L312 745" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="336" y="754" font-size="15" class="muted" text-decoration="line-through">Купить корм коту</text>
+  <rect x="720" y="738" width="90" height="26" rx="13" fill="#F3F4F6"/>
+  <text x="765" y="755" font-size="12" text-anchor="middle" class="muted">Питомцы</text>
+  <circle cx="916" cy="748" r="14" fill="#00B894"/>
+  <text x="916" y="753" font-size="11" text-anchor="middle" class="white">М</text>
+  <text x="940" y="753" font-size="13" class="muted">Макс</text>
+  <text x="1080" y="753" font-size="13" class="muted">14.07</text>
+  <circle cx="1230" cy="748" r="5" fill="#00B894"/>
+  <text x="1244" y="753" font-size="11" class="muted" font-weight="600">LOW</text>
+  <text x="1380" y="754" font-size="16" class="muted">⋮</text>
+
+  <!-- Task 8: empty, MEDIUM -->
+  <rect x="272" y="792" width="1136" height="64" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
+  <rect x="296" y="816" width="20" height="20" rx="4" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="336" y="830" font-size="15">Забронировать ресторан</text>
+  <rect x="720" y="814" width="90" height="26" rx="13" fill="#F3F4F6"/>
+  <text x="765" y="831" font-size="12" text-anchor="middle" class="muted">Другое</text>
+  <circle cx="916" cy="824" r="14" fill="#A29BFE"/>
+  <text x="916" y="829" font-size="11" text-anchor="middle" class="white">А</text>
+  <text x="940" y="829" font-size="13" class="muted">Аня</text>
+  <text x="1080" y="829" font-size="13">18.07</text>
+  <circle cx="1230" cy="824" r="5" fill="#FDCB6E"/>
+  <text x="1244" y="829" font-size="11" class="muted" font-weight="600">MEDIUM</text>
+  <text x="1380" y="830" font-size="16" class="muted">⋮</text>
+
+  <!-- ============ BULK ACTION BAR ============ -->
+  <rect x="272" y="864" width="700" height="28" rx="8" fill="#EEF0FF"/>
+  <text x="292" y="883" font-size="13" class="primary" font-weight="600">Выбрано: 2</text>
+  <!-- Отметить выполненным -->
+  <rect x="400" y="866" width="220" height="24" rx="8" fill="#6C5CE7"/>
+  <text x="510" y="883" font-size="12" text-anchor="middle" class="white">Отметить выполненным</text>
+  <!-- Удалить -->
+  <rect x="632" y="866" width="100" height="24" rx="8" fill="#FFFFFF" stroke="#E17055"/>
+  <text x="682" y="883" font-size="12" text-anchor="middle" class="danger">Удалить</text>
+
+  <!-- ============ SUMMARY FOOTER ============ -->
+  <text x="1408" y="883" font-size="13" text-anchor="end" class="muted">Показано 8 из 12 задач</text>
+</svg>

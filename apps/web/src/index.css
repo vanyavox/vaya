@@ -126,6 +126,26 @@
     color: var(--t-muted);
   }
 
+  .text-danger {
+    color: #e17055;
+  }
+
+  .check-box {
+    @apply w-5 h-5 rounded border-2 flex items-center justify-center text-sm;
+    border-color: var(--t-border);
+  }
+  .check-box:hover {
+    border-color: #6c5ce7;
+  }
+  .check-box-done {
+    background-color: #00b894;
+    border-color: #00b894;
+    color: #fff;
+  }
+  .check-box-done:hover {
+    border-color: #00b894;
+  }
+
   /* ── Overlay ─────────────────────────────────────────────────────────── */
   .overlay {
     background-color: rgba(0, 0, 0, 0.4);

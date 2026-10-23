@@ -42,6 +42,7 @@ export function Todos() {
   const [dueDate, setDueDate] = useState('');
   const [assigneeChoice, setAssigneeChoice] = useState<'me' | 'partner' | 'both'>('me');
   const [statusMenuId, setStatusMenuId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const updateParam = (key: string, value: string, dropValue = 'all') => {
     const next = new URLSearchParams(searchParams);
@@ -69,7 +70,9 @@ export function Todos() {
     },
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['tasks'] });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,6 +112,31 @@ export function Todos() {
       await api.post(`/tasks/${id}/reopen`);
       invalidate();
     } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleToggleDone = async (task: { id: string; status: string }) => {
+    if (task.status === 'DONE') {
+      await handleReopen(task.id);
+    } else {
+      await handleComplete(task.id);
+    }
+  };
+
+  const openDelete = (task: { id: string; title: string }) => {
+    setStatusMenuId(null);
+    setDeleteTarget({ id: task.id, title: task.title });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await api.delete(`/tasks/${deleteTarget.id}`);
+      setDeleteTarget(null);
+      invalidate();
+    } catch (err: any) {
+      setDeleteTarget(null);
       alert(err.message);
     }
   };
@@ -194,18 +222,21 @@ export function Todos() {
                 task.status === 'DONE' || task.status === 'CANCELLED' ? 'opacity-60' : ''
               }`}
             >
-              <button
-                onClick={() =>
-                  task.status === 'DONE' ? handleReopen(task.id) : handleComplete(task.id)
-                }
-                className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                  task.status === 'DONE'
-                    ? 'bg-success border-success text-white'
-                    : 'theme-border hover:border-primary'
-                }`}
-              >
-                {task.status === 'DONE' && '✓'}
-              </button>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={task.status === 'DONE'}
+                  onChange={() => handleToggleDone(task)}
+                  className="sr-only peer"
+                />
+                <span
+                  className={`check-box peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50 ${
+                    task.status === 'DONE' ? 'check-box-done' : ''
+                  }`}
+                >
+                  {task.status === 'DONE' && '✓'}
+                </span>
+              </label>
 
               <div className="flex-1 min-w-0">
                 <div className={`font-medium ${task.status === 'DONE' ? 'line-through' : ''}`}>
@@ -255,6 +286,16 @@ export function Todos() {
                   </>
                 )}
               </div>
+
+              <button
+                type="button"
+                onClick={() => openDelete(task)}
+                className="text-danger opacity-70 hover:opacity-100 text-lg leading-none px-1"
+                title="Удалить задачу"
+                aria-label="Удалить задачу"
+              >
+                ✕
+              </button>
             </div>
           ))}
         </div>
@@ -319,6 +360,41 @@ export function Todos() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirm modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
+          <div
+            className="theme-surface rounded-card p-6 w-full max-w-sm"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-task-title"
+          >
+            <h2 id="delete-task-title" className="text-lg font-semibold mb-2">
+              Удалить задачу?
+            </h2>
+            <p className="theme-muted text-sm mb-6">
+              «{deleteTarget.title}» будет удалена безвозвратно.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                className="btn-secondary flex-1"
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="btn-danger flex-1"
+              >
+                Удалить
+              </button>
+            </div>
           </div>
         </div>
       )}

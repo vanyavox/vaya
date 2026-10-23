@@ -120,10 +120,15 @@ export interface TaskDto {
   updatedAt: string;
 }
 
-export interface TaskStatsDto {
+export interface TaskStatsBucket {
   byStatus: Record<TaskStatus, number>;
   byCategory: Record<TaskCategory, number>;
   total: number;
+}
+
+export interface TaskStatsDto {
+  couple: TaskStatsBucket;
+  personal: TaskStatsBucket;
 }
 
 // ─── Calendar Feed ───────────────────────────────────────────────────────────

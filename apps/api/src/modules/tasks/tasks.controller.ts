@@ -94,7 +94,7 @@ export class TasksController {
   }
 
   @Get('stats')
-  @ApiOperation({ summary: 'Статистика задач' })
+  @ApiOperation({ summary: 'Статистика задач: персональная и парная' })
   stats(@CurrentUser() user: CurrentUserPayload) {
     return this.tasksService.stats(user.id);
   }

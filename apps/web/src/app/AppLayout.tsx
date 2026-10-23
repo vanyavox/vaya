@@ -23,9 +23,9 @@ export function AppLayout() {
   ];
 
   const secondaryNav = [
-    { to: '/app/pairing', label: 'Связка', icon: '💜' },
-    { to: '/app/settings/calendar-feed', label: 'Настройки', icon: '⚙️' },
-    { to: '/app/profile', label: 'Профиль', icon: '👤' },
+    { to: '/app/pairing', label: 'Связка', icon: '💜', end: false },
+    { to: '/app/settings/calendar-feed', label: 'Настройки', icon: '⚙️', end: false },
+    { to: '/app/profile', label: 'Профиль', icon: '👤', end: false },
   ];
 
   const allNav = [...navItems, ...secondaryNav];

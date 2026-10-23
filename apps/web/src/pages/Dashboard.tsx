@@ -3,6 +3,42 @@ import { Link } from 'react-router-dom';
 import { api } from '../shared/api-client';
 import { useAuth } from '../app/AuthContext';
 
+function StatusRow({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: string;
+}) {
+  return (
+    <div className="flex items-center justify-between py-1">
+      <span className="flex items-center gap-2 text-sm theme-muted">
+        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+        {label}
+      </span>
+      <span className="font-semibold">{value}</span>
+    </div>
+  );
+}
+
+function StatsBucket({ title, stats }: { title: string; stats: any }) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-2">
+        <h3 className="text-sm font-medium theme-muted">{title}</h3>
+        <span className="text-sm theme-muted">
+          Всего <span className="font-semibold theme-text">{stats?.total ?? 0}</span>
+        </span>
+      </div>
+      <StatusRow label="Ожидают" value={stats?.byStatus?.TODO ?? 0} color="#d97706" />
+      <StatusRow label="В работе" value={stats?.byStatus?.IN_PROGRESS ?? 0} color="#6c5ce7" />
+      <StatusRow label="Готово" value={stats?.byStatus?.DONE ?? 0} color="#00b894" />
+    </div>
+  );
+}
+
 export function Dashboard() {
   const { user } = useAuth();
 
@@ -49,16 +85,16 @@ export function Dashboard() {
           <div className="text-2xl sm:text-3xl font-bold">{events?.length ?? 0}</div>
         </div>
         <div className="card">
-          <div className="theme-muted text-xs sm:text-sm">Задачи</div>
-          <div className="text-2xl sm:text-3xl font-bold">{tasks?.byStatus?.TODO ?? 0}</div>
+          <div className="theme-muted text-xs sm:text-sm">Мои задачи</div>
+          <div className="text-2xl sm:text-3xl font-bold">{tasks?.personal?.total ?? 0}</div>
+        </div>
+        <div className="card">
+          <div className="theme-muted text-xs sm:text-sm">Наши задачи</div>
+          <div className="text-2xl sm:text-3xl font-bold">{tasks?.couple?.total ?? 0}</div>
         </div>
         <div className="card">
           <div className="theme-muted text-xs sm:text-sm">Выполнено</div>
-          <div className="text-2xl sm:text-3xl font-bold">{tasks?.byStatus?.DONE ?? 0}</div>
-        </div>
-        <div className="card">
-          <div className="theme-muted text-xs sm:text-sm">Всего дел</div>
-          <div className="text-2xl sm:text-3xl font-bold">{tasks?.total ?? 0}</div>
+          <div className="text-2xl sm:text-3xl font-bold">{tasks?.couple?.byStatus?.DONE ?? 0}</div>
         </div>
       </div>
 
@@ -105,20 +141,10 @@ export function Dashboard() {
                 Все дела →
               </Link>
             </div>
-            {tasks?.byStatus ? (
-              <div className="flex gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-warning">{tasks.byStatus.TODO}</div>
-                  <div className="text-sm theme-muted">Ожидают</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{tasks.byStatus.IN_PROGRESS}</div>
-                  <div className="text-sm theme-muted">В работе</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-success">{tasks.byStatus.DONE}</div>
-                  <div className="text-sm theme-muted">Готово</div>
-                </div>
+            {tasks?.personal && tasks?.couple ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                <StatsBucket title="Персональные" stats={tasks.personal} />
+                <StatsBucket title="Парные" stats={tasks.couple} />
               </div>
             ) : (
               <p className="theme-muted">Загрузка...</p>

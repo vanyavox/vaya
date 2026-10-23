@@ -21,6 +21,13 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: 'Отменено',
 };
 
+const STATUS_BADGE: Record<string, string> = {
+  TODO: 'badge-warning',
+  IN_PROGRESS: 'badge-primary',
+  DONE: 'badge-success',
+  CANCELLED: 'badge-neutral',
+};
+
 export function Todos() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -32,6 +39,7 @@ export function Todos() {
   const [category, setCategory] = useState('OTHER');
   const [dueDate, setDueDate] = useState('');
   const [assigneeChoice, setAssigneeChoice] = useState<'me' | 'partner' | 'both'>('me');
+  const [statusMenuId, setStatusMenuId] = useState<string | null>(null);
 
   const { data: couple } = useQuery({
     queryKey: ['couple'],
@@ -96,6 +104,24 @@ export function Todos() {
     }
   };
 
+  const handleStatusChange = async (id: string, status: string) => {
+    setStatusMenuId(null);
+    if (status === 'DONE') {
+      await handleComplete(id);
+      return;
+    }
+    if (status === 'TODO') {
+      await handleReopen(id);
+      return;
+    }
+    try {
+      await api.patch(`/tasks/${id}`, { status });
+      invalidate();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -135,6 +161,7 @@ export function Todos() {
           <option value="TODO">Ожидает</option>
           <option value="IN_PROGRESS">В работе</option>
           <option value="DONE">Выполнено</option>
+          <option value="CANCELLED">Отменено</option>
         </select>
 
         <input
@@ -155,7 +182,7 @@ export function Todos() {
             <div
               key={task.id}
               className={`card flex items-center gap-4 py-3 ${
-                task.status === 'DONE' ? 'opacity-60' : ''
+                task.status === 'DONE' || task.status === 'CANCELLED' ? 'opacity-60' : ''
               }`}
             >
               <button
@@ -189,17 +216,36 @@ export function Todos() {
                 {CATEGORY_LABELS[task.category] ?? task.category}
               </span>
 
-              <span
-                className={`badge ${
-                  task.status === 'DONE'
-                    ? 'badge-success'
-                    : task.status === 'IN_PROGRESS'
-                      ? 'badge-primary'
-                      : 'badge-warning'
-                }`}
-              >
-                {STATUS_LABELS[task.status] ?? task.status}
-              </span>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setStatusMenuId(statusMenuId === task.id ? null : task.id)}
+                  className={`badge cursor-pointer ${STATUS_BADGE[task.status] ?? 'badge-neutral'}`}
+                  title="Изменить статус"
+                >
+                  {STATUS_LABELS[task.status] ?? task.status}
+                  <span className="ml-1 opacity-60">▾</span>
+                </button>
+                {statusMenuId === task.id && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setStatusMenuId(null)} />
+                    <div className="absolute right-0 top-full mt-1 z-20 theme-surface border theme-border rounded-btn shadow-lg py-1 min-w-[150px]">
+                      {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => handleStatusChange(task.id, value)}
+                          className={`w-full text-left px-3 py-2 text-sm theme-hover ${
+                            task.status === value ? 'text-primary font-medium' : ''
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           ))}
         </div>

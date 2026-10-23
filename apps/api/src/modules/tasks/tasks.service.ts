@@ -138,7 +138,10 @@ export class TasksService {
         ...(data.description !== undefined && { description: data.description }),
         ...(data.assigneeId !== undefined && { assigneeId: data.assigneeId || null }),
         ...(data.category !== undefined && { category: data.category }),
-        ...(data.status !== undefined && { status: data.status }),
+        ...(data.status !== undefined && {
+          status: data.status,
+          completedAt: data.status === 'DONE' ? (task.completedAt ?? new Date()) : null,
+        }),
         ...(data.priority !== undefined && { priority: data.priority }),
         ...(data.dueDate !== undefined && { dueDate: data.dueDate ? new Date(data.dueDate) : null }),
       },
@@ -190,15 +193,24 @@ export class TasksService {
   async stats(userId: string) {
     const coupleId = await this.getCoupleId(userId);
 
+    const [couple, personal] = await Promise.all([
+      this.countStats({ coupleId }),
+      this.countStats({ coupleId, assigneeId: userId }),
+    ]);
+
+    return { couple, personal };
+  }
+
+  private async countStats(where: Prisma.TaskWhereInput) {
     const byStatus = await this.prisma.task.groupBy({
       by: ['status'],
-      where: { coupleId },
+      where,
       _count: true,
     });
 
     const byCategory = await this.prisma.task.groupBy({
       by: ['category'],
-      where: { coupleId },
+      where,
       _count: true,
     });
 

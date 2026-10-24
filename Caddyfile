@@ -1,0 +1,33 @@
+{$SITE_NAME} {
+	encode gzip
+
+	# Hashed Vite assets (/assets/*-<hash>.js|css) — safe to cache hard (also on CDN)
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# API must never be cached (auth, couple data, ICS is separate)
+	@api path /api/*
+	header @api Cache-Control "private, no-store"
+
+	# Uploaded avatars etc. — short public cache
+	@uploads path /uploads/*
+	header @uploads Cache-Control "public, max-age=86400"
+
+	# SPA shell and client routes — always revalidate
+	@spa {
+		not path /assets/*
+		not path /api/*
+		not path /uploads/*
+	}
+	header @spa Cache-Control "no-cache"
+
+	# SPA + API + uploads are served by the Nest app
+	reverse_proxy api:3000
+
+	header {
+		# HSTS (safe once HTTPS works)
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}

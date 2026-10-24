@@ -19,10 +19,13 @@ COPY packages/shared packages/shared
 COPY apps/api apps/api
 COPY apps/web apps/web
 
+# Optional asset CDN origin for Vite base, e.g. https://cdn.vanyayana.ru
+ARG VITE_CDN_BASE=/
+
 RUN npx prisma generate --schema=apps/api/prisma/schema.prisma \
   && npm run build -w @vaya/shared \
   && npm run build -w @vaya/api \
-  && npm run build -w @vaya/web \
+  && VITE_CDN_BASE="${VITE_CDN_BASE:-/}" npm run build -w @vaya/web \
   && mkdir -p public \
   && cp -R apps/web/dist/. public/
 

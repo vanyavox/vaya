@@ -14,7 +14,30 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   app.setGlobalPrefix('api/v1');
-  app.use(helmet());
+
+  // Cross-origin /assets (Timeweb CDN etc.) must be allowlisted in CSP
+  const assetCdn = process.env.ASSET_CDN_ORIGIN?.replace(/\/$/, '');
+  const cdnSrc = assetCdn ? [assetCdn] : [];
+
+  app.use(
+    helmet({
+      // SPA + theme anti-flash script in index.html (inline)
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          baseUri: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'", ...cdnSrc],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https:', 'data:', ...cdnSrc],
+          imgSrc: ["'self'", 'data:', 'https:', ...cdnSrc],
+          fontSrc: ["'self'", 'data:', 'https:', ...cdnSrc],
+          connectSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          frameAncestors: ["'self'"],
+          formAction: ["'self'"],
+        },
+      },
+    }),
+  );
   app.use(cookieParser());
 
   app.enableCors({

@@ -1,0 +1,74 @@
+# Production stack for a single VPS: Postgres + app + Caddy (auto HTTPS).
+# Usage: docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vaya}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-vaya}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vaya}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - vaya
+
+  api:
+    build:
+      context: .
+      args:
+        # Vite base for hashed /assets, e.g. https://cdn.vanyayana.ru (empty = same-origin)
+        VITE_CDN_BASE: ${ASSET_CDN_URL:-/}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vaya}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-vaya}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-30d}
+      CORS_ORIGIN: ${PUBLIC_URL}
+      PUBLIC_URL: ${PUBLIC_URL}
+      WEB_DIST: /app/public
+      UPLOAD_DIR: /data/uploads
+      # Must match VITE_CDN_BASE — CSP allowlist for cross-origin scripts/styles/fonts
+      ASSET_CDN_ORIGIN: ${ASSET_CDN_URL:-}
+    volumes:
+      - uploads:/data/uploads
+    networks:
+      - vaya
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_NAME: ${SITE_NAME:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - vaya
+
+networks:
+  vaya:
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:

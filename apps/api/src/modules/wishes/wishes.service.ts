@@ -5,11 +5,15 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { PushService } from '../push/push.service';
 import { WishStatus, Priority, Prisma } from '@prisma/client';
 
 @Injectable()
 export class WishesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly pushService: PushService,
+  ) {}
 
   async list(
     userId: string,
@@ -96,6 +100,12 @@ export class WishesService {
         priority: data.priority ?? 'MEDIUM',
         sortOrder: (maxSort._max.sortOrder ?? -1) + 1,
       },
+    });
+
+    void this.pushService.notifyPartner(userId, {
+      title: 'Новое желание',
+      body: wish.title,
+      url: `/app/wishes/${wish.wishlistId}`,
     });
 
     return this.toDto(wish);

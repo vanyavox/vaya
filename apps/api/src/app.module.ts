@@ -9,6 +9,7 @@ import { WishesModule } from './modules/wishes/wishes.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { HealthModule } from './modules/health/health.module';
+import { PushModule } from './modules/push/push.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { HealthModule } from './modules/health/health.module';
     WishesModule,
     CalendarModule,
     TasksModule,
+    PushModule,
   ],
 })
 export class AppModule {}

@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { PushService } from '../push/push.service';
 import { randomUUID, randomBytes } from 'crypto';
 import { EventKind, Prisma } from '@prisma/client';
 import { existsSync, unlinkSync, createReadStream } from 'fs';
@@ -33,7 +34,10 @@ function fixMulterOriginalName(name: string): string {
 
 @Injectable()
 export class CalendarService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly pushService: PushService,
+  ) {}
 
   async listEvents(
     userId: string,
@@ -119,6 +123,15 @@ export class CalendarService {
       },
       include: { attachments: true },
     });
+
+    if (event.coupleId) {
+      const actor = await this.prisma.user.findUnique({ where: { id: userId } });
+      void this.pushService.notifyPartner(userId, {
+        title: 'Новое событие',
+        body: `${actor?.name ?? 'Партнёр'} добавил(а) событие «${event.title}»`,
+        url: '/app/calendar',
+      });
+    }
 
     return this.toDto(event);
   }

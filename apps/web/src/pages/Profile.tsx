@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../app/AuthContext';
 import { api } from '../shared/api-client';
+import { disablePush, enablePush, hasActivePush, isPushSupported } from '../shared/push';
 
 export function Profile() {
   const { user, refreshUser, logout } = useAuth();
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [saving, setSaving] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushMsg, setPushMsg] = useState('');
+  const pushSupported = isPushSupported();
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
 
@@ -74,6 +79,32 @@ export function Profile() {
       setPasswordError(true);
     } finally {
       setChangingPassword(false);
+    }
+  };
+
+
+  useEffect(() => {
+    if (!isPushSupported()) return;
+    hasActivePush().then(setPushEnabled).catch(() => undefined);
+  }, []);
+
+  const handleTogglePush = async () => {
+    setPushBusy(true);
+    setPushMsg('');
+    try {
+      if (pushEnabled) {
+        await disablePush();
+        setPushEnabled(false);
+        setPushMsg('Уведомления выключены');
+      } else {
+        await enablePush();
+        setPushEnabled(true);
+        setPushMsg('Уведомления включены');
+      }
+    } catch (err: any) {
+      setPushMsg(err?.message ?? 'Не удалось изменить подписку');
+    } finally {
+      setPushBusy(false);
     }
   };
 
@@ -199,6 +230,42 @@ export function Profile() {
               {changingPassword ? 'Сохранение...' : 'Изменить пароль'}
             </button>
           </form>
+        </div>
+
+        {/* Push notifications */}
+        <div className="card mt-6">
+          <h3 className="font-semibold mb-2">Уведомления</h3>
+          <p className="theme-muted text-sm mb-3">
+            Сообщать, когда партнёр добавляет дела, общие события или желания
+          </p>
+          {!pushSupported ? (
+            <p className="text-sm theme-muted">
+              Push-уведомления недоступны в этом браузере
+            </p>
+          ) : (
+            <>
+              <button
+                onClick={handleTogglePush}
+                disabled={pushBusy}
+                className={pushEnabled ? 'btn-secondary w-full' : 'btn-primary w-full'}
+              >
+                {pushBusy
+                  ? 'Подождите...'
+                  : pushEnabled
+                    ? 'Выключить уведомления'
+                    : 'Включить уведомления'}
+              </button>
+              {pushMsg && (
+                <div
+                  className={`mt-3 text-sm rounded-btn px-3 py-2 ${
+                    pushEnabled ? 'bg-success/10 text-success' : 'theme-muted theme-bg'
+                  }`}
+                >
+                  {pushMsg}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* Danger zone */}

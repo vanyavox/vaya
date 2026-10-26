@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { PushService } from '../push/push.service';
 import { TaskStatus, TaskCategory, Priority, Prisma } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly pushService: PushService,
+  ) {}
 
   private async getCoupleId(userId: string): Promise<string> {
     const membership = await this.prisma.coupleMember.findFirst({ where: { userId } });
@@ -106,6 +110,12 @@ export class TasksService {
         priority: data.priority ?? 'MEDIUM',
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
       },
+    });
+
+    void this.pushService.notifyPartner(userId, {
+      title: 'Новое дело',
+      body: task.title,
+      url: '/app/todos',
     });
 
     return this.toDto(task);

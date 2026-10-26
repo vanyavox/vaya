@@ -35,7 +35,7 @@ export function AppLayout() {
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-40 theme-surface border-b theme-border px-4 py-3 flex items-center justify-between">
         <NavLink to="/app" className="text-xl font-bold text-primary">
-          Vaya
+          V&Y
         </NavLink>
         <div className="flex items-center gap-1">
           <button
@@ -92,7 +92,7 @@ export function AppLayout() {
       <aside className="hidden lg:flex w-60 theme-surface border-r theme-border flex-col flex-shrink-0">
         <div className="p-4">
           <NavLink to="/app" className="text-xl font-bold text-primary">
-            Vaya
+            V&Y
           </NavLink>
         </div>
 

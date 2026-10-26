@@ -47,7 +47,7 @@ const fileFilter = (_req: any, file: Express.Multer.File, cb: any) => {
   if (ALLOWED_MIME.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Only PNG, JPEG, WebP allowed' }), false);
+    cb(new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Допускаются только PNG, JPEG, WebP' }), false);
   }
 };
 

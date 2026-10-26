@@ -90,7 +90,7 @@ class ApiClient {
     if (res.status === 204) return undefined as T;
     const data = await res.json().catch(() => null);
     if (!res.ok) {
-      throw new ApiError(res.status, data?.code ?? 'INTERNAL_ERROR', data?.message ?? 'Request failed', data?.details);
+      throw new ApiError(res.status, data?.code ?? 'INTERNAL_ERROR', data?.message ?? 'Не удалось выполнить запрос', data?.details);
     }
     return data as T;
   }

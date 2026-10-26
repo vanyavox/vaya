@@ -17,7 +17,7 @@ export class CoupleGuard implements CanActivate {
     if (!membership) {
       throw new ForbiddenException({
         code: 'FORBIDDEN',
-        message: 'User is not part of a couple',
+        message: 'Пользователь не состоит в паре',
       });
     }
     return true;

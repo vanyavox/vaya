@@ -35,7 +35,7 @@ function KindSelect({ value, onChange }: { value: string; onChange: (kind: strin
     <div ref={ref} className="relative">
       <button
         type="button"
-        className="input w-full flex items-center justify-between"
+        className="input w-full flex items-center gap-2"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -47,7 +47,7 @@ function KindSelect({ value, onChange }: { value: string; onChange: (kind: strin
           />
           {KIND_LABELS[value] ?? value}
         </span>
-        <span className="theme-muted text-xs">▾</span>
+        <span className="theme-muted text-xs ml-auto pr-1.5 leading-none">▾</span>
       </button>
       {open && (
         <div className="absolute z-20 mt-1 w-full theme-surface border theme-border rounded-btn shadow-lg overflow-hidden" role="listbox">

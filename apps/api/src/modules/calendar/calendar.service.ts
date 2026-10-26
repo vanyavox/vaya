@@ -76,7 +76,7 @@ export class CalendarService {
       where: { id },
       include: { attachments: true },
     });
-    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Event not found' });
+    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Событие не найдено' });
     await this.checkEventAccess(userId, event);
     return this.toDto(event);
   }
@@ -140,7 +140,7 @@ export class CalendarService {
     },
   ) {
     const event = await this.prisma.calendarEvent.findUnique({ where: { id } });
-    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Event not found' });
+    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Событие не найдено' });
     await this.checkEventAccess(userId, event, true);
 
     const updated = await this.prisma.calendarEvent.update({
@@ -168,7 +168,7 @@ export class CalendarService {
       where: { id },
       include: { attachments: true },
     });
-    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Event not found' });
+    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Событие не найдено' });
     await this.checkEventAccess(userId, event, true);
     for (const att of event.attachments) {
       this.removeUploadFile(att.filename);
@@ -184,10 +184,10 @@ export class CalendarService {
     file: Express.Multer.File,
   ) {
     if (!file) {
-      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'File is required' });
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Файл обязателен' });
     }
     const event = await this.prisma.calendarEvent.findUnique({ where: { id: eventId } });
-    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Event not found' });
+    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Событие не найдено' });
     await this.checkEventAccess(userId, event);
 
     const attachment = await this.prisma.eventAttachment.create({
@@ -210,7 +210,7 @@ export class CalendarService {
       include: { event: true },
     });
     if (!attachment || attachment.eventId !== eventId) {
-      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Attachment not found' });
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Вложение не найдено' });
     }
     await this.checkEventAccess(userId, attachment.event);
     this.removeUploadFile(attachment.filename);
@@ -415,7 +415,7 @@ export class CalendarService {
         return;
       }
     }
-    throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+    throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
   }
 
   private toDto(e: any) {
@@ -459,13 +459,13 @@ export class CalendarService {
       include: { event: true },
     });
     if (!attachment || attachment.eventId !== eventId) {
-      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Attachment not found' });
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Вложение не найдено' });
     }
     await this.checkEventAccess(userId, attachment.event);
 
     const filepath = this.resolveUploadPath(attachment.filename);
     if (!existsSync(filepath)) {
-      throw new NotFoundException({ code: 'NOT_FOUND', message: 'File not found' });
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Файл не найден' });
     }
 
     res.setHeader('Content-Type', attachment.mimeType || 'application/octet-stream');

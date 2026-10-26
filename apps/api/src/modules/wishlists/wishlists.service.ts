@@ -50,7 +50,7 @@ export class WishlistsService {
       },
     });
 
-    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wishlist not found' });
+    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Список желаний не найден' });
     await this.checkAccess(userId, wishlist);
 
     return {
@@ -78,9 +78,9 @@ export class WishlistsService {
 
   async update(userId: string, id: string, data: { title?: string; description?: string }) {
     const wishlist = await this.prisma.wishlist.findUnique({ where: { id } });
-    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wishlist not found' });
+    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Список желаний не найден' });
     if (wishlist.ownerId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Not the owner' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Только владелец может это сделать' });
     }
 
     const updated = await this.prisma.wishlist.update({
@@ -97,16 +97,16 @@ export class WishlistsService {
 
   async remove(userId: string, id: string) {
     const wishlist = await this.prisma.wishlist.findUnique({ where: { id } });
-    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wishlist not found' });
+    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Список желаний не найден' });
     if (wishlist.ownerId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Not the owner' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Только владелец может это сделать' });
     }
     await this.prisma.wishlist.delete({ where: { id } });
   }
 
   async reorder(userId: string, id: string, order: string[]) {
     const wishlist = await this.prisma.wishlist.findUnique({ where: { id } });
-    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wishlist not found' });
+    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Список желаний не найден' });
     await this.checkAccess(userId, wishlist);
 
     await this.prisma.$transaction(
@@ -134,7 +134,7 @@ export class WishlistsService {
         if (ownerInCouple) return;
       }
     }
-    throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+    throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
   }
 
   private async getPartnerIds(userId: string, coupleId?: string): Promise<string[]> {

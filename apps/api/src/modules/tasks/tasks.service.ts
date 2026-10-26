@@ -9,7 +9,7 @@ export class TasksService {
   private async getCoupleId(userId: string): Promise<string> {
     const membership = await this.prisma.coupleMember.findFirst({ where: { userId } });
     if (!membership) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Not in a couple' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Вы не состоите в паре' });
     }
     return membership.coupleId;
   }
@@ -75,9 +75,9 @@ export class TasksService {
   async getDetail(userId: string, id: string) {
     const coupleId = await this.getCoupleId(userId);
     const task = await this.prisma.task.findUnique({ where: { id } });
-    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Task not found' });
+    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Задача не найдена' });
     if (task.coupleId !== coupleId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
     }
     return this.toDto(task);
   }
@@ -126,9 +126,9 @@ export class TasksService {
   ) {
     const coupleId = await this.getCoupleId(userId);
     const task = await this.prisma.task.findUnique({ where: { id } });
-    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Task not found' });
+    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Задача не найдена' });
     if (task.coupleId !== coupleId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
     }
 
     const updated = await this.prisma.task.update({
@@ -153,9 +153,9 @@ export class TasksService {
   async remove(userId: string, id: string) {
     const coupleId = await this.getCoupleId(userId);
     const task = await this.prisma.task.findUnique({ where: { id } });
-    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Task not found' });
+    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Задача не найдена' });
     if (task.coupleId !== coupleId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
     }
     await this.prisma.task.delete({ where: { id } });
   }
@@ -163,9 +163,9 @@ export class TasksService {
   async complete(userId: string, id: string) {
     const coupleId = await this.getCoupleId(userId);
     const task = await this.prisma.task.findUnique({ where: { id } });
-    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Task not found' });
+    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Задача не найдена' });
     if (task.coupleId !== coupleId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
     }
 
     const updated = await this.prisma.task.update({
@@ -178,9 +178,9 @@ export class TasksService {
   async reopen(userId: string, id: string) {
     const coupleId = await this.getCoupleId(userId);
     const task = await this.prisma.task.findUnique({ where: { id } });
-    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Task not found' });
+    if (!task) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Задача не найдена' });
     if (task.coupleId !== coupleId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
     }
 
     const updated = await this.prisma.task.update({

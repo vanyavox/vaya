@@ -12,7 +12,7 @@ export class UsersService {
 
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'User not found' });
+    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Пользователь не найден' });
     return this.toDto(user);
   }
 
@@ -22,7 +22,7 @@ export class UsersService {
         where: { email: data.email, NOT: { id: userId } },
       });
       if (existing) {
-        throw new BadRequestException({ code: 'CONFLICT', message: 'Email already in use' });
+        throw new BadRequestException({ code: 'CONFLICT', message: 'Email уже занят' });
       }
     }
     const user = await this.prisma.user.update({
@@ -38,15 +38,15 @@ export class UsersService {
 
   async changePassword(userId: string, data: { currentPassword: string; newPassword: string }) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'User not found' });
+    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Пользователь не найден' });
 
     const valid = await argon2.verify(user.passwordHash, data.currentPassword);
     if (!valid) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Current password is incorrect' });
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Текущий пароль неверный' });
     }
 
     if (data.newPassword.length < 8) {
-      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'New password must be at least 8 characters' });
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Новый пароль должен быть не короче 8 символов' });
     }
 
     const passwordHash = await argon2.hash(data.newPassword);
@@ -65,10 +65,10 @@ export class UsersService {
   }
 
   async setAvatar(userId: string, file: Express.Multer.File) {
-    if (!file) throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'No file' });
+    if (!file) throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Файл не передан' });
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'User not found' });
+    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Пользователь не найден' });
 
     // Delete old avatar
     if (user.avatarUrl) {
@@ -85,7 +85,7 @@ export class UsersService {
 
   async removeAvatar(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'User not found' });
+    if (!user) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Пользователь не найден' });
     if (user.avatarUrl) this.removeFile(user.avatarUrl);
     const updated = await this.prisma.user.update({
       where: { id: userId },

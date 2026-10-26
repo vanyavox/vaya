@@ -25,7 +25,7 @@ export class AuthService {
   async register(dto: RegisterDto) {
     const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (existing) {
-      throw new ConflictException({ code: 'CONFLICT', message: 'Email already registered' });
+      throw new ConflictException({ code: 'CONFLICT', message: 'Email уже зарегистрирован' });
     }
 
     const passwordHash = await argon2.hash(dto.password);
@@ -50,12 +50,12 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (!user) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Invalid credentials' });
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Неверный email или пароль' });
     }
 
     const valid = await argon2.verify(user.passwordHash, dto.password);
     if (!valid) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Invalid credentials' });
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Неверный email или пароль' });
     }
 
     const accessToken = await this.signAccessToken(user.id, user.email, user.name);
@@ -70,7 +70,7 @@ export class AuthService {
 
   async refresh(rawToken: string | undefined) {
     if (!rawToken) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'No refresh token' });
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Нет refresh-токена' });
     }
 
     const tokenHash = this.hashToken(rawToken);
@@ -80,7 +80,7 @@ export class AuthService {
     });
 
     if (!stored) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Invalid refresh token' });
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Недействительный refresh-токен' });
     }
 
     // Rotate: revoke old, issue new
@@ -115,7 +115,7 @@ export class AuthService {
   async me(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'User not found' });
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Пользователь не найден' });
     }
     return this.toUserDto(user);
   }

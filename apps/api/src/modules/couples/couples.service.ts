@@ -29,7 +29,7 @@ export class CouplesService {
     });
 
     if (!membership) {
-      throw new NotFoundException({ code: 'NOT_FOUND', message: 'No couple found' });
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Пара не найдена' });
     }
 
     return this.toDto(membership.couple, membership.userId);
@@ -38,7 +38,7 @@ export class CouplesService {
   async createCouple(userId: string, name?: string) {
     const existing = await this.prisma.coupleMember.findFirst({ where: { userId } });
     if (existing) {
-      throw new BadRequestException({ code: 'CONFLICT', message: 'Already in a couple' });
+      throw new BadRequestException({ code: 'CONFLICT', message: 'Вы уже состоите в паре' });
     }
 
     const inviteCode = generateInviteCode();
@@ -63,7 +63,7 @@ export class CouplesService {
   async regenerateInvite(userId: string) {
     const membership = await this.prisma.coupleMember.findFirst({ where: { userId } });
     if (!membership) {
-      throw new NotFoundException({ code: 'NOT_FOUND', message: 'No couple found' });
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Пара не найдена' });
     }
 
     const inviteCode = generateInviteCode();
@@ -83,7 +83,7 @@ export class CouplesService {
   async joinCouple(userId: string, inviteCode: string) {
     const existing = await this.prisma.coupleMember.findFirst({ where: { userId } });
     if (existing) {
-      throw new BadRequestException({ code: 'CONFLICT', message: 'Already in a couple' });
+      throw new BadRequestException({ code: 'CONFLICT', message: 'Вы уже состоите в паре' });
     }
 
     const couple = await this.prisma.couple.findUnique({
@@ -92,11 +92,11 @@ export class CouplesService {
     });
 
     if (!couple) {
-      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Invalid invite code' });
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Неверный код приглашения' });
     }
 
     if (couple.members.length >= 2) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Couple is full' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'В паре уже два участника' });
     }
 
     const updated = await this.prisma.couple.update({
@@ -119,7 +119,7 @@ export class CouplesService {
   async leaveCouple(userId: string) {
     const membership = await this.prisma.coupleMember.findFirst({ where: { userId } });
     if (!membership) {
-      throw new NotFoundException({ code: 'NOT_FOUND', message: 'No couple found' });
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Пара не найдена' });
     }
     await this.prisma.coupleMember.delete({ where: { id: membership.id } });
   }

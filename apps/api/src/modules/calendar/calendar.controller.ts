@@ -284,7 +284,7 @@ export class CalendarController {
   async getIcsFeed(@Param('token') token: string, @Res() res: Response): Promise<void> {
     const ics = await this.calendarService.generateIcsFeed(token);
     if (!ics) {
-      res.status(404).json({ statusCode: 404, code: 'NOT_FOUND', message: 'Feed not found' });
+      res.status(404).json({ statusCode: 404, code: 'NOT_FOUND', message: 'Подписка не найдена' });
       return;
     }
     res.setHeader('Content-Type', 'text/calendar; charset=utf-8');

@@ -21,7 +21,7 @@ export class WishesService {
       const wishlist = await this.prisma.wishlist.findUnique({
         where: { id: query.wishlistId },
       });
-      if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wishlist not found' });
+      if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Список желаний не найден' });
       await this.checkWishlistAccess(userId, wishlist);
       where.wishlistId = query.wishlistId;
     } else {
@@ -55,7 +55,7 @@ export class WishesService {
       where: { id },
       include: { wishlist: true },
     });
-    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wish not found' });
+    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Желание не найдено' });
     await this.checkWishlistAccess(userId, wish.wishlist);
     return this.toDto(wish);
   }
@@ -74,9 +74,9 @@ export class WishesService {
     },
   ) {
     const wishlist = await this.prisma.wishlist.findUnique({ where: { id: wishlistId } });
-    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wishlist not found' });
+    if (!wishlist) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Список желаний не найден' });
     if (wishlist.ownerId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Only owner can add wishes' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Добавлять желания может только владелец' });
     }
 
     const maxSort = await this.prisma.wish.aggregate({
@@ -118,11 +118,11 @@ export class WishesService {
       where: { id },
       include: { wishlist: true },
     });
-    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wish not found' });
+    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Желание не найдено' });
 
     // Only the wishlist owner (wish creator) can edit content
     if (wish.wishlist.ownerId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Only owner can edit wishes' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Изменять желания может только владелец' });
     }
 
     const updated = await this.prisma.wish.update({
@@ -146,9 +146,9 @@ export class WishesService {
       where: { id },
       include: { wishlist: true },
     });
-    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wish not found' });
+    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Желание не найдено' });
     if (wish.wishlist.ownerId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Only owner can delete wishes' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Удалять желания может только владелец' });
     }
     await this.prisma.wish.delete({ where: { id } });
   }
@@ -158,14 +158,14 @@ export class WishesService {
       where: { id },
       include: { wishlist: true },
     });
-    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wish not found' });
+    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Желание не найдено' });
     await this.checkWishlistAccess(userId, wish.wishlist);
 
     if (wish.wishlist.ownerId === userId) {
-      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Cannot reserve own wish' });
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Нельзя забронировать своё желание' });
     }
     if (wish.status !== 'AVAILABLE') {
-      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Wish is not available' });
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Желание уже недоступно' });
     }
 
     const updated = await this.prisma.wish.update({
@@ -180,13 +180,13 @@ export class WishesService {
       where: { id },
       include: { wishlist: true },
     });
-    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wish not found' });
+    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Желание не найдено' });
 
     if (wish.reservedById !== userId && wish.wishlist.ownerId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Not allowed' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Действие запрещено' });
     }
     if (wish.status !== 'RESERVED') {
-      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Wish is not reserved' });
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Желание не забронировано' });
     }
 
     const updated = await this.prisma.wish.update({
@@ -201,13 +201,13 @@ export class WishesService {
       where: { id },
       include: { wishlist: true },
     });
-    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wish not found' });
+    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Желание не найдено' });
 
     if (wish.reservedById !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Only the person who reserved can mark as gifted' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Отметить подаренным может только тот, кто бронировал' });
     }
     if (wish.status !== 'RESERVED') {
-      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Wish is not reserved' });
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Желание не забронировано' });
     }
 
     const updated = await this.prisma.wish.update({
@@ -222,13 +222,13 @@ export class WishesService {
       where: { id },
       include: { wishlist: true },
     });
-    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Wish not found' });
+    if (!wish) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Желание не найдено' });
 
     if (wish.wishlist.ownerId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Only owner can mark as received' });
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Отметить полученным может только владелец' });
     }
     if (wish.status !== 'GIFTED') {
-      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Wish is not gifted yet' });
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Желание ещё не подарено' });
     }
 
     const updated = await this.prisma.wish.update({
@@ -249,7 +249,7 @@ export class WishesService {
       });
       if (membership) return;
     }
-    throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
+    throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа' });
   }
 
   private toDto(w: any) {

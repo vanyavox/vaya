@@ -27,6 +27,7 @@ async function bootstrap() {
           defaultSrc: ["'self'"],
           baseUri: ["'self'"],
           scriptSrc: ["'self'", "'unsafe-inline'", ...cdnSrc],
+          workerSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'", 'https:', 'data:', ...cdnSrc],
           imgSrc: ["'self'", 'data:', 'https:', ...cdnSrc],
           fontSrc: ["'self'", 'data:', 'https:', ...cdnSrc],

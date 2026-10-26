@@ -20,6 +20,8 @@ services:
       - vaya
 
   api:
+    # Override for a prebuilt registry image, e.g. VAYA_IMAGE=ghcr.io/org/vaya:tag
+    image: ${VAYA_IMAGE:-vaya-api:local}
     build:
       context: .
       args:
@@ -35,11 +37,14 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-vaya}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-vaya}
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
       JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
-      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-30d}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-7d}
       CORS_ORIGIN: ${PUBLIC_URL}
       PUBLIC_URL: ${PUBLIC_URL}
       WEB_DIST: /app/public
       UPLOAD_DIR: /data/uploads
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:?set VAPID_PUBLIC_KEY in .env}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:?set VAPID_PRIVATE_KEY in .env}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@example.com}
       # Must match VITE_CDN_BASE — CSP allowlist for cross-origin scripts/styles/fonts
       ASSET_CDN_ORIGIN: ${ASSET_CDN_URL:-}
     volumes:

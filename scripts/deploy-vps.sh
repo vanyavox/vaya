@@ -10,6 +10,11 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+# Optional: run a prebuilt image from GHCR instead of building locally
+#   export VAYA_IMAGE=ghcr.io/<owner>/<repo>:<tag>
+#   docker pull "$VAYA_IMAGE"
+# then skip --build below (compose will use $VAYA_IMAGE).
+
 echo "==> Building and starting stack"
 docker compose -f docker-compose.prod.yml up -d --build
 

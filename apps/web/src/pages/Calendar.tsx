@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { BooomSheet } from '../app/BooomSheet';
@@ -17,6 +17,65 @@ const KIND_LABELS: Record<string, string> = {
   HOLIDAY: 'Праздник',
 };
 
+function KindSelect({ value, onChange }: { value: string; onChange: (kind: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        className="input w-full flex items-center justify-between"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="flex items-center gap-2">
+          <span
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            style={{ backgroundColor: KIND_COLORS[value] ?? '#6C5CE7' }}
+          />
+          {KIND_LABELS[value] ?? value}
+        </span>
+        <span className="theme-muted text-xs">▾</span>
+      </button>
+      {open && (
+        <div className="absolute z-20 mt-1 w-full theme-surface border theme-border rounded-btn shadow-lg overflow-hidden" role="listbox">
+          {Object.entries(KIND_LABELS).map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              role="option"
+              aria-selected={value === k}
+              onClick={() => {
+                onChange(k);
+                setOpen(false);
+              }}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left theme-hover ${
+                value === k ? 'bg-primary/10 font-medium' : ''
+              }`}
+            >
+              <span
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: KIND_COLORS[k] }}
+              />
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function toLocalInput(iso: string) {
   const d = new Date(iso);
   return localDateTimeValue(d);
@@ -27,12 +86,16 @@ function localDateTimeValue(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function defaultEventTimes() {
-  const start = new Date();
+function eventTimesForDate(date: Date) {
+  const start = new Date(date);
   start.setHours(19, 0, 0, 0);
-  const end = new Date();
+  const end = new Date(date);
   end.setHours(21, 0, 0, 0);
   return { start: localDateTimeValue(start), end: localDateTimeValue(end) };
+}
+
+function isPastEvent(e: { endsAt: string }, now: Date) {
+  return new Date(e.endsAt).getTime() < now.getTime();
 }
 
 export function Calendar() {
@@ -40,10 +103,11 @@ export function Calendar() {
   const [view, setView] = useState<'month' | 'list'>('month');
   const [scope, setScope] = useState<'all' | 'personal' | 'shared'>('all');
   const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
-  const [eventStart, setEventStart] = useState(() => defaultEventTimes().start);
-  const [eventEnd, setEventEnd] = useState(() => defaultEventTimes().end);
+  const [eventStart, setEventStart] = useState(() => eventTimesForDate(new Date()).start);
+  const [eventEnd, setEventEnd] = useState(() => eventTimesForDate(new Date()).end);
   const [eventLocation, setEventLocation] = useState('');
   const [eventKind, setEventKind] = useState('EVENT');
   const [eventShared, setEventShared] = useState(true);
@@ -189,12 +253,21 @@ export function Calendar() {
   });
 
   const monthName = currentDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
-  const today = new Date();
+  const now = new Date();
   const openCreateForm = () => {
-    const { start, end } = defaultEventTimes();
+    const { start, end } = eventTimesForDate(selectedDate ?? now);
     setEventStart(start);
     setEventEnd(end);
     setShowEventForm(true);
+  };
+
+  const changeMonth = (delta: number) => {
+    setCurrentDate(new Date(year, month + delta, 1));
+    setSelectedDate(null);
+  };
+
+  const selectDay = (day: number) => {
+    setSelectedDate(new Date(year, month, day));
   };
 
   const eventBody = selected
@@ -250,7 +323,13 @@ export function Calendar() {
 
             <div>
               <div className="theme-muted text-xs mb-0.5">Тип</div>
-              <div>{KIND_LABELS[selected.kind] ?? selected.kind}</div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ backgroundColor: KIND_COLORS[selected.kind] ?? '#6C5CE7' }}
+                />
+                <span>{KIND_LABELS[selected.kind] ?? selected.kind}</span>
+              </div>
             </div>
           </div>
 
@@ -319,15 +398,7 @@ export function Calendar() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Тип</label>
-              <select
-                className="input"
-                value={draft.kind}
-                onChange={(e) => setDraft({ ...draft, kind: e.target.value })}
-              >
-                {Object.entries(KIND_LABELS).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </select>
+              <KindSelect value={draft.kind} onChange={(kind) => setDraft({ ...draft, kind })} />
             </div>
             <label className="flex items-center gap-2">
               <input
@@ -371,14 +442,14 @@ export function Calendar() {
       <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6 flex-wrap">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
+            onClick={() => changeMonth(-1)}
             className="btn-secondary px-3 py-1.5"
           >
             ‹
           </button>
           <span className="font-semibold text-base sm:text-lg capitalize min-w-[120px] sm:min-w-[150px]">{monthName}</span>
           <button
-            onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
+            onClick={() => changeMonth(1)}
             className="btn-secondary px-3 py-1.5"
           >
             ›
@@ -439,38 +510,53 @@ export function Calendar() {
                 const dayEvents = day ? eventsByDay.get(day) ?? [] : [];
                 const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
                 const isToday =
-                  day === today.getDate() &&
-                  month === today.getMonth() &&
-                  year === today.getFullYear();
+                  day === now.getDate() &&
+                  month === now.getMonth() &&
+                  year === now.getFullYear();
+                const isSelectedDay =
+                  !!day &&
+                  !!selectedDate &&
+                  day === selectedDate.getDate() &&
+                  month === selectedDate.getMonth() &&
+                  year === selectedDate.getFullYear();
 
                 return (
                   <div
                     key={i}
+                    onClick={day ? () => selectDay(day) : undefined}
                     className={`min-h-[64px] sm:min-h-[100px] border-b border-r theme-border p-1 sm:p-2 ${
-                      day ? '' : 'theme-hover'
-                    }`}
+                      day ? 'cursor-pointer' : 'theme-hover'
+                    } ${isSelectedDay ? 'ring-2 ring-inset ring-primary' : ''}`}
                   >
                     {day && (
                       <>
                         <div
                           className={`w-6 h-6 flex items-center justify-center rounded-full text-xs sm:text-sm mb-0.5 ${
-                            isToday ? 'bg-primary text-white font-bold' : ''
+                            isToday ? 'bg-primary text-white font-bold' : isSelectedDay ? 'font-semibold text-primary' : ''
                           }`}
                         >
                           {day}
                         </div>
                         <div className="space-y-0.5">
-                          {dayEvents.slice(0, 1).map((e: any) => (
-                            <button
-                              key={e.id}
-                              type="button"
-                              onClick={() => openEvent(e)}
-                              className="w-full text-[9px] sm:text-xs px-1 py-0.5 rounded truncate text-white text-left hover:opacity-80"
-                              style={{ backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7' }}
-                            >
-                              {e.title}
-                            </button>
-                          ))}
+                          {dayEvents.slice(0, 1).map((e: any) => {
+                            const past = isPastEvent(e, now);
+                            return (
+                              <button
+                                key={e.id}
+                                type="button"
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  openEvent(e);
+                                }}
+                                className={`w-full text-[9px] sm:text-xs px-1 py-0.5 rounded truncate text-white text-left ${
+                                  past ? 'opacity-45 line-through' : 'hover:opacity-80'
+                                }`}
+                                style={{ backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7' }}
+                              >
+                                {e.title}
+                              </button>
+                            );
+                          })}
                           {dayEvents.length > 1 && (
                             <div className="text-[9px] sm:text-xs theme-muted">+{dayEvents.length - 1}</div>
                           )}
@@ -496,29 +582,34 @@ export function Calendar() {
       {view === 'list' && (
         <div className="space-y-2">
           {events?.length ? (
-            events.map((e: any) => (
-              <button
-                key={e.id}
-                type="button"
-                onClick={() => openEvent(e)}
-                className="card flex items-center gap-3 w-full text-left theme-hover cursor-pointer"
-              >
-                <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7' }}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{e.title}</div>
-                  <div className="text-xs theme-muted">
-                    {e.allDay ? 'Весь день' : new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
-                    {e.location ? ` · ${e.location}` : ''}
+            events.map((e: any) => {
+              const past = isPastEvent(e, now);
+              return (
+                <button
+                  key={e.id}
+                  type="button"
+                  onClick={() => openEvent(e)}
+                  className={`card flex items-center gap-3 w-full text-left theme-hover cursor-pointer ${
+                    past ? 'opacity-50' : ''
+                  }`}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7' }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-medium truncate ${past ? 'line-through' : ''}`}>{e.title}</div>
+                    <div className="text-xs theme-muted">
+                      {e.allDay ? 'Весь день' : new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                      {e.location ? ` · ${e.location}` : ''}
+                    </div>
                   </div>
-                </div>
-                <div className="text-xs theme-muted flex-shrink-0">
-                  {new Date(e.startsAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
-                </div>
-              </button>
-            ))
+                  <div className="text-xs theme-muted flex-shrink-0">
+                    {new Date(e.startsAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                  </div>
+                </button>
+              );
+            })
           ) : (
             <div className="card text-center py-8 theme-muted">Событий нет</div>
           )}
@@ -567,12 +658,7 @@ export function Calendar() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Тип</label>
-                <select className="input" value={eventKind} onChange={(e) => setEventKind(e.target.value)}>
-                  <option value="EVENT">Событие</option>
-                  <option value="MEETING">Встреча</option>
-                  <option value="DATE">Свидание</option>
-                  <option value="HOLIDAY">Праздник</option>
-                </select>
+                <KindSelect value={eventKind} onChange={setEventKind} />
               </div>
               <label className="flex items-center gap-2">
                 <input type="checkbox" checked={eventShared} onChange={(e) => setEventShared(e.target.checked)} />

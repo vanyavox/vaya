@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { useConfirm } from '../app/ConfirmProvider';
 import { useToast } from '../app/ToastProvider';
+import { BooomSheet } from '../app/BooomSheet';
 
 const STATUS_LABELS: Record<string, { label: string; class: string }> = {
   AVAILABLE: { label: 'Доступно', class: 'badge-success' },
@@ -141,23 +142,42 @@ export function WishlistDetail() {
         <span>{wishlist.title}</span>
       </div>
 
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{wishlist.title}</h1>
-            <span className={`badge ${wishlist.visibility === 'SHARED' ? 'badge-primary' : 'badge-success'}`}>
-              {wishlist.visibility === 'SHARED' ? 'Общий' : wishlist.isOwner ? 'Мой' : 'Личный'}
+      <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 mb-8">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <h1 className="text-2xl font-bold break-words">{wishlist.title}</h1>
+            <span
+              className={`badge ${
+                wishlist.visibility === 'SHARED'
+                  ? 'badge-primary'
+                  : wishlist.isOwner
+                    ? 'badge-success'
+                    : 'badge-partner'
+              }`}
+            >
+              {wishlist.visibility === 'SHARED'
+                ? 'Общий'
+                : wishlist.isOwner
+                  ? 'Мой'
+                  : wishlist.owner?.name ?? 'Партнёр'}
             </span>
           </div>
           {wishlist.description && (
             <p className="theme-muted mt-1">{wishlist.description}</p>
           )}
         </div>
-        {wishlist.isOwner && (
-          <button onClick={handleDelete} className="btn-danger">
-            Удалить
-          </button>
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          {(wishlist.isOwner || wishlist.visibility === 'SHARED') && (
+            <button onClick={() => setShowWishForm(true)} className="btn-primary text-sm">
+              + Желание
+            </button>
+          )}
+          {wishlist.isOwner && (
+            <button onClick={handleDelete} className="btn-danger text-sm">
+              Удалить
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Wishes grid */}
@@ -240,20 +260,43 @@ export function WishlistDetail() {
         </div>
       )}
 
-      {/* FAB — only when I can add wishes (own list or shared) */}
-      {(wishlist.isOwner || wishlist.visibility === 'SHARED') && (
-        <button
-          onClick={() => setShowWishForm(true)}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full text-2xl shadow-lg hover:bg-primary-dark"
-        >
-          +
-        </button>
-      )}
-
-      {/* Edit wish modal */}
+      {/* Edit wish — BottomSheet on mobile, modal on desktop */}
+      <BooomSheet open={!!editingWishId} onClose={() => setEditingWishId(null)}>
+        <h2 className="text-lg font-semibold mb-4">Изменить желание</h2>
+        <form onSubmit={handleUpdateWish} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Название</label>
+            <input type="text" className="input" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Цена</label>
+            <input type="number" className="input" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} min="0" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Ссылка (где купить)</label>
+            <input type="url" className="input" value={editUrl} onChange={(e) => setEditUrl(e.target.value)} placeholder="https://..." />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Приоритет</label>
+            <select className="input" value={editPriority} onChange={(e) => setEditPriority(e.target.value)}>
+              <option value="LOW">Низкий</option>
+              <option value="MEDIUM">Средний</option>
+              <option value="HIGH">Высокий</option>
+            </select>
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setEditingWishId(null)} className="btn-secondary flex-1">
+              Отмена
+            </button>
+            <button type="submit" className="btn-primary flex-1">
+              Сохранить
+            </button>
+          </div>
+        </form>
+      </BooomSheet>
       {editingWishId && (
-        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="theme-surface rounded-card p-6 w-full max-w-md">
+        <div className="hidden lg:flex fixed inset-0 overlay items-center justify-center z-50" onClick={() => setEditingWishId(null)}>
+          <div className="theme-surface rounded-card p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-semibold mb-4">Изменить желание</h2>
             <form onSubmit={handleUpdateWish} className="space-y-4">
               <div>
@@ -266,13 +309,7 @@ export function WishlistDetail() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Ссылка (где купить)</label>
-                <input
-                  type="url"
-                  className="input"
-                  value={editUrl}
-                  onChange={(e) => setEditUrl(e.target.value)}
-                  placeholder="https://..."
-                />
+                <input type="url" className="input" value={editUrl} onChange={(e) => setEditUrl(e.target.value)} placeholder="https://..." />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Приоритет</label>
@@ -295,10 +332,43 @@ export function WishlistDetail() {
         </div>
       )}
 
-      {/* Wish form modal */}
+      {/* New wish — BottomSheet on mobile, modal on desktop */}
+      <BooomSheet open={showWishForm} onClose={() => setShowWishForm(false)}>
+        <h2 className="text-lg font-semibold mb-4">Новое желание</h2>
+        <form onSubmit={handleCreateWish} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Название</label>
+            <input type="text" className="input" value={wishTitle} onChange={(e) => setWishTitle(e.target.value)} required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Цена</label>
+            <input type="number" className="input" value={wishPrice} onChange={(e) => setWishPrice(e.target.value)} min="0" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Ссылка (где купить)</label>
+            <input type="url" className="input" value={wishUrl} onChange={(e) => setWishUrl(e.target.value)} placeholder="https://..." />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Приоритет</label>
+            <select className="input" value={wishPriority} onChange={(e) => setWishPriority(e.target.value)}>
+              <option value="LOW">Низкий</option>
+              <option value="MEDIUM">Средний</option>
+              <option value="HIGH">Высокий</option>
+            </select>
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setShowWishForm(false)} className="btn-secondary flex-1">
+              Отмена
+            </button>
+            <button type="submit" className="btn-primary flex-1">
+              Создать
+            </button>
+          </div>
+        </form>
+      </BooomSheet>
       {showWishForm && (
-        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="theme-surface rounded-card p-6 w-full max-w-md">
+        <div className="hidden lg:flex fixed inset-0 overlay items-center justify-center z-50" onClick={() => setShowWishForm(false)}>
+          <div className="theme-surface rounded-card p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-semibold mb-4">Новое желание</h2>
             <form onSubmit={handleCreateWish} className="space-y-4">
               <div>
@@ -311,13 +381,7 @@ export function WishlistDetail() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Ссылка (где купить)</label>
-                <input
-                  type="url"
-                  className="input"
-                  value={wishUrl}
-                  onChange={(e) => setWishUrl(e.target.value)}
-                  placeholder="https://..."
-                />
+                <input type="url" className="input" value={wishUrl} onChange={(e) => setWishUrl(e.target.value)} placeholder="https://..." />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Приоритет</label>

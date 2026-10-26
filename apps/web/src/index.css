@@ -121,6 +121,13 @@
     background-color: rgba(225, 112, 85, 0.12);
     color: #e17055;
   }
+  .badge-partner {
+    background-color: rgba(0, 180, 216, 0.14);
+    color: #0984a8;
+  }
+  html.dark .badge-partner {
+    color: #48c5e4;
+  }
   .badge-neutral {
     background-color: var(--t-hover);
     color: var(--t-muted);

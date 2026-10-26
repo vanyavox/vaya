@@ -7,7 +7,7 @@ import { useToast } from '../app/ToastProvider';
 export function Wishlists() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [scope, setScope] = useState<'all' | 'mine' | 'personal' | 'shared'>('personal');
+  const [scope, setScope] = useState<'all' | 'mine' | 'personal' | 'shared'>('all');
   const [showCreate, setShowCreate] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -122,9 +122,19 @@ export function Wishlists() {
               <div className="flex items-start justify-between gap-2 mb-2">
                 <h3 className="font-semibold truncate flex-1">{w.title}</h3>
                 <span
-                  className={`badge flex-shrink-0 ${w.visibility === 'SHARED' ? 'badge-primary' : 'badge-success'}`}
+                  className={`badge flex-shrink-0 ${
+                    w.visibility === 'SHARED'
+                      ? 'badge-primary'
+                      : w.isOwner
+                        ? 'badge-success'
+                        : 'badge-partner'
+                  }`}
                 >
-                  {w.visibility === 'SHARED' ? 'Общий' : w.isOwner ? 'Мой' : 'Личный'}
+                  {w.visibility === 'SHARED'
+                    ? 'Общий'
+                    : w.isOwner
+                      ? 'Мой'
+                      : w.owner?.name ?? 'Партнёр'}
                 </span>
               </div>
               {w.description && (

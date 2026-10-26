@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 
@@ -76,21 +76,25 @@ export function Pairing() {
         <div className="max-w-lg">
           <div className="card">
             <h2 className="text-lg font-semibold mb-4">Вы в паре</h2>
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-start justify-center gap-4 sm:gap-6">
               {couple.members.map((m: any, i: number) => (
-                <div key={m.userId} className="flex flex-col items-center">
-                  {m.avatarUrl ? (
-                    <img src={m.avatarUrl} alt={m.name} className="w-16 h-16 rounded-full" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xl sm:text-2xl font-bold">
-                      {m.name[0]}
-                    </div>
+                <Fragment key={m.userId}>
+                  {i > 0 && (
+                    <div className="text-3xl text-danger self-center pt-2">♥</div>
                   )}
-                  <span className="mt-2 font-medium">{m.name}</span>
-                  <span className="text-xs theme-muted">{m.role === 'OWNER' ? 'Владелец' : 'Партнёр'}</span>
-                </div>
+                  <div className="flex flex-col items-center">
+                    {m.avatarUrl ? (
+                      <img src={m.avatarUrl} alt={m.name} className="w-16 h-16 rounded-full" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xl sm:text-2xl font-bold">
+                        {m.name[0]}
+                      </div>
+                    )}
+                    <span className="mt-2 font-medium">{m.name}</span>
+                    <span className="text-xs theme-muted">{m.role === 'OWNER' ? 'Владелец' : 'Партнёр'}</span>
+                  </div>
+                </Fragment>
               ))}
-              <div className="text-3xl text-danger">♥</div>
             </div>
           </div>
 

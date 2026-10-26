@@ -57,7 +57,7 @@ export class WishlistsController {
   @ApiOperation({ summary: 'Список виш-листов' })
   list(
     @CurrentUser() user: CurrentUserPayload,
-    @Query('scope') scope?: 'personal' | 'shared' | 'all',
+    @Query('scope') scope?: 'mine' | 'personal' | 'shared' | 'all',
   ) {
     return this.wishlistsService.list(user.id, scope ?? 'all');
   }

@@ -6,30 +6,38 @@ import { Visibility, Prisma } from '@prisma/client';
 export class WishlistsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(userId: string, scope: 'personal' | 'shared' | 'all' = 'all') {
+  async list(userId: string, scope: 'mine' | 'personal' | 'shared' | 'all' = 'all') {
     const membership = await this.prisma.coupleMember.findFirst({ where: { userId } });
+    const partnerIds = await this.getPartnerIds(userId, membership?.coupleId);
 
     const where: Prisma.WishlistWhereInput = {};
-    if (scope === 'personal') {
-      where.ownerId = userId;
+    if (scope === 'mine') {
       where.visibility = 'PERSONAL';
+      where.ownerId = userId;
+    } else if (scope === 'personal') {
+      // Personal = what my partner wants — I open it to buy a gift
+      where.visibility = 'PERSONAL';
+      where.ownerId = { in: partnerIds.length ? partnerIds : ['none'] };
     } else if (scope === 'shared') {
       where.visibility = 'SHARED';
-      if (membership) where.coupleId = membership.coupleId;
+      where.coupleId = membership?.coupleId ?? 'none';
     } else {
       where.OR = [
-        { ownerId: userId },
-        ...(membership ? [{ coupleId: membership.coupleId, visibility: 'SHARED' as const }] : []),
+        { visibility: 'PERSONAL' },
+        { visibility: 'SHARED', coupleId: membership?.coupleId ?? 'none' },
       ];
     }
 
     const wishlists = await this.prisma.wishlist.findMany({
       where,
-      include: { _count: { select: { wishes: true } } },
+      include: {
+        _count: { select: { wishes: true } },
+        owner: { select: { id: true, name: true, avatarUrl: true } },
+      },
       orderBy: { updatedAt: 'desc' },
     });
 
-    return wishlists.map((w) => this.toDto(w, w._count.wishes));
+    return wishlists.map((w) => this.toDto(w, w._count.wishes, userId));
   }
 
   async getDetail(userId: string, id: string) {
@@ -38,6 +46,7 @@ export class WishlistsService {
       include: {
         wishes: { orderBy: { sortOrder: 'asc' } },
         _count: { select: { wishes: true } },
+        owner: { select: { id: true, name: true, avatarUrl: true } },
       },
     });
 
@@ -45,7 +54,7 @@ export class WishlistsService {
     await this.checkAccess(userId, wishlist);
 
     return {
-      ...this.toDto(wishlist, wishlist._count.wishes),
+      ...this.toDto(wishlist, wishlist._count.wishes, userId),
       wishes: wishlist.wishes.map((w) => this.wishToDto(w)),
     };
   }
@@ -64,7 +73,7 @@ export class WishlistsService {
       include: { _count: { select: { wishes: true } } },
     });
 
-    return this.toDto(wishlist, 0);
+    return this.toDto(wishlist, 0, userId);
   }
 
   async update(userId: string, id: string, data: { title?: string; description?: string }) {
@@ -83,7 +92,7 @@ export class WishlistsService {
       include: { _count: { select: { wishes: true } } },
     });
 
-    return this.toDto(updated, updated._count.wishes);
+    return this.toDto(updated, updated._count.wishes, userId);
   }
 
   async remove(userId: string, id: string) {
@@ -109,19 +118,42 @@ export class WishlistsService {
 
   private async checkAccess(userId: string, wishlist: { ownerId: string; visibility: string; coupleId: string | null }) {
     if (wishlist.ownerId === userId) return;
-    if (wishlist.visibility === 'SHARED' && wishlist.coupleId) {
+
+    // Partner can open personal lists (gift ideas) and shared lists
+    if (wishlist.coupleId) {
       const membership = await this.prisma.coupleMember.findFirst({
         where: { userId, coupleId: wishlist.coupleId },
       });
       if (membership) return;
+    } else {
+      const mine = await this.prisma.coupleMember.findFirst({ where: { userId } });
+      if (mine) {
+        const ownerInCouple = await this.prisma.coupleMember.findFirst({
+          where: { userId: wishlist.ownerId, coupleId: mine.coupleId },
+        });
+        if (ownerInCouple) return;
+      }
     }
     throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No access' });
   }
 
-  private toDto(w: { id: string; ownerId: string; coupleId: string | null; title: string; description: string | null; visibility: string; createdAt: Date; updatedAt: Date }, wishCount: number) {
+  private async getPartnerIds(userId: string, coupleId?: string): Promise<string[]> {
+    if (!coupleId) return [];
+    const members = await this.prisma.coupleMember.findMany({
+      where: { coupleId, userId: { not: userId } },
+      select: { userId: true },
+    });
+    return members.map((m) => m.userId);
+  }
+
+  private toDto(w: any, wishCount: number, viewerId?: string) {
     return {
       id: w.id,
       ownerId: w.ownerId,
+      owner: w.owner
+        ? { id: w.owner.id, name: w.owner.name, avatarUrl: w.owner.avatarUrl ?? null }
+        : undefined,
+      isOwner: viewerId != null ? w.ownerId === viewerId : w.ownerId === viewerId,
       coupleId: w.coupleId,
       title: w.title,
       description: w.description,

@@ -7,7 +7,7 @@ import { useToast } from '../app/ToastProvider';
 export function Wishlists() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [scope, setScope] = useState<'all' | 'personal' | 'shared'>('all');
+  const [scope, setScope] = useState<'all' | 'mine' | 'personal' | 'shared'>('personal');
   const [showCreate, setShowCreate] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -42,7 +42,7 @@ export function Wishlists() {
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
-        {(['all', 'personal', 'shared'] as const).map((s) => (
+        {(['all', 'mine', 'personal', 'shared'] as const).map((s) => (
           <button
             key={s}
             onClick={() => setScope(s)}
@@ -52,11 +52,13 @@ export function Wishlists() {
                 : 'theme-surface border theme-border theme-muted theme-hover'
             }`}
           >
-            {s === 'all' ? 'Все' : s === 'personal' ? 'Личные' : 'Общие'}
+            {s === 'all' ? 'Все' : s === 'mine' ? 'Мои' : s === 'personal' ? 'Личные' : 'Общие'}
           </button>
         ))}
       </div>
-
+      <p className="text-xs theme-muted mb-4">
+        Личные — что хочет партнёр. Мои — что хочу я. Общие — нужное паре.
+      </p>
       {/* Create modal */}
       {showCreate && (
         <div className="fixed inset-0 overlay flex items-center justify-center z-50">
@@ -89,8 +91,8 @@ export function Wishlists() {
                   value={visibility}
                   onChange={(e) => setVisibility(e.target.value as any)}
                 >
-                  <option value="PERSONAL">Личный</option>
-                  <option value="SHARED">Общий</option>
+                  <option value="PERSONAL">Личный — что хочу я</option>
+                  <option value="SHARED">Общий — что нужно нам</option>
                 </select>
               </div>
               <div className="flex gap-3">
@@ -112,22 +114,24 @@ export function Wishlists() {
       ) : wishlists?.length ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {wishlists.map((w: any) => (
-            <Link key={w.id} to={`/app/wishes/${w.id}`}>
-              <div className="card hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold">{w.title}</h3>
-                  <span
-                    className={`badge ${w.visibility === 'SHARED' ? 'badge-primary' : 'badge-success'}`}
-                  >
-                    {w.visibility === 'SHARED' ? 'Общий' : 'Личный'}
-                  </span>
-                </div>
-                {w.description && (
-                  <p className="theme-muted text-sm mb-3">{w.description}</p>
-                )}
-                <div className="text-sm theme-muted">
-                  {w.wishCount} желаний
-                </div>
+            <Link
+              key={w.id}
+              to={`/app/wishes/${w.id}`}
+              className="card flex flex-col min-h-[140px] hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="font-semibold truncate flex-1">{w.title}</h3>
+                <span
+                  className={`badge flex-shrink-0 ${w.visibility === 'SHARED' ? 'badge-primary' : 'badge-success'}`}
+                >
+                  {w.visibility === 'SHARED' ? 'Общий' : w.isOwner ? 'Мой' : 'Личный'}
+                </span>
+              </div>
+              {w.description && (
+                <p className="theme-muted text-sm line-clamp-2 mb-3">{w.description}</p>
+              )}
+              <div className="text-sm theme-muted mt-auto pt-2">
+                {w.wishCount} желаний
               </div>
             </Link>
           ))}

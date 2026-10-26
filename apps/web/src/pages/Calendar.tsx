@@ -98,6 +98,57 @@ function isPastEvent(e: { endsAt: string }, now: Date) {
   return new Date(e.endsAt).getTime() < now.getTime();
 }
 
+function isMultiDayEvent(e: { startsAt: string; endsAt: string }) {
+  const s = new Date(e.startsAt);
+  const t = new Date(e.endsAt);
+  return (
+    s.getFullYear() !== t.getFullYear() ||
+    s.getMonth() !== t.getMonth() ||
+    s.getDate() !== t.getDate()
+  );
+}
+
+function eventTouchesDay(e: { startsAt: string; endsAt: string }, y: number, m: number, d: number) {
+  const dayStart = new Date(y, m, d).getTime();
+  const dayEnd = new Date(y, m, d + 1).getTime();
+  return new Date(e.startsAt).getTime() < dayEnd && new Date(e.endsAt).getTime() > dayStart;
+}
+
+const CHIP_CLASS =
+  'w-full text-[9px] sm:text-xs px-1 py-0.5 truncate text-white text-left hover:opacity-80';
+
+function chipClassFor(e: any, now: Date, opts?: { left?: boolean; right?: boolean }) {
+  const past = isPastEvent(e, now);
+  return [
+    CHIP_CLASS,
+    past ? 'opacity-45 line-through hover:opacity-45' : '',
+    opts?.left === false ? 'rounded-l-none' : 'rounded-l-btn',
+    opts?.right === false ? 'rounded-r-none' : 'rounded-r-btn',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function formatCountdown(target: Date, now: Date): string {
+  const diff = target.getTime() - now.getTime();
+  if (diff <= 0) return 'уже идёт';
+  const mins = Math.floor(diff / 60000);
+  const days = Math.floor(mins / (60 * 24));
+  const hours = Math.floor((mins % (60 * 24)) / 60);
+  const m = mins % 60;
+  if (days > 0) return `через ${days} д ${hours} ч`;
+  if (hours > 0) return `через ${hours} ч ${m} мин`;
+  return `через ${m} мин`;
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024) return `${size} Б`;
+  if (size < 1024 * 1024) return `${Math.round(size / 1024)} КБ`;
+  return `${(size / (1024 * 1024)).toFixed(1)} МБ`;
+}
+
+const ATTACHMENT_MAX_SIZE = 25 * 1024 * 1024;
+
 export function Calendar() {
   const queryClient = useQueryClient();
   const [view, setView] = useState<'month' | 'list'>('month');
@@ -111,6 +162,8 @@ export function Calendar() {
   const [eventLocation, setEventLocation] = useState('');
   const [eventKind, setEventKind] = useState('EVENT');
   const [eventShared, setEventShared] = useState(true);
+  const [eventShowCountdown, setEventShowCountdown] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -122,12 +175,13 @@ export function Calendar() {
     endsAt: string;
     allDay: boolean;
     kind: string;
+    showCountdown: boolean;
   } | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthStart = new Date(year, month, 1);
-  const monthEnd = new Date(year, month + 1, 0);
+  const monthEnd = new Date(year, month + 1, 1);
 
   const { data: events } = useQuery({
     queryKey: ['events', scope, year, month],
@@ -164,6 +218,7 @@ export function Calendar() {
       endsAt: toLocalInput(selected.endsAt),
       allDay: selected.allDay,
       kind: selected.kind,
+      showCountdown: !!selected.showCountdown,
     });
   };
 
@@ -179,6 +234,7 @@ export function Calendar() {
         endsAt: new Date(draft.endsAt).toISOString(),
         allDay: draft.allDay,
         kind: draft.kind,
+        showCountdown: draft.showCountdown,
       });
       queryClient.invalidateQueries({ queryKey: ['events'] });
       setIsEditing(false);
@@ -208,20 +264,54 @@ export function Calendar() {
     setDraft(null);
   };
 
+  const handleUploadAttachment = async (file: File) => {
+    if (!selected) return;
+    if (file.size > ATTACHMENT_MAX_SIZE) {
+      alert('Файл больше 25 МБ');
+      return;
+    }
+    try {
+      await api.upload(`/calendar/events/${selected.id}/attachments`, file);
+      await queryClient.invalidateQueries({ queryKey: ['events'] });
+    } catch (err: any) {
+      alert(err.message ?? 'Не удалось загрузить файл');
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!selected) return;
+    if (!confirm('Удалить файл?')) return;
+    try {
+      await api.delete(`/calendar/events/${selected.id}/attachments/${attachmentId}`);
+      await queryClient.invalidateQueries({ queryKey: ['events'] });
+    } catch (err: any) {
+      alert(err.message ?? 'Не удалось удалить файл');
+    }
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/calendar/events', {
+      const created = await api.post<any>('/calendar/events', {
         title: eventTitle,
         startsAt: new Date(eventStart).toISOString(),
         endsAt: new Date(eventEnd).toISOString(),
         location: eventLocation || undefined,
         kind: eventKind,
         shared: eventShared,
+        showCountdown: eventShowCountdown,
       });
+      for (const file of pendingFiles) {
+        if (file.size > ATTACHMENT_MAX_SIZE) {
+          alert(`Файл «${file.name}» больше 25 МБ — пропущен`);
+          continue;
+        }
+        await api.upload(`/calendar/events/${created.id}/attachments`, file);
+      }
       queryClient.invalidateQueries({ queryKey: ['events'] });
       setShowEventForm(false);
       setEventTitle('');
+      setPendingFiles([]);
     } catch (err: any) {
       alert(err.message);
     }
@@ -229,13 +319,16 @@ export function Calendar() {
 
   // Build month grid
   const firstDay = monthStart.getDay(); // 0=Sun
-  const daysInMonth = monthEnd.getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
   const startDay = firstDay === 0 ? 6 : firstDay - 1; // Convert to Mon=0
 
   const days: (number | null)[] = [];
   for (let i = 0; i < startDay; i++) days.push(null);
   for (let d = 1; d <= daysInMonth; d++) days.push(d);
   while (days.length % 7 !== 0) days.push(null);
+
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
 
   const eventsByDay = new Map<number, any[]>();
   events?.forEach((e: any) => {
@@ -252,12 +345,29 @@ export function Calendar() {
     tasksByDay.get(d)!.push(t);
   });
 
+  const multiDayEvents = (events ?? []).filter(isMultiDayEvent);
+  const singleDayEvents = (events ?? []).filter((e: any) => !isMultiDayEvent(e));
+
+  const singleByDay = new Map<number, any[]>();
+  singleDayEvents.forEach((e: any) => {
+    const d = new Date(e.startsAt).getDate();
+    if (!singleByDay.has(d)) singleByDay.set(d, []);
+    singleByDay.get(d)!.push(e);
+  });
+
   const monthName = currentDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
   const now = new Date();
+
   const openCreateForm = () => {
     const { start, end } = eventTimesForDate(selectedDate ?? now);
     setEventStart(start);
     setEventEnd(end);
+    setEventTitle('');
+    setEventLocation('');
+    setEventKind('EVENT');
+    setEventShared(true);
+    setEventShowCountdown(false);
+    setPendingFiles([]);
     setShowEventForm(true);
   };
 
@@ -330,6 +440,30 @@ export function Calendar() {
                 />
                 <span>{KIND_LABELS[selected.kind] ?? selected.kind}</span>
               </div>
+            </div>
+
+            <div>
+              <div className="theme-muted text-xs mb-0.5">Файлы</div>
+              {(selected.attachments ?? []).length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {selected.attachments.map((a: any) => (
+                    <a
+                      key={a.id}
+                      href={a.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      download={a.originalName}
+                      title={`${a.originalName} (${formatFileSize(a.size)})`}
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-btn theme-bg theme-hover text-sm"
+                    >
+                      <span aria-hidden>📎</span>
+                      <span className="max-w-[140px] truncate">{a.originalName}</span>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <div className="theme-muted text-sm">Нет файлов</div>
+              )}
             </div>
           </div>
 
@@ -408,6 +542,56 @@ export function Calendar() {
               />
               <span className="text-sm">Весь день</span>
             </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={draft.showCountdown}
+                onChange={(e) => setDraft({ ...draft, showCountdown: e.target.checked })}
+              />
+              <span className="text-sm">Отображать обратный отсчёт</span>
+            </label>
+            <div>
+              <div className="text-sm font-medium mb-1">Файлы</div>
+              {(selected?.attachments ?? []).length > 0 && (
+                <div className="space-y-1 mb-2">
+                  {selected.attachments.map((a: any) => (
+                    <div key={a.id} className="flex items-center gap-2 text-sm theme-bg rounded-btn px-2 py-1.5">
+                      <a
+                        href={a.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        download={a.originalName}
+                        className="flex-1 min-w-0 truncate text-primary hover:underline"
+                      >
+                        {a.originalName}
+                      </a>
+                      <span className="text-xs theme-muted flex-shrink-0">{formatFileSize(a.size)}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteAttachment(a.id)}
+                        className="text-danger text-xs flex-shrink-0"
+                        aria-label="Удалить файл"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label className="btn-secondary text-sm cursor-pointer inline-flex items-center">
+                + Прикрепить файл
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleUploadAttachment(f);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              <div className="text-xs theme-muted mt-1">до 25 МБ</div>
+            </div>
             <div className="flex gap-3">
               <button
                 type="button"
@@ -504,76 +688,122 @@ export function Calendar() {
               ))}
             </div>
 
-            {/* Days */}
-            <div className="grid grid-cols-7">
-              {days.map((day, i) => {
-                const dayEvents = day ? eventsByDay.get(day) ?? [] : [];
-                const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
-                const isToday =
-                  day === now.getDate() &&
-                  month === now.getMonth() &&
-                  year === now.getFullYear();
-                const isSelectedDay =
-                  !!day &&
-                  !!selectedDate &&
-                  day === selectedDate.getDate() &&
-                  month === selectedDate.getMonth() &&
-                  year === selectedDate.getFullYear();
+            {/* Weeks: date row + event chips (multi-day spans columns, same chip style) */}
+            {weeks.map((week, wi) => {
+              const weekBars = multiDayEvents
+                .map((e: any) => {
+                  const covered: number[] = [];
+                  week.forEach((day, i) => {
+                    if (day && eventTouchesDay(e, year, month, day)) covered.push(i);
+                  });
+                  if (!covered.length) return null;
+                  return {
+                    e,
+                    colStart: covered[0] + 1,
+                    colSpan: covered[covered.length - 1] - covered[0] + 1,
+                    startsHere: covered[0] === week.findIndex((d) => d !== null && eventTouchesDay(e, year, month, d)),
+                  };
+                })
+                .filter(Boolean) as { e: any; colStart: number; colSpan: number }[];
 
-                return (
-                  <div
-                    key={i}
-                    onClick={day ? () => selectDay(day) : undefined}
-                    className={`min-h-[64px] sm:min-h-[100px] border-b border-r theme-border p-1 sm:p-2 ${
-                      day ? 'cursor-pointer' : 'theme-hover'
-                    } ${isSelectedDay ? 'ring-2 ring-inset ring-primary' : ''}`}
-                  >
-                    {day && (
-                      <>
+              return (
+                <div key={wi} className="border-b theme-border min-h-[64px] sm:min-h-[100px]">
+                  {/* Dates */}
+                  <div className="grid grid-cols-7">
+                    {week.map((day, i) => {
+                      const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
+                      const isToday =
+                        day === now.getDate() &&
+                        month === now.getMonth() &&
+                        year === now.getFullYear();
+                      const isSelectedDay =
+                        !!day &&
+                        !!selectedDate &&
+                        day === selectedDate.getDate() &&
+                        month === selectedDate.getMonth() &&
+                        year === selectedDate.getFullYear();
+                      return (
                         <div
-                          className={`w-6 h-6 flex items-center justify-center rounded-full text-xs sm:text-sm mb-0.5 ${
-                            isToday ? 'bg-primary text-white font-bold' : isSelectedDay ? 'font-semibold text-primary' : ''
-                          }`}
+                          key={i}
+                          onClick={day ? () => selectDay(day) : undefined}
+                          className={`border-r theme-border px-1 sm:px-2 pt-1 sm:pt-2 ${
+                            day ? 'cursor-pointer' : 'theme-hover'
+                          } ${isSelectedDay ? 'ring-2 ring-inset ring-primary' : ''}`}
                         >
-                          {day}
-                        </div>
-                        <div className="space-y-0.5">
-                          {dayEvents.slice(0, 1).map((e: any) => {
-                            const past = isPastEvent(e, now);
-                            return (
-                              <button
-                                key={e.id}
-                                type="button"
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  openEvent(e);
-                                }}
-                                className={`w-full text-[9px] sm:text-xs px-1 py-0.5 rounded truncate text-white text-left ${
-                                  past ? 'opacity-45 line-through' : 'hover:opacity-80'
+                          {day && (
+                            <>
+                              <div
+                                className={`w-6 h-6 flex items-center justify-center rounded-full text-xs sm:text-sm ${
+                                  isToday
+                                    ? 'bg-primary text-white font-bold'
+                                    : isSelectedDay
+                                      ? 'font-semibold text-primary'
+                                      : ''
                                 }`}
-                                style={{ backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7' }}
                               >
-                                {e.title}
-                              </button>
-                            );
-                          })}
-                          {dayEvents.length > 1 && (
-                            <div className="text-[9px] sm:text-xs theme-muted">+{dayEvents.length - 1}</div>
-                          )}
-                          {dayTasks.length > 0 && (
-                            <div className="flex gap-0.5">
-                              {dayTasks.slice(0, 3).map((t: any) => (
-                                <div key={t.id} className="w-1 h-1 rounded-full bg-text-secondary" />
-                              ))}
-                            </div>
+                                {day}
+                              </div>
+                              {dayTasks.length > 0 && (
+                                <div className="flex gap-0.5 mt-0.5">
+                                  {dayTasks.slice(0, 3).map((t: any) => (
+                                    <div key={t.id} className="w-1 h-1 rounded-full bg-text-secondary" />
+                                  ))}
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
-                      </>
-                    )}
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Event chips — multi-day spans columns like a single-day chip */}
+                  <div className="grid grid-cols-7 gap-y-0.5 px-1 pb-1.5 min-h-[22px] sm:min-h-[28px]">
+                    {weekBars.map(({ e, colStart, colSpan }) => (
+                      <button
+                        key={`m-${e.id}`}
+                        type="button"
+                        onClick={() => openEvent(e)}
+                        className={chipClassFor(e, now)}
+                        style={{
+                          gridColumn: `${colStart} / span ${colSpan}`,
+                          backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
+                        }}
+                        title={e.title}
+                      >
+                        {e.title}
+                        {e.showCountdown && !isPastEvent(e, now) && (
+                          <span className="ml-1 opacity-90">{formatCountdown(new Date(e.startsAt), now)}</span>
+                        )}
+                      </button>
+                    ))}
+                    {week.map((day, i) => {
+                      const dayEvents = day ? singleByDay.get(day) ?? [] : [];
+                      return dayEvents.slice(0, 2).map((e: any) => (
+                        <button
+                          key={e.id}
+                          type="button"
+                          onClick={() => openEvent(e)}
+                          className={chipClassFor(e, now)}
+                          style={{
+                            gridColumn: i + 1,
+                            backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
+                          }}
+                          title={e.title}
+                        >
+                          {e.title}
+                          {e.showCountdown && !isPastEvent(e, now) && (
+                            <span className="ml-1 opacity-90">
+                              {formatCountdown(new Date(e.startsAt), now)}
+                            </span>
+                          )}
+                        </button>
+                      ));
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -602,6 +832,7 @@ export function Calendar() {
                     <div className="text-xs theme-muted">
                       {e.allDay ? 'Весь день' : new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                       {e.location ? ` · ${e.location}` : ''}
+                      {e.showCountdown && !past ? ` · ${formatCountdown(new Date(e.startsAt), now)}` : ''}
                     </div>
                   </div>
                   <div className="text-xs theme-muted flex-shrink-0">
@@ -664,6 +895,56 @@ export function Calendar() {
                 <input type="checkbox" checked={eventShared} onChange={(e) => setEventShared(e.target.checked)} />
                 <span className="text-sm">Общее событие</span>
               </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={eventShowCountdown}
+                  onChange={(e) => setEventShowCountdown(e.target.checked)}
+                />
+                <span className="text-sm">Отображать обратный отсчёт</span>
+              </label>
+              <div>
+                <div className="text-sm font-medium mb-1">Файлы</div>
+                {pendingFiles.length > 0 && (
+                  <div className="space-y-1 mb-2">
+                    {pendingFiles.map((f, i) => (
+                      <div key={`${f.name}-${i}`} className="flex items-center gap-2 text-sm theme-bg rounded-btn px-2 py-1.5">
+                        <span className="flex-1 min-w-0 truncate">{f.name}</span>
+                        <span className="text-xs theme-muted flex-shrink-0">{formatFileSize(f.size)}</span>
+                        <button
+                          type="button"
+                          onClick={() => setPendingFiles((files) => files.filter((_, j) => j !== i))}
+                          className="text-danger text-xs flex-shrink-0"
+                          aria-label="Убрать файл"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <label className="btn-secondary text-sm cursor-pointer inline-flex items-center">
+                  + Прикрепить файл
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const list = Array.from(e.target.files ?? []);
+                      const ok = list.filter((f) => {
+                        if (f.size > ATTACHMENT_MAX_SIZE) {
+                          alert(`Файл «${f.name}» больше 25 МБ`);
+                          return false;
+                        }
+                        return true;
+                      });
+                      setPendingFiles((files) => [...files, ...ok]);
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
+                <div className="text-xs theme-muted mt-1">до 25 МБ</div>
+              </div>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setShowEventForm(false)} className="btn-secondary flex-1">
                   Отмена

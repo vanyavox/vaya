@@ -10,13 +10,30 @@ import {
   Res,
   UseGuards,
   HttpCode,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { IsString, IsOptional, IsEnum, IsBoolean, IsNumber, IsDateString, MinLength } from 'class-validator';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { randomUUID } from 'crypto';
 import { CalendarService } from './calendar.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { CurrentUser, CurrentUserPayload } from '../../common/decorators/current-user.decorator';
+
+const ATTACHMENT_MAX_SIZE = 25 * 1024 * 1024;
+
+const attachmentStorage = diskStorage({
+  destination: process.env.UPLOAD_DIR ?? 'uploads',
+  filename: (_req, file, cb) => {
+    const ext = extname(file.originalname);
+    cb(null, `${randomUUID()}${ext}`);
+  },
+});
 
 class CreateEventDto {
   @IsString()
@@ -56,6 +73,10 @@ class CreateEventDto {
   @IsOptional()
   @IsNumber()
   reminderMinutesBefore?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  showCountdown?: boolean;
 
   @IsOptional()
   @IsBoolean()
@@ -99,6 +120,10 @@ class UpdateEventDto {
   @IsOptional()
   @IsNumber()
   reminderMinutesBefore?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  showCountdown?: boolean;
 }
 
 class FeedTokenDto {
@@ -166,6 +191,40 @@ export class CalendarController {
   @ApiOperation({ summary: 'Удалить событие' })
   deleteEvent(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
     return this.calendarService.deleteEvent(user.id, id);
+  }
+
+  // ─── Event attachments ─────────────────────────────────────────────────────
+
+  @Post('calendar/events/:id/attachments')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Прикрепить файл к событию (до 25 МБ)' })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: attachmentStorage,
+      limits: { fileSize: ATTACHMENT_MAX_SIZE },
+    }),
+  )
+  uploadAttachment(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.calendarService.addAttachment(user.id, id, file);
+  }
+
+  @Delete('calendar/events/:id/attachments/:attachmentId')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Удалить вложение события' })
+  deleteAttachment(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Param('attachmentId') attachmentId: string,
+  ) {
+    return this.calendarService.removeAttachment(user.id, id, attachmentId);
   }
 
   // ─── Tasks in range ─────────────────────────────────────────────────────────

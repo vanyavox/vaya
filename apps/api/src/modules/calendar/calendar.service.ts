@@ -2,10 +2,15 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { randomUUID, randomBytes } from 'crypto';
 import { EventKind, Prisma } from '@prisma/client';
+import { existsSync, unlinkSync } from 'fs';
+import { join } from 'path';
+
+const UPLOAD_DIR = process.env.UPLOAD_DIR ?? 'uploads';
 
 @Injectable()
 export class CalendarService {
@@ -20,7 +25,9 @@ export class CalendarService {
     const to = new Date(query.to);
 
     const where: Prisma.CalendarEventWhereInput = {
-      startsAt: { gte: from, lte: to },
+      // Include events that overlap the range (multi-day events starting earlier)
+      startsAt: { lte: to },
+      endsAt: { gte: from },
     };
 
     const scope = query.scope ?? 'all';
@@ -39,13 +46,17 @@ export class CalendarService {
     const events = await this.prisma.calendarEvent.findMany({
       where,
       orderBy: { startsAt: 'asc' },
+      include: { attachments: true },
     });
 
     return events.map((e) => this.toDto(e));
   }
 
   async getEvent(userId: string, id: string) {
-    const event = await this.prisma.calendarEvent.findUnique({ where: { id } });
+    const event = await this.prisma.calendarEvent.findUnique({
+      where: { id },
+      include: { attachments: true },
+    });
     if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Event not found' });
     await this.checkEventAccess(userId, event);
     return this.toDto(event);
@@ -64,6 +75,7 @@ export class CalendarService {
       kind?: EventKind;
       color?: string;
       reminderMinutesBefore?: number;
+      showCountdown?: boolean;
       shared?: boolean;
     },
   ) {
@@ -84,7 +96,9 @@ export class CalendarService {
         kind: data.kind ?? 'EVENT',
         color: data.color ?? null,
         reminderMinutesBefore: data.reminderMinutesBefore ?? null,
+        showCountdown: data.showCountdown ?? false,
       },
+      include: { attachments: true },
     });
 
     return this.toDto(event);
@@ -103,6 +117,7 @@ export class CalendarService {
       kind?: EventKind;
       color?: string;
       reminderMinutesBefore?: number;
+      showCountdown?: boolean;
     },
   ) {
     const event = await this.prisma.calendarEvent.findUnique({ where: { id } });
@@ -121,17 +136,77 @@ export class CalendarService {
         ...(data.kind !== undefined && { kind: data.kind }),
         ...(data.color !== undefined && { color: data.color }),
         ...(data.reminderMinutesBefore !== undefined && { reminderMinutesBefore: data.reminderMinutesBefore }),
+        ...(data.showCountdown !== undefined && { showCountdown: data.showCountdown }),
       },
+      include: { attachments: true },
     });
 
     return this.toDto(updated);
   }
 
   async deleteEvent(userId: string, id: string) {
-    const event = await this.prisma.calendarEvent.findUnique({ where: { id } });
+    const event = await this.prisma.calendarEvent.findUnique({
+      where: { id },
+      include: { attachments: true },
+    });
     if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Event not found' });
     await this.checkEventAccess(userId, event, true);
+    for (const att of event.attachments) {
+      this.removeUploadFile(att.filename);
+    }
     await this.prisma.calendarEvent.delete({ where: { id } });
+  }
+
+  // ─── Attachments ───────────────────────────────────────────────────────────
+
+  async addAttachment(
+    userId: string,
+    eventId: string,
+    file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'File is required' });
+    }
+    const event = await this.prisma.calendarEvent.findUnique({ where: { id: eventId } });
+    if (!event) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Event not found' });
+    await this.checkEventAccess(userId, event);
+
+    const attachment = await this.prisma.eventAttachment.create({
+      data: {
+        eventId,
+        uploaderId: userId,
+        filename: file.filename,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
+      },
+    });
+
+    return this.attachmentDto(attachment);
+  }
+
+  async removeAttachment(userId: string, eventId: string, attachmentId: string) {
+    const attachment = await this.prisma.eventAttachment.findUnique({
+      where: { id: attachmentId },
+      include: { event: true },
+    });
+    if (!attachment || attachment.eventId !== eventId) {
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Attachment not found' });
+    }
+    await this.checkEventAccess(userId, attachment.event);
+    this.removeUploadFile(attachment.filename);
+    await this.prisma.eventAttachment.delete({ where: { id: attachmentId } });
+  }
+
+  private removeUploadFile(filename: string) {
+    const filepath = join(process.cwd(), UPLOAD_DIR, filename);
+    if (existsSync(filepath)) {
+      try {
+        unlinkSync(filepath);
+      } catch {
+        // ignore missing/cleanup errors
+      }
+    }
   }
 
   async listTasksInRange(userId: string, from: string, to: string) {
@@ -340,8 +415,21 @@ export class CalendarService {
       kind: e.kind,
       color: e.color,
       reminderMinutesBefore: e.reminderMinutesBefore,
+      showCountdown: e.showCountdown ?? false,
+      attachments: (e.attachments ?? []).map((a: any) => this.attachmentDto(a)),
       createdAt: e.createdAt.toISOString(),
       updatedAt: e.updatedAt.toISOString(),
+    };
+  }
+
+  private attachmentDto(a: any) {
+    return {
+      id: a.id,
+      originalName: a.originalName,
+      mimeType: a.mimeType,
+      size: a.size,
+      url: `/uploads/${a.filename}`,
+      createdAt: a.createdAt.toISOString(),
     };
   }
 

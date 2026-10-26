@@ -73,6 +73,7 @@ model User {
   memberships   CoupleMember[]
   refreshTokens RefreshToken[]
   createdEvents CalendarEvent[]
+  eventAttachments EventAttachment[]
   createdTasks  Task[]            @relation("TaskCreator")
   assignedTasks Task[]            @relation("TaskAssignee")
   wishlists     Wishlist[]
@@ -179,15 +180,33 @@ model CalendarEvent {
   kind                  EventKind @default(EVENT)
   color                 String?
   reminderMinutesBefore Int?
+  showCountdown         Boolean   @default(false)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
   creator               User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   couple                Couple?   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  attachments           EventAttachment[]
 
   @@index([coupleId, startsAt])
   @@index([creatorId, startsAt])
   @@index([startsAt])
   @@map("calendar_events")
+}
+
+model EventAttachment {
+  id           String        @id @default(uuid())
+  eventId      String
+  uploaderId   String
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  createdAt    DateTime      @default(now())
+  event        CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  uploader     User          @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("event_attachments")
 }
 
 model Task {

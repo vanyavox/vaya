@@ -3,6 +3,18 @@ import { Link } from 'react-router-dom';
 import { api } from '../shared/api-client';
 import { useAuth } from '../app/AuthContext';
 
+function formatCountdown(target: Date, now: Date): string {
+  const diff = target.getTime() - now.getTime();
+  if (diff <= 0) return 'уже идёт';
+  const mins = Math.floor(diff / 60000);
+  const days = Math.floor(mins / (60 * 24));
+  const hours = Math.floor((mins % (60 * 24)) / 60);
+  const m = mins % 60;
+  if (days > 0) return `через ${days} д ${hours} ч`;
+  if (hours > 0) return `через ${hours} ч ${m} мин`;
+  return `через ${m} мин`;
+}
+
 function StatusRow({
   label,
   value,
@@ -54,6 +66,15 @@ export function Dashboard() {
       const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
       return api.get<any[]>(`/calendar/events?from=${start}&to=${end}&scope=all`);
+    },
+  });
+
+  const { data: upcoming } = useQuery({
+    queryKey: ['events', 'upcoming'],
+    queryFn: () => {
+      const now = new Date();
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 14);
+      return api.get<any[]>(`/calendar/events?from=${now.toISOString()}&to=${end.toISOString()}&scope=all`);
     },
   });
 
@@ -131,6 +152,48 @@ export function Dashboard() {
             ) : (
               <p className="theme-muted">На сегодня событий нет</p>
             )}
+          </div>
+
+          {/* Countdown to upcoming events */}
+          <div className="card mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Обратный отсчёт</h2>
+              <Link to="/app/calendar" className="text-primary text-sm hover:underline">
+                Календарь →
+              </Link>
+            </div>
+            {(() => {
+              const now = new Date();
+              const list = (upcoming ?? [])
+                .filter((e: any) => e.showCountdown && new Date(e.startsAt).getTime() >= now.getTime() - 60 * 60 * 1000)
+                .slice(0, 5);
+              if (!list.length) {
+                return <p className="theme-muted">Событий с обратным отсчётом нет</p>;
+              }
+              return (
+                <div className="space-y-3">
+                  {list.map((e: any) => (
+                    <div key={e.id} className="flex items-center gap-3 p-2 rounded-btn theme-bg">
+                      <div
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: e.color ?? '#6C5CE7' }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{e.title}</div>
+                        <div className="text-sm theme-muted">
+                          {new Date(e.startsAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                          {!e.allDay &&
+                            ` · ${new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`}
+                        </div>
+                      </div>
+                      <div className="text-xs font-medium text-primary flex-shrink-0">
+                        {formatCountdown(new Date(e.startsAt), now)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Tasks summary */}

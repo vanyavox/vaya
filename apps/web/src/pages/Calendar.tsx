@@ -688,119 +688,129 @@ export function Calendar() {
               ))}
             </div>
 
-            {/* Weeks: date row + event chips (multi-day spans columns, same chip style) */}
+            {/* Weeks: full-height day columns; multi-day chips overlay via grid-column */}
             {weeks.map((week, wi) => {
               const weekBars = multiDayEvents
                 .map((e: any) => {
                   const covered: number[] = [];
-                  week.forEach((day, i) => {
-                    if (day && eventTouchesDay(e, year, month, day)) covered.push(i);
+                  week.forEach((d, j) => {
+                    if (d && eventTouchesDay(e, year, month, d)) covered.push(j);
                   });
                   if (!covered.length) return null;
                   return {
                     e,
                     colStart: covered[0] + 1,
                     colSpan: covered[covered.length - 1] - covered[0] + 1,
-                    startsHere: covered[0] === week.findIndex((d) => d !== null && eventTouchesDay(e, year, month, d)),
                   };
                 })
                 .filter(Boolean) as { e: any; colStart: number; colSpan: number }[];
 
               return (
-                <div key={wi} className="border-b theme-border min-h-[64px] sm:min-h-[100px]">
-                  {/* Dates */}
-                  <div className="grid grid-cols-7">
-                    {week.map((day, i) => {
-                      const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
-                      const isToday =
-                        day === now.getDate() &&
-                        month === now.getMonth() &&
-                        year === now.getFullYear();
-                      const isSelectedDay =
-                        !!day &&
-                        !!selectedDate &&
-                        day === selectedDate.getDate() &&
-                        month === selectedDate.getMonth() &&
-                        year === selectedDate.getFullYear();
-                      return (
-                        <div
-                          key={i}
-                          onClick={day ? () => selectDay(day) : undefined}
-                          className={`border-r theme-border px-1 sm:px-2 pt-1 sm:pt-2 ${
-                            day ? 'cursor-pointer' : 'theme-hover'
-                          } ${isSelectedDay ? 'ring-2 ring-inset ring-primary' : ''}`}
-                        >
-                          {day && (
-                            <>
-                              <div
-                                className={`w-6 h-6 flex items-center justify-center rounded-full text-xs sm:text-sm ${
-                                  isToday
-                                    ? 'bg-primary text-white font-bold'
-                                    : isSelectedDay
-                                      ? 'font-semibold text-primary'
-                                      : ''
-                                }`}
-                              >
-                                {day}
-                              </div>
+                <div
+                  key={wi}
+                  className="border-b theme-border grid grid-cols-7 min-h-[64px] sm:min-h-[100px]"
+                >
+                  {week.map((day, i) => {
+                    const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
+                    const dayEvents = day ? singleByDay.get(day) ?? [] : [];
+                    const isToday =
+                      day === now.getDate() &&
+                      month === now.getMonth() &&
+                      year === now.getFullYear();
+                    const isSelectedDay =
+                      !!day &&
+                      !!selectedDate &&
+                      day === selectedDate.getDate() &&
+                      month === selectedDate.getMonth() &&
+                      year === selectedDate.getFullYear();
+
+                    return (
+                      <div
+                        key={i}
+                        onClick={day ? () => selectDay(day) : undefined}
+                        style={{ gridColumn: i + 1, gridRow: 1 }}
+                        className={`relative border-r theme-border p-1 sm:p-2 ${
+                          day ? 'cursor-pointer' : 'theme-hover'
+                        } ${isSelectedDay ? 'ring-2 ring-inset ring-primary z-10' : ''}`}
+                      >
+                        {day && (
+                          <>
+                            <div
+                              className={`w-6 h-6 flex items-center justify-center rounded-full text-xs sm:text-sm mb-1 ${
+                                isToday
+                                  ? 'bg-primary text-white font-bold'
+                                  : isSelectedDay
+                                    ? 'font-semibold text-primary'
+                                    : ''
+                              }`}
+                            >
+                              {day}
+                            </div>
+                            <div className="space-y-0.5">
+                              {dayEvents.slice(0, 3).map((e: any) => (
+                                <button
+                                  key={e.id}
+                                  type="button"
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    openEvent(e);
+                                  }}
+                                  className={chipClassFor(e, now)}
+                                  style={{
+                                    backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
+                                  }}
+                                  title={e.title}
+                                >
+                                  {e.title}
+                                  {e.showCountdown && !isPastEvent(e, now) && (
+                                    <span className="ml-1 opacity-90">
+                                      {formatCountdown(new Date(e.startsAt), now)}
+                                    </span>
+                                  )}
+                                </button>
+                              ))}
                               {dayTasks.length > 0 && (
-                                <div className="flex gap-0.5 mt-0.5">
+                                <div className="flex gap-0.5">
                                   {dayTasks.slice(0, 3).map((t: any) => (
                                     <div key={t.id} className="w-1 h-1 rounded-full bg-text-secondary" />
                                   ))}
                                 </div>
                               )}
-                            </>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Event chips — multi-day spans columns like a single-day chip */}
-                  <div className="grid grid-cols-7 gap-y-0.5 px-1 pb-1.5 min-h-[22px] sm:min-h-[28px]">
-                    {weekBars.map(({ e, colStart, colSpan }) => (
-                      <button
-                        key={`m-${e.id}`}
-                        type="button"
-                        onClick={() => openEvent(e)}
-                        className={chipClassFor(e, now)}
-                        style={{
-                          gridColumn: `${colStart} / span ${colSpan}`,
-                          backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
-                        }}
-                        title={e.title}
-                      >
-                        {e.title}
-                        {e.showCountdown && !isPastEvent(e, now) && (
-                          <span className="ml-1 opacity-90">{formatCountdown(new Date(e.startsAt), now)}</span>
+                            </div>
+                          </>
                         )}
-                      </button>
-                    ))}
-                    {week.map((day, i) => {
-                      const dayEvents = day ? singleByDay.get(day) ?? [] : [];
-                      return dayEvents.slice(0, 2).map((e: any) => (
-                        <button
-                          key={e.id}
-                          type="button"
-                          onClick={() => openEvent(e)}
-                          className={chipClassFor(e, now)}
-                          style={{
-                            gridColumn: i + 1,
-                            backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
-                          }}
-                          title={e.title}
-                        >
-                          {e.title}
-                          {e.showCountdown && !isPastEvent(e, now) && (
-                            <span className="ml-1 opacity-90">
-                              {formatCountdown(new Date(e.startsAt), now)}
-                            </span>
-                          )}
-                        </button>
-                      ));
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Multi-day chips: span columns, sit in the event band under the date numbers */}
+                  {weekBars.map(({ e, colStart, colSpan }) => (
+                    <button
+                      key={`m-${e.id}`}
+                      type="button"
+                      onClick={() => openEvent(e)}
+                      className={`${chipClassFor(e, now)} z-20 pointer-events-auto`}
+                      style={{
+                        gridColumn: `${colStart} / span ${colSpan}`,
+                        gridRow: 1,
+                        alignSelf: 'start',
+                        marginTop: '2.15rem',
+                        marginInline: '0.25rem',
+                        width: 'auto',
+                        justifySelf: 'stretch',
+                        position: 'relative',
+                        backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
+                      }}
+                      title={e.title}
+                    >
+                      {e.title}
+                      {e.showCountdown && !isPastEvent(e, now) && (
+                        <span className="ml-1 opacity-90">
+                          {formatCountdown(new Date(e.startsAt), now)}
+                        </span>
+                      )}
+                    </button>
+                  ))}
                 </div>
               );
             })}

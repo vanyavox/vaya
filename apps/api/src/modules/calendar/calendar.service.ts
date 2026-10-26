@@ -12,6 +12,25 @@ import { isAbsolute, join } from 'path';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR ?? 'uploads';
 
+/**
+ * Multer/busboy often interpret multipart filenames as latin1, which mangles
+ * UTF-8 names (Cyrillic shows as mojibake). Restore the original when needed.
+ */
+function fixMulterOriginalName(name: string): string {
+  if (!name) return name;
+  if (/^[\x20-\x7E]+$/.test(name)) return name;
+  // UTF-8 Cyrillic bytes as latin1 produce Ð/Ñ sequences
+  if (/[\u00D0\u00D1]/.test(name)) {
+    try {
+      const decoded = Buffer.from(name, 'latin1').toString('utf8');
+      if (decoded && !decoded.includes('\uFFFD')) return decoded;
+    } catch {
+      /* keep original */
+    }
+  }
+  return name;
+}
+
 @Injectable()
 export class CalendarService {
   constructor(private readonly prisma: PrismaService) {}
@@ -176,7 +195,7 @@ export class CalendarService {
         eventId,
         uploaderId: userId,
         filename: file.filename,
-        originalName: file.originalname,
+        originalName: fixMulterOriginalName(file.originalname),
         mimeType: file.mimetype,
         size: file.size,
       },
@@ -426,7 +445,7 @@ export class CalendarService {
     return {
       id: a.id,
       eventId: a.eventId,
-      originalName: a.originalName,
+      originalName: fixMulterOriginalName(a.originalName),
       mimeType: a.mimeType,
       size: a.size,
       url: `/api/v1/calendar/events/${a.eventId}/attachments/${a.id}/download`,

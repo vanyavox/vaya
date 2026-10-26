@@ -182,36 +182,23 @@ export function WishlistDetail() {
 
       {/* Wishes grid */}
       {wishlist.wishes?.length ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {wishlist.wishes.map((wish: any) => (
-            <div key={wish.id} className="card">
-              {wish.imageUrl ? (
-                <img src={wish.imageUrl} alt={wish.title} className="w-full h-32 object-cover rounded-btn mb-3" />
-              ) : (
-                <div className="w-full h-32 theme-bg rounded-btn mb-3 flex items-center justify-center text-3xl">
-                  🎁
-                </div>
-              )}
-              <h3 className="font-semibold mb-1">{wish.title}</h3>
-              {wish.price && (
-                <div className="text-lg font-bold text-primary mb-2">
+            <div key={wish.id} className="card flex flex-col p-3 sm:p-4">
+              <div className="w-full h-20 sm:h-24 theme-bg rounded-btn mb-2 overflow-hidden">
+                {wish.imageUrl ? (
+                  <img src={wish.imageUrl} alt={wish.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-2xl">🎁</div>
+                )}
+              </div>
+              <h3 className="font-semibold text-sm sm:text-base mb-1 line-clamp-2">{wish.title}</h3>
+              {wish.price != null && (
+                <div className="text-base sm:text-lg font-bold text-primary mb-1">
                   {Number(wish.price).toLocaleString('ru-RU')} {wish.currency}
                 </div>
               )}
-              {wish.url && (
-                <a
-                  href={wish.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-primary text-xs inline-flex items-center gap-1 mb-2 px-3 py-1.5"
-                >
-                  🛍 Купить подарок
-                </a>
-              )}
-              {!wish.url && (
-                <div className="text-xs theme-muted mb-2">Ссылка на покупку не указана</div>
-              )}
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-1.5 mb-2">
                 <span className={`badge ${STATUS_LABELS[wish.status]?.class ?? 'badge-primary'}`}>
                   {STATUS_LABELS[wish.status]?.label ?? wish.status}
                 </span>
@@ -219,37 +206,51 @@ export function WishlistDetail() {
                   {PRIORITY_LABELS[wish.priority] ?? wish.priority}
                 </span>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {wish.status === 'AVAILABLE' && (
-                  <button onClick={() => handleAction(wish.id, 'reserve')} className="btn-secondary text-xs flex-1">
-                    Зарезервировать
-                  </button>
+              <div className="mt-auto space-y-2">
+                {wish.url ? (
+                  <a
+                    href={wish.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-primary text-xs w-full flex items-center justify-center gap-1"
+                  >
+                    🛍 Купить подарок
+                  </a>
+                ) : (
+                  <div className="text-[11px] theme-muted">Ссылка на покупку не указана</div>
                 )}
-                {wish.status === 'RESERVED' && (
-                  <button onClick={() => handleAction(wish.id, 'unreserve')} className="btn-secondary text-xs flex-1">
-                    Снять резерв
-                  </button>
-                )}
-                {wish.status === 'RESERVED' && (
-                  <button onClick={() => handleAction(wish.id, 'gift')} className="btn-primary text-xs flex-1">
-                    Подарено
-                  </button>
-                )}
-                {wish.status === 'GIFTED' && (
-                  <button onClick={() => handleAction(wish.id, 'receive')} className="btn-primary text-xs flex-1">
-                    Получено
-                  </button>
-                )}
-                {(wishlist.isOwner || wishlist.visibility === 'SHARED') && (
-                  <>
-                    <button onClick={() => startEditWish(wish)} className="btn-secondary text-xs px-3">
-                      Изменить
+                <div className="flex gap-1.5">
+                  {wish.status === 'AVAILABLE' && (
+                    <button onClick={() => handleAction(wish.id, 'reserve')} className="btn-secondary text-[11px] sm:text-xs flex-1 min-w-0 px-1 py-1.5 whitespace-nowrap">
+                      В резерв
                     </button>
-                    <button onClick={() => handleDeleteWish(wish.id)} className="btn-secondary text-xs px-3 text-danger">
-                      Удалить
+                  )}
+                  {wish.status === 'RESERVED' && (
+                    <button onClick={() => handleAction(wish.id, 'unreserve')} className="btn-secondary text-[11px] sm:text-xs flex-1 min-w-0 px-1 py-1.5 whitespace-nowrap">
+                      Снять
                     </button>
-                  </>
-                )}
+                  )}
+                  {wish.status === 'RESERVED' && (
+                    <button onClick={() => handleAction(wish.id, 'gift')} className="btn-primary text-[11px] sm:text-xs flex-1 min-w-0 px-1 py-1.5 whitespace-nowrap">
+                      Подарено
+                    </button>
+                  )}
+                  {wish.status === 'GIFTED' && (
+                    <button onClick={() => handleAction(wish.id, 'receive')} className="btn-primary text-[11px] sm:text-xs flex-1 min-w-0 px-1 py-1.5 whitespace-nowrap">
+                      Получено
+                    </button>
+                  )}
+                  {(wishlist.isOwner || wishlist.visibility === 'SHARED') && (
+                    <>
+                      <button onClick={() => startEditWish(wish)} className="btn-secondary text-[11px] sm:text-xs flex-1 min-w-0 px-1 py-1.5 whitespace-nowrap">
+                        Изменить
+                      </button>
+                      <button onClick={() => handleDeleteWish(wish.id)} className="btn-secondary text-[11px] sm:text-xs flex-1 min-w-0 px-1 py-1.5 whitespace-nowrap text-danger">
+                        Удалить
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           ))}

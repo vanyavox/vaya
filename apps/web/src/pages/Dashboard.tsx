@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../shared/api-client';
@@ -84,10 +85,6 @@ export function Dashboard() {
     retry: false,
   });
 
-  const { data: partnerWishlists } = useQuery({
-    queryKey: ['wishlists', 'personal'],
-    queryFn: () => api.get<any[]>(`/wishlists?scope=personal`),
-  });
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Доброе утро' : hour < 18 ? 'Добрый день' : 'Добрый вечер';
@@ -225,29 +222,23 @@ export function Dashboard() {
           {/* Pairing status */}
           <div className="card">
             <h2 className="text-lg font-semibold mb-3">Связка</h2>
-            {couple?.members?.length === 2 && partnerWishlists?.length
-              ? partnerWishlists.slice(0, 3).map((w: any) => (
-                  <Link key={w.id} to={`/app/wishes/${w.id}`} className="card theme-hover block mb-3">
-                    <div className="font-semibold truncate">{w.title}</div>
-                    <div className="text-sm theme-muted">{w.wishCount} желаний</div>
-                  </Link>
-                ))
-              : null}
             {couple?.members?.length === 2 ? (
               <div className="flex items-center gap-3">
-                {couple.members.map((m: any) => (
-                  <div key={m.userId} className="flex items-center gap-2">
-                    {m.avatarUrl ? (
-                      <img src={m.avatarUrl} alt={m.name} className="w-8 h-8 rounded-full" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                        {m.name[0]}
-                      </div>
-                    )}
-                    <span className="text-sm">{m.name}</span>
-                  </div>
+                {couple.members.map((m: any, i: number) => (
+                  <Fragment key={m.userId}>
+                    {i > 0 && <span className="text-danger text-lg leading-none">♥</span>}
+                    <div className="flex items-center gap-2">
+                      {m.avatarUrl ? (
+                        <img src={m.avatarUrl} alt={m.name} className="w-8 h-8 rounded-full" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                          {m.name[0]}
+                        </div>
+                      )}
+                      <span className="text-sm">{m.name}</span>
+                    </div>
+                  </Fragment>
                 ))}
-                <span className="text-danger">♥</span>
               </div>
             ) : (
               <div>

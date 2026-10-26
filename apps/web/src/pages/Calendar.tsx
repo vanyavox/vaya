@@ -19,19 +19,31 @@ const KIND_LABELS: Record<string, string> = {
 
 function toLocalInput(iso: string) {
   const d = new Date(iso);
+  return localDateTimeValue(d);
+}
+
+function localDateTimeValue(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function defaultEventTimes() {
+  const start = new Date();
+  start.setHours(19, 0, 0, 0);
+  const end = new Date();
+  end.setHours(21, 0, 0, 0);
+  return { start: localDateTimeValue(start), end: localDateTimeValue(end) };
 }
 
 export function Calendar() {
   const queryClient = useQueryClient();
   const [view, setView] = useState<'month' | 'list'>('month');
   const [scope, setScope] = useState<'all' | 'personal' | 'shared'>('all');
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 6, 1)); // July 2026
+  const [currentDate, setCurrentDate] = useState(() => new Date());
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
-  const [eventStart, setEventStart] = useState('2026-07-18T19:00');
-  const [eventEnd, setEventEnd] = useState('2026-07-18T21:00');
+  const [eventStart, setEventStart] = useState(() => defaultEventTimes().start);
+  const [eventEnd, setEventEnd] = useState(() => defaultEventTimes().end);
   const [eventLocation, setEventLocation] = useState('');
   const [eventKind, setEventKind] = useState('EVENT');
   const [eventShared, setEventShared] = useState(true);
@@ -177,6 +189,13 @@ export function Calendar() {
   });
 
   const monthName = currentDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+  const today = new Date();
+  const openCreateForm = () => {
+    const { start, end } = defaultEventTimes();
+    setEventStart(start);
+    setEventEnd(end);
+    setShowEventForm(true);
+  };
 
   const eventBody = selected
     ? !isEditing || !draft ? (
@@ -342,7 +361,7 @@ export function Calendar() {
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold">Календарь</h1>
-        <button onClick={() => setShowEventForm(true)} className="btn-primary text-sm sm:text-base">
+        <button onClick={openCreateForm} className="btn-primary text-sm sm:text-base">
           <span className="sm:hidden">+ Событие</span>
           <span className="hidden sm:inline">+ Новое событие</span>
         </button>
@@ -419,7 +438,10 @@ export function Calendar() {
               {days.map((day, i) => {
                 const dayEvents = day ? eventsByDay.get(day) ?? [] : [];
                 const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
-                const isToday = day === 16 && month === 6 && year === 2026;
+                const isToday =
+                  day === today.getDate() &&
+                  month === today.getMonth() &&
+                  year === today.getFullYear();
 
                 return (
                   <div

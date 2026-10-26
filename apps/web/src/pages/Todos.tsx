@@ -220,84 +220,88 @@ export function Todos() {
           {tasks.map((task: any) => (
             <div
               key={task.id}
-              className={`card flex items-center gap-4 py-3 ${
+              className={`card flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 py-3 ${
                 task.status === 'DONE' || task.status === 'CANCELLED' ? 'opacity-60' : ''
               }`}
             >
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={task.status === 'DONE'}
-                  onChange={() => handleToggleDone(task)}
-                  className="sr-only peer"
-                />
-                <span
-                  className={`check-box peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50 ${
-                    task.status === 'DONE' ? 'check-box-done' : ''
-                  }`}
-                >
-                  {task.status === 'DONE' && '✓'}
-                </span>
-              </label>
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <label className="flex items-center cursor-pointer pt-0.5 flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={task.status === 'DONE'}
+                    onChange={() => handleToggleDone(task)}
+                    className="sr-only peer"
+                  />
+                  <span
+                    className={`check-box peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50 ${
+                      task.status === 'DONE' ? 'check-box-done' : ''
+                    }`}
+                  >
+                    {task.status === 'DONE' && '✓'}
+                  </span>
+                </label>
 
-              <div className="flex-1 min-w-0">
-                <div className={`font-medium ${task.status === 'DONE' ? 'line-through' : ''}`}>
-                  {task.title}
-                </div>
-                <div className="flex items-center gap-2 text-xs theme-muted">
-                  {task.dueDate && (
-                    <span>Срок: {new Date(task.dueDate).toLocaleDateString('ru-RU')}</span>
-                  )}
-                  {task.assigneeId === user?.id && <span>• Моя</span>}
-                  {task.assigneeId && task.assigneeId !== user?.id && <span>• {partner?.name ?? 'Партнёр'}</span>}
-                  {!task.assigneeId && <span>• Для двоих</span>}
+                <div className="flex-1 min-w-0">
+                  <div className={`font-medium break-words ${task.status === 'DONE' ? 'line-through' : ''}`}>
+                    {task.title}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs theme-muted">
+                    {task.dueDate && (
+                      <span>Срок: {new Date(task.dueDate).toLocaleDateString('ru-RU')}</span>
+                    )}
+                    {task.assigneeId === user?.id && <span>• Моя</span>}
+                    {task.assigneeId && task.assigneeId !== user?.id && <span>• {partner?.name ?? 'Партнёр'}</span>}
+                    {!task.assigneeId && <span>• Для двоих</span>}
+                  </div>
                 </div>
               </div>
 
-              <span className="badge badge-neutral">
-                {CATEGORY_LABELS[task.category] ?? task.category}
-              </span>
+              <div className="flex items-center gap-2 flex-wrap pl-11 sm:pl-0">
+                <span className="badge badge-neutral">
+                  {CATEGORY_LABELS[task.category] ?? task.category}
+                </span>
 
-              <div className="relative">
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setStatusMenuId(statusMenuId === task.id ? null : task.id)}
+                    className={`badge cursor-pointer ${STATUS_BADGE[task.status] ?? 'badge-neutral'}`}
+                    title="Изменить статус"
+                  >
+                    {STATUS_LABELS[task.status] ?? task.status}
+                    <span className="ml-1 opacity-60">▾</span>
+                  </button>
+                  {statusMenuId === task.id && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setStatusMenuId(null)} />
+                      <div className="absolute right-0 top-full mt-1 z-20 theme-surface border theme-border rounded-btn shadow-lg py-1 min-w-[150px]">
+                        {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => handleStatusChange(task.id, value)}
+                            className={`w-full text-left px-3 py-2 text-sm theme-hover ${
+                              task.status === value ? 'text-primary font-medium' : ''
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setStatusMenuId(statusMenuId === task.id ? null : task.id)}
-                  className={`badge cursor-pointer ${STATUS_BADGE[task.status] ?? 'badge-neutral'}`}
-                  title="Изменить статус"
+                  onClick={() => openDelete(task)}
+                  className="text-danger opacity-70 hover:opacity-100 text-lg leading-none px-1 ml-auto sm:ml-0"
+                  title="Удалить задачу"
+                  aria-label="Удалить задачу"
                 >
-                  {STATUS_LABELS[task.status] ?? task.status}
-                  <span className="ml-1 opacity-60">▾</span>
+                  ✕
                 </button>
-                {statusMenuId === task.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setStatusMenuId(null)} />
-                    <div className="absolute right-0 top-full mt-1 z-20 theme-surface border theme-border rounded-btn shadow-lg py-1 min-w-[150px]">
-                      {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => handleStatusChange(task.id, value)}
-                          className={`w-full text-left px-3 py-2 text-sm theme-hover ${
-                            task.status === value ? 'text-primary font-medium' : ''
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
               </div>
-
-              <button
-                type="button"
-                onClick={() => openDelete(task)}
-                className="text-danger opacity-70 hover:opacity-100 text-lg leading-none px-1"
-                title="Удалить задачу"
-                aria-label="Удалить задачу"
-              >
-                ✕
-              </button>
             </div>
           ))}
         </div>

@@ -86,7 +86,6 @@ export class UsersController {
     FileInterceptor('file', {
       storage,
       fileFilter,
-      limits: { fileSize: 2 * 1024 * 1024 },
     }),
   )
   uploadAvatar(@CurrentUser() user: CurrentUserPayload, @UploadedFile() file: Express.Multer.File) {

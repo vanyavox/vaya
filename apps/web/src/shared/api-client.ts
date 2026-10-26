@@ -1,7 +1,20 @@
 const API_BASE = '/api/v1';
 
+// Endpoints that must not trigger silent refresh (avoid loops / pointless retries)
+const NO_REFRESH_PATHS = new Set([
+  '/auth/login',
+  '/auth/register',
+  '/auth/refresh',
+  '/auth/logout',
+]);
+
 class ApiClient {
   private accessToken: string | null = null;
+  private onUnauthorized: (() => void) | null = null;
+
+  setOnUnauthorized(cb: (() => void) | null) {
+    this.onUnauthorized = cb;
+  }
 
   setToken(token: string | null) {
     this.accessToken = token;
@@ -35,7 +48,7 @@ class ApiClient {
       credentials: 'include',
     });
 
-    if (res.status === 401 && !path.startsWith('/auth/')) {
+    if (res.status === 401 && !NO_REFRESH_PATHS.has(path)) {
       // Try refresh
       const refreshed = await this.tryRefresh();
       if (refreshed) {
@@ -58,11 +71,17 @@ class ApiClient {
         method: 'POST',
         credentials: 'include',
       });
-      if (!res.ok) return false;
+      if (!res.ok) {
+        // Refresh cookie missing or idle window (7d) exceeded — session is over
+        this.setToken(null);
+        this.onUnauthorized?.();
+        return false;
+      }
       const data = await res.json();
       this.setToken(data.accessToken);
       return true;
     } catch {
+      // Network error — keep current session state
       return false;
     }
   }

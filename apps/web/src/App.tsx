@@ -14,13 +14,27 @@ import { Todos } from './pages/Todos';
 import { CalendarFeed } from './pages/CalendarFeed';
 import { NotFound } from './pages/NotFound';
 import { ProtectedRoute } from './app/ProtectedRoute';
+import { GuestRoute } from './app/GuestRoute';
 
 export default function App() {
   return (
     <Routes>
-      {/* Public */}
-      <Route path="/" element={<Landing />} />
-      <Route element={<AuthLayout />}>
+      {/* Public — signed-in users are sent to /app */}
+      <Route
+        path="/"
+        element={
+          <GuestRoute>
+            <Landing />
+          </GuestRoute>
+        }
+      />
+      <Route
+        element={
+          <GuestRoute>
+            <AuthLayout />
+          </GuestRoute>
+        }
+      >
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>

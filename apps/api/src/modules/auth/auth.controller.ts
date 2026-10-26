@@ -10,18 +10,23 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { CurrentUser, CurrentUserPayload } from '../../common/decorators/current-user.decorator';
+import { parseTtl } from '../../common/utils/ttl';
 
 const REFRESH_COOKIE = 'vaya_refresh';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Регистрация' })
@@ -69,12 +74,14 @@ export class AuthController {
   }
 
   private setRefreshCookie(res: Response, token: string) {
+    // Keep cookie lifetime in sync with the refresh token idle window
+    const maxAge = parseTtl(this.config.get<string>('JWT_REFRESH_TTL') ?? '7d');
     res.cookie(REFRESH_COOKIE, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/api/v1/auth',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge,
     });
   }
 }

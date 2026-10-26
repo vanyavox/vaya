@@ -34,12 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const token = api.getToken();
-    if (token) {
-      refreshUser().finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-    }
+    api.setOnUnauthorized(() => setUser(null));
+    return () => api.setOnUnauthorized(null);
+  }, []);
+
+  useEffect(() => {
+    // Restore session via refresh cookie — access token may be missing or expired.
+    // The cookie is valid for the 7-day idle window, so this keeps the user logged in.
+    refreshUser().finally(() => setIsLoading(false));
   }, [refreshUser]);
 
   const login = async (email: string, password: string) => {

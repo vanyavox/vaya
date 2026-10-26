@@ -706,7 +706,7 @@ export function Calendar() {
 
             {/* Weeks: full-height day columns; multi-day chips overlay via grid-column */}
             {weeks.map((week, wi) => {
-              const weekBars = multiDayEvents
+              const weekBarsRaw = multiDayEvents
                 .map((e: any) => {
                   const covered: number[] = [];
                   week.forEach((d, j) => {
@@ -721,10 +721,29 @@ export function Calendar() {
                 })
                 .filter(Boolean) as { e: any; colStart: number; colSpan: number }[];
 
+              // Pack overlapping multi-day bars into lanes so they don't cover each other
+              const sortedBars = [...weekBarsRaw].sort(
+                (a, b) => a.colStart - b.colStart || b.colSpan - a.colSpan,
+              );
+              const laneEnds: number[] = [];
+              const weekBars = sortedBars.map((bar) => {
+                const colEnd = bar.colStart + bar.colSpan - 1;
+                let lane = 0;
+                while (lane < laneEnds.length && laneEnds[lane] >= bar.colStart) lane += 1;
+                laneEnds[lane] = colEnd;
+                return { ...bar, lane };
+              });
+
               return (
                 <div
                   key={wi}
                   className="border-b theme-border grid grid-cols-7 min-h-[64px] sm:min-h-[100px]"
+                  style={{
+                    minHeight:
+                      laneEnds.length > 0
+                        ? `calc(3.5rem + ${laneEnds.length} * 1.4rem)`
+                        : undefined,
+                  }}
                 >
                   {week.map((day, i) => {
                     const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
@@ -799,8 +818,8 @@ export function Calendar() {
                     );
                   })}
 
-                  {/* Multi-day chips: span columns, sit in the event band under the date numbers */}
-                  {weekBars.map(({ e, colStart, colSpan }) => (
+                  {/* Multi-day chips: one lane per non-overlapping bar */}
+                  {weekBars.map(({ e, colStart, colSpan, lane }) => (
                     <button
                       key={`m-${e.id}`}
                       type="button"
@@ -810,7 +829,7 @@ export function Calendar() {
                         gridColumn: `${colStart} / span ${colSpan}`,
                         gridRow: 1,
                         alignSelf: 'start',
-                        marginTop: '2.15rem',
+                        marginTop: `calc(2.15rem + ${lane} * 1.4rem)`,
                         marginInline: '0.25rem',
                         width: 'auto',
                         justifySelf: 'stretch',

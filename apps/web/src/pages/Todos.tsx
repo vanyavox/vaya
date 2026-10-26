@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
+import { useToast } from '../app/ToastProvider';
 import { useAuth } from '../app/AuthContext';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -30,6 +31,7 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 export function Todos() {
+  const toast = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -94,7 +96,7 @@ export function Todos() {
       setDueDate('');
       setAssigneeChoice('me');
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 
@@ -103,7 +105,7 @@ export function Todos() {
       await api.post(`/tasks/${id}/complete`);
       invalidate();
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 
@@ -112,7 +114,7 @@ export function Todos() {
       await api.post(`/tasks/${id}/reopen`);
       invalidate();
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 
@@ -137,7 +139,7 @@ export function Todos() {
       invalidate();
     } catch (err: any) {
       setDeleteTarget(null);
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 
@@ -155,7 +157,7 @@ export function Todos() {
       await api.patch(`/tasks/${id}`, { status });
       invalidate();
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 

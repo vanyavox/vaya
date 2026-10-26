@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
+import { useToast } from '../app/ToastProvider';
 
 export function Wishlists() {
+  const toast = useToast();
   const queryClient = useQueryClient();
   const [scope, setScope] = useState<'all' | 'personal' | 'shared'>('all');
   const [showCreate, setShowCreate] = useState(false);
@@ -25,7 +27,7 @@ export function Wishlists() {
       setTitle('');
       setDescription('');
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 

@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
+import { useConfirm } from '../app/ConfirmProvider';
+import { useToast } from '../app/ToastProvider';
 
 export function CalendarFeed() {
+  const confirmRegen = useConfirm();
+  const toast = useToast();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState('');
 
@@ -12,7 +16,13 @@ export function CalendarFeed() {
   });
 
   const handleRegenerate = async () => {
-    if (!confirm('Перевыпустить токен? Старая ссылка перестанет работать.')) return;
+    const ok = await confirmRegen({
+      title: 'Перевыпустить токен?',
+      message: 'Старая ссылка перестанет работать.',
+      confirmLabel: 'Перевыпустить',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.post('/calendar/feed-token');
       queryClient.invalidateQueries({ queryKey: ['feed-token'] });

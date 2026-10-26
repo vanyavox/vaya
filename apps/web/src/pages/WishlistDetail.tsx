@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
+import { useConfirm } from '../app/ConfirmProvider';
+import { useToast } from '../app/ToastProvider';
 
 const STATUS_LABELS: Record<string, { label: string; class: string }> = {
   AVAILABLE: { label: 'Доступно', class: 'badge-success' },
@@ -19,6 +21,8 @@ const PRIORITY_LABELS: Record<string, string> = {
 export function WishlistDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const confirmDelete = useConfirm();
+  const toast = useToast();
   const queryClient = useQueryClient();
   const [showWishForm, setShowWishForm] = useState(false);
   const [wishTitle, setWishTitle] = useState('');
@@ -46,7 +50,7 @@ export function WishlistDetail() {
       setWishTitle('');
       setWishPrice('');
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 
@@ -55,17 +59,23 @@ export function WishlistDetail() {
       await api.post(`/wishes/${wishId}/${action}`);
       invalidate();
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Удалить список желаний?')) return;
+    const okList = await confirmDelete({
+      title: 'Удалить список желаний?',
+      message: 'Все желания в списке также будут удалены.',
+      confirmLabel: 'Удалить',
+      danger: true,
+    });
+    if (!okList) return;
     try {
       await api.delete(`/wishlists/${id}`);
       navigate('/app/wishes');
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Ошибка');
     }
   };
 

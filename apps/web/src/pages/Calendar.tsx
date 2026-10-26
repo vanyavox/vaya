@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { BooomSheet } from '../app/BooomSheet';
+import { useConfirm } from '../app/ConfirmProvider';
+import { useToast } from '../app/ToastProvider';
 
 const KIND_COLORS: Record<string, string> = {
   EVENT: '#6C5CE7',
@@ -151,6 +153,8 @@ const ATTACHMENT_MAX_SIZE = 25 * 1024 * 1024;
 
 export function Calendar() {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
   const [view, setView] = useState<'month' | 'list'>('month');
   const [scope, setScope] = useState<'all' | 'personal' | 'shared'>('all');
   const [currentDate, setCurrentDate] = useState(() => new Date());
@@ -240,13 +244,19 @@ export function Calendar() {
       setIsEditing(false);
       setDraft(null);
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Не удалось сохранить событие');
     }
   };
 
   const handleDelete = async () => {
     if (!selected) return;
-    if (!confirm('Удалить событие?')) return;
+    const ok = await confirm({
+      title: 'Удалить событие?',
+      message: 'Файлы события также будут удалены.',
+      confirmLabel: 'Удалить',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`/calendar/events/${selected.id}`);
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -254,7 +264,7 @@ export function Calendar() {
       setIsEditing(false);
       setDraft(null);
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Не удалось удалить событие');
     }
   };
 
@@ -267,25 +277,31 @@ export function Calendar() {
   const handleUploadAttachment = async (file: File) => {
     if (!selected) return;
     if (file.size > ATTACHMENT_MAX_SIZE) {
-      alert('Файл больше 25 МБ');
+      toast('Файл больше 25 МБ');
       return;
     }
     try {
       await api.upload(`/calendar/events/${selected.id}/attachments`, file);
       await queryClient.invalidateQueries({ queryKey: ['events'] });
     } catch (err: any) {
-      alert(err.message ?? 'Не удалось загрузить файл');
+      toast(err.message ?? 'Не удалось загрузить файл');
     }
   };
 
   const handleDeleteAttachment = async (attachmentId: string) => {
     if (!selected) return;
-    if (!confirm('Удалить файл?')) return;
+    const ok = await confirm({
+      title: 'Удалить файл?',
+      message: 'Файл будет удалён без возможности восстановления.',
+      confirmLabel: 'Удалить',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`/calendar/events/${selected.id}/attachments/${attachmentId}`);
       await queryClient.invalidateQueries({ queryKey: ['events'] });
     } catch (err: any) {
-      alert(err.message ?? 'Не удалось удалить файл');
+      toast(err.message ?? 'Не удалось удалить файл');
     }
   };
 
@@ -303,7 +319,7 @@ export function Calendar() {
       });
       for (const file of pendingFiles) {
         if (file.size > ATTACHMENT_MAX_SIZE) {
-          alert(`Файл «${file.name}» больше 25 МБ — пропущен`);
+          toast(`Файл «${file.name}» больше 25 МБ — пропущен`);
           continue;
         }
         await api.upload(`/calendar/events/${created.id}/attachments`, file);
@@ -313,7 +329,7 @@ export function Calendar() {
       setEventTitle('');
       setPendingFiles([]);
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message ?? 'Не удалось создать событие');
     }
   };
 
@@ -943,7 +959,7 @@ export function Calendar() {
                       const list = Array.from(e.target.files ?? []);
                       const ok = list.filter((f) => {
                         if (f.size > ATTACHMENT_MAX_SIZE) {
-                          alert(`Файл «${f.name}» больше 25 МБ`);
+                          toast(`Файл «${f.name}» больше 25 МБ`);
                           return false;
                         }
                         return true;

@@ -288,6 +288,35 @@ export function Calendar() {
     }
   };
 
+  const openAttachment = async (a: { id: string; url: string; originalName: string }) => {
+    try {
+      const token = api.getToken();
+      const res = await fetch(a.url, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        toast('Не удалось открыть файл');
+        return;
+      }
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      // Open in a new tab when browser can display it; otherwise download
+      const type = res.headers.get('Content-Type') ?? blob.type ?? '';
+      if (type.startsWith('image/') || type.startsWith('text/') || type === 'application/pdf') {
+        window.open(objectUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = a.originalName;
+        link.click();
+      }
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+    } catch {
+      toast('Не удалось открыть файл');
+    }
+  };
+
   const handleDeleteAttachment = async (attachmentId: string) => {
     if (!selected) return;
     const ok = await confirm({
@@ -463,18 +492,16 @@ export function Calendar() {
               {(selected.attachments ?? []).length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {selected.attachments.map((a: any) => (
-                    <a
+                    <button
                       key={a.id}
-                      href={a.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      download={a.originalName}
+                      type="button"
+                      onClick={() => openAttachment(a)}
                       title={`${a.originalName} (${formatFileSize(a.size)})`}
-                      className="flex items-center gap-1.5 px-2 py-1 rounded-btn theme-bg theme-hover text-sm"
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-btn theme-bg theme-hover text-sm text-left"
                     >
                       <span aria-hidden>📎</span>
                       <span className="max-w-[140px] truncate">{a.originalName}</span>
-                    </a>
+                    </button>
                   ))}
                 </div>
               ) : (
@@ -572,15 +599,13 @@ export function Calendar() {
                 <div className="space-y-1 mb-2">
                   {selected.attachments.map((a: any) => (
                     <div key={a.id} className="flex items-center gap-2 text-sm theme-bg rounded-btn px-2 py-1.5">
-                      <a
-                        href={a.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        download={a.originalName}
-                        className="flex-1 min-w-0 truncate text-primary hover:underline"
+                      <button
+                        type="button"
+                        onClick={() => openAttachment(a)}
+                        className="flex-1 min-w-0 truncate text-primary hover:underline text-left"
                       >
                         {a.originalName}
-                      </a>
+                      </button>
                       <span className="text-xs theme-muted flex-shrink-0">{formatFileSize(a.size)}</span>
                       <button
                         type="button"

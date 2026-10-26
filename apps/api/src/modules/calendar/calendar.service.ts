@@ -7,8 +7,8 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { randomUUID, randomBytes } from 'crypto';
 import { EventKind, Prisma } from '@prisma/client';
-import { existsSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { existsSync, unlinkSync, createReadStream } from 'fs';
+import { isAbsolute, join } from 'path';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR ?? 'uploads';
 
@@ -199,7 +199,7 @@ export class CalendarService {
   }
 
   private removeUploadFile(filename: string) {
-    const filepath = join(process.cwd(), UPLOAD_DIR, filename);
+    const filepath = this.resolveUploadPath(filename);
     if (existsSync(filepath)) {
       try {
         unlinkSync(filepath);
@@ -425,12 +425,44 @@ export class CalendarService {
   private attachmentDto(a: any) {
     return {
       id: a.id,
+      eventId: a.eventId,
       originalName: a.originalName,
       mimeType: a.mimeType,
       size: a.size,
-      url: `/uploads/${a.filename}`,
+      url: `/api/v1/calendar/events/${a.eventId}/attachments/${a.id}/download`,
       createdAt: a.createdAt.toISOString(),
     };
+  }
+
+  async downloadAttachment(userId: string, eventId: string, attachmentId: string, res: any) {
+    const attachment = await this.prisma.eventAttachment.findUnique({
+      where: { id: attachmentId },
+      include: { event: true },
+    });
+    if (!attachment || attachment.eventId !== eventId) {
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'Attachment not found' });
+    }
+    await this.checkEventAccess(userId, attachment.event);
+
+    const filepath = this.resolveUploadPath(attachment.filename);
+    if (!existsSync(filepath)) {
+      throw new NotFoundException({ code: 'NOT_FOUND', message: 'File not found' });
+    }
+
+    res.setHeader('Content-Type', attachment.mimeType || 'application/octet-stream');
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename*=UTF-8''${encodeURIComponent(attachment.originalName)}`,
+    );
+    res.setHeader('Content-Length', String(attachment.size));
+    const stream = createReadStream(filepath);
+    stream.pipe(res);
+  }
+
+  private resolveUploadPath(filename: string) {
+    const uploadDir = process.env.UPLOAD_DIR ?? 'uploads';
+    const base = isAbsolute(uploadDir) ? uploadDir : join(process.cwd(), uploadDir);
+    return join(base, filename);
   }
 
   private feedTokenDto(t: any) {

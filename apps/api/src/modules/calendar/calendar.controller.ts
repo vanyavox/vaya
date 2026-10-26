@@ -27,8 +27,13 @@ import { CurrentUser, CurrentUserPayload } from '../../common/decorators/current
 
 const ATTACHMENT_MAX_SIZE = 25 * 1024 * 1024;
 
+const attachmentUploadDir = (() => {
+  const dir = process.env.UPLOAD_DIR ?? 'uploads';
+  return dir.startsWith('/') ? dir : require('path').join(process.cwd(), dir);
+})();
+
 const attachmentStorage = diskStorage({
-  destination: process.env.UPLOAD_DIR ?? 'uploads',
+  destination: attachmentUploadDir,
   filename: (_req, file, cb) => {
     const ext = extname(file.originalname);
     cb(null, `${randomUUID()}${ext}`);
@@ -212,6 +217,19 @@ export class CalendarController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.calendarService.addAttachment(user.id, id, file);
+  }
+
+  @Get('calendar/events/:id/attachments/:attachmentId/download')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Скачать вложение события' })
+  downloadAttachment(
+    @CurrentUser() user: CurrentUserPayload,
+    @Param('id') id: string,
+    @Param('attachmentId') attachmentId: string,
+    @Res() res: Response,
+  ) {
+    return this.calendarService.downloadAttachment(user.id, id, attachmentId, res);
   }
 
   @Delete('calendar/events/:id/attachments/:attachmentId')

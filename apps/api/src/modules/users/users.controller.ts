@@ -14,7 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { IsString, MinLength } from 'class-validator';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
 import { randomUUID } from 'crypto';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
@@ -33,7 +33,10 @@ class ChangePasswordDto {
 const ALLOWED_MIME = ['image/png', 'image/jpeg', 'image/webp'];
 
 const storage = diskStorage({
-  destination: process.env.UPLOAD_DIR ?? 'uploads',
+  destination: (() => {
+    const dir = process.env.UPLOAD_DIR ?? 'uploads';
+    return dir.startsWith('/') ? dir : join(process.cwd(), dir);
+  })(),
   filename: (_req, file, cb) => {
     const ext = extname(file.originalname) || '.png';
     cb(null, `${randomUUID()}${ext}`);

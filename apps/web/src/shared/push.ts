@@ -1,5 +1,19 @@
 import { api } from './api-client';
 
+export function isIOS() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  // iPadOS 13+ may report as Macintosh; detect touch + Mac
+  const iOSDevice = /iPad|iPhone|iPod/.test(ua);
+  const iPadOS = ua.includes('Macintosh') && 'ontouchend' in document;
+  return iOSDevice || iPadOS;
+}
+
+export function isStandaloneIOS() {
+  // Launched from Home Screen (not a Safari tab)
+  return isIOS() && (window.navigator as any).standalone === true;
+}
+
 export function isPushSupported() {
   return (
     typeof window !== 'undefined' &&
@@ -7,6 +21,13 @@ export function isPushSupported() {
     'PushManager' in window &&
     'Notification' in window
   );
+}
+
+/** True when the browser can actually subscribe (iOS must be Home Screen PWA). */
+export function canUsePush() {
+  if (!isPushSupported()) return false;
+  if (isIOS() && !isStandaloneIOS()) return false;
+  return true;
 }
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -19,10 +40,24 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export async function enablePush(): Promise<void> {
+  if (!isPushSupported()) {
+    throw new Error('Уведомления не поддерживаются в этом браузере');
+  }
+  if (isIOS() && !isStandaloneIOS()) {
+    throw new Error(
+      'На iPhone сначала добавьте V&Y на экран «Домой» и откройте приложение с иконки',
+    );
+  }
+
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
-    throw new Error('Разрешение на уведомления не выдано');
+    throw new Error(
+      permission === 'denied'
+        ? 'Уведомления запрещены — разрешите их в настройках сайта / iOS'
+        : 'Разрешение на уведомления не выдано',
+    );
   }
+
   const reg = await navigator.serviceWorker.register('/sw.js');
   await navigator.serviceWorker.ready;
 
@@ -37,11 +72,12 @@ export async function enablePush(): Promise<void> {
     });
   }
 
+  const json = sub.toJSON();
   await api.post('/push/subscribe', {
     endpoint: sub.endpoint,
     keys: {
-      p256dh: (sub.toJSON().keys as any)?.p256dh ?? '',
-      auth: (sub.toJSON().keys as any)?.auth ?? '',
+      p256dh: (json.keys as any)?.p256dh ?? '',
+      auth: (json.keys as any)?.auth ?? '',
     },
   });
 }

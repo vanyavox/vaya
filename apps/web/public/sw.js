@@ -18,6 +18,8 @@ self.addEventListener('push', (event) => {
       body: payload.body || '',
       icon: '/favicon.ico',
       badge: '/favicon.ico',
+      tag: 'vaya',
+      renotify: true,
       data: { url: payload.url || '/app' },
     }),
   );

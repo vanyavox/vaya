@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../app/AuthContext';
 import { api } from '../shared/api-client';
-import { disablePush, enablePush, hasActivePush, isPushSupported } from '../shared/push';
+import {
+  canUsePush,
+  disablePush,
+  enablePush,
+  hasActivePush,
+  isIOS,
+  isPushSupported,
+  isStandaloneIOS,
+} from '../shared/push';
 
 export function Profile() {
   const { user, refreshUser, logout } = useAuth();
@@ -12,6 +20,7 @@ export function Profile() {
   const [pushBusy, setPushBusy] = useState(false);
   const [pushMsg, setPushMsg] = useState('');
   const pushSupported = isPushSupported();
+  const iosNeedsHomeScreen = isIOS() && !isStandaloneIOS();
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
 
@@ -242,6 +251,25 @@ export function Profile() {
             <p className="text-sm theme-muted">
               Push-уведомления недоступны в этом браузере
             </p>
+          ) : iosNeedsHomeScreen ? (
+            <div className="text-sm space-y-2">
+              <p className="font-medium">
+                На iPhone уведомления работают только из иконки на экране «Домой».
+              </p>
+              <ol className="list-decimal list-inside theme-muted space-y-1">
+                <li>Откройте сайт в Safari (не в другом браузере)</li>
+                <li>Нажмите «Поделиться»</li>
+                <li>Выберите «На экран «Домой»» → «Добавить»</li>
+                <li>Запустите V&amp;Y с новой иконки и вернитесь в Профиль</li>
+              </ol>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="btn-secondary w-full"
+              >
+                Я добавил на экран «Домой» — проверить
+              </button>
+            </div>
           ) : (
             <>
               <button
@@ -255,6 +283,11 @@ export function Profile() {
                     ? 'Выключить уведомления'
                     : 'Включить уведомления'}
               </button>
+              {isStandaloneIOS() && (
+                <p className="text-xs theme-muted mt-2">
+                  Открыто с иконки на экране «Домой» — можно включать уведомления.
+                </p>
+              )}
               {pushMsg && (
                 <div
                   className={`mt-3 text-sm rounded-btn px-3 py-2 ${

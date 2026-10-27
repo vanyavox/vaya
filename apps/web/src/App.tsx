@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthLayout } from './app/AuthLayout';
 import { AppLayout } from './app/AppLayout';
-import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
@@ -24,7 +23,7 @@ export default function App() {
         path="/"
         element={
           <GuestRoute>
-            <Landing />
+            <Navigate to="/login" replace />
           </GuestRoute>
         }
       />

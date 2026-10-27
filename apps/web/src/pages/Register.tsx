@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../app/AuthContext';
 
+// Registration is closed; keep the form code but block usage
+const REGISTRATION_OPEN = false;
+
 export function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -14,6 +17,7 @@ export function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!REGISTRATION_OPEN) return;
     setError('');
     if (password !== confirm) {
       setError('Пароли не совпадают');
@@ -40,7 +44,12 @@ export function Register() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {!REGISTRATION_OPEN && (
+        <div className="mb-4 p-3 rounded-btn bg-primary/10 text-primary text-sm">
+          Регистрация временно закрыта. Для доступа обратитесь к владельцу пары.
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="space-y-4" aria-disabled={!REGISTRATION_OPEN}>
         <div>
           <label className="block text-sm font-medium mb-1">Имя</label>
           <input
@@ -87,8 +96,8 @@ export function Register() {
           />
         </div>
 
-        <button type="submit" className="btn-primary w-full" disabled={loading}>
-          {loading ? 'Создание...' : 'Зарегистрироваться'}
+        <button type="submit" className="btn-primary w-full" disabled={loading || !REGISTRATION_OPEN}>
+          {!REGISTRATION_OPEN ? 'Регистрация закрыта' : loading ? 'Создание...' : 'Зарегистрироваться'}
         </button>
       </form>
 

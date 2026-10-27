@@ -64,9 +64,7 @@ export function Login() {
 
       <p className="mt-4 text-center text-sm theme-muted">
         Нет аккаунта?{' '}
-        <Link to="/register" className="text-primary hover:underline">
-          Зарегистрироваться
-        </Link>
+        <span className="theme-muted text-sm">Регистрация закрыта</span>
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState, Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 
@@ -82,7 +83,10 @@ export function Pairing() {
                   {i > 0 && (
                     <div className="text-3xl text-danger self-center pt-2">♥</div>
                   )}
-                  <div className="flex flex-col items-center">
+                  <Link
+                    to={`/app/profile/${m.userId}`}
+                    className="flex flex-col items-center hover:opacity-80"
+                  >
                     {m.avatarUrl ? (
                       <img src={m.avatarUrl} alt={m.name} className="w-16 h-16 rounded-full" />
                     ) : (
@@ -92,7 +96,7 @@ export function Pairing() {
                     )}
                     <span className="mt-2 font-medium">{m.name}</span>
                     <span className="text-xs theme-muted">{m.role === 'OWNER' ? 'Владелец' : 'Партнёр'}</span>
-                  </div>
+                  </Link>
                 </Fragment>
               ))}
             </div>

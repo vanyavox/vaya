@@ -49,6 +49,7 @@ export default function App() {
       >
         <Route path="/app" element={<Dashboard />} />
         <Route path="/app/profile" element={<Profile />} />
+        <Route path="/app/profile/:userId" element={<Profile />} />
         <Route path="/app/pairing" element={<Pairing />} />
         <Route path="/app/wishes" element={<Wishlists />} />
         <Route path="/app/wishes/:id" element={<WishlistDetail />} />

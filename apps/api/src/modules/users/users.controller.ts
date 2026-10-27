@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Patch,
   Post,
   Delete,
@@ -62,6 +63,12 @@ export class UsersController {
   @ApiOperation({ summary: 'Профиль текущего пользователя' })
   getProfile(@CurrentUser() user: CurrentUserPayload) {
     return this.usersService.getProfile(user.id);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Профиль себя или партнёра по паре' })
+  getMemberProfile(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.usersService.getMemberProfile(user.id, id);
   }
 
   @Patch('me')

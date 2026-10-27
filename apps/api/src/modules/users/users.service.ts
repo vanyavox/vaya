@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { PrismaService } from '../../prisma/prisma.service';
 import { existsSync, unlinkSync, mkdirSync } from 'fs';
@@ -9,6 +9,22 @@ export class UsersService {
   private readonly uploadDir = process.env.UPLOAD_DIR ?? 'uploads';
 
   constructor(private readonly prisma: PrismaService) {}
+
+  async getMemberProfile(viewerId: string, userId: string) {
+    if (viewerId === userId) return this.getProfile(userId);
+
+    const mine = await this.prisma.coupleMember.findFirst({ where: { userId: viewerId } });
+    if (!mine) {
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа к профилю' });
+    }
+    const targetInCouple = await this.prisma.coupleMember.findFirst({
+      where: { userId, coupleId: mine.coupleId },
+    });
+    if (!targetInCouple) {
+      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Нет доступа к профилю' });
+    }
+    return this.getProfile(userId);
+  }
 
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });

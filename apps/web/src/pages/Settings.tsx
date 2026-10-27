@@ -74,9 +74,6 @@ export function Settings() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl sm:text-2xl font-bold">Настройки</h1>
-        <Link to="/app/profile" className="btn-secondary text-sm">
-          Профиль
-        </Link>
       </div>
 
       <div className="space-y-6 max-w-2xl">

@@ -1,23 +1,42 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../app/AuthContext';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { useToast } from '../app/ToastProvider';
 
 export function Profile() {
-  const { user, refreshUser, logout } = useAuth();
+  const { user: me, refreshUser, logout } = useAuth();
+  const { userId } = useParams<{ userId?: string }>();
   const toast = useToast();
-  const [name, setName] = useState(user?.name ?? '');
-  const [bio, setBio] = useState((user as any)?.bio ?? '');
-  const [email, setEmail] = useState(user?.email ?? '');
+  const isSelf = !userId || userId === me?.id;
+
+  const { data: member, isLoading: memberLoading } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => api.get<any>(`/users/${userId}`),
+    enabled: !!userId && userId !== me?.id,
+  });
+
+  const user: any = isSelf ? me : member;
+  const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
+  const [email, setEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    setName(user?.name ?? '');
-    setBio((user as any)?.bio ?? '');
-    setEmail(user?.email ?? '');
-  }, [user?.name, user?.email, (user as any)?.bio]);
+    if (!user) return;
+    setName(user.name ?? '');
+    setBio(user.bio ?? '');
+    setEmail(user.email ?? '');
+  }, [user?.name, user?.bio, user?.email]);
+
+  if (userId && userId !== me?.id && memberLoading) {
+    return <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />;
+  }
+  if (userId && userId !== me?.id && !member) {
+    return <p className="theme-muted">Профиль не найден</p>;
+  }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,16 +71,20 @@ export function Profile() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold">Профиль</h1>
-        <Link to="/app/settings" className="btn-secondary text-sm">
-          Настройки
-        </Link>
+        <h1 className="text-xl sm:text-2xl font-bold">
+          {isSelf ? 'Профиль' : `Профиль · ${user?.name ?? ''}`}
+        </h1>
+        {isSelf && (
+          <Link to="/app/settings" className="btn-secondary text-sm">
+            Настройки
+          </Link>
+        )}
       </div>
 
       {/* Anketa */}
       <div className="card max-w-2xl">
         <div className="flex items-center gap-4 mb-6">
-          <label className="cursor-pointer relative">
+          <label className={`relative ${isSelf ? 'cursor-pointer' : ''}`}>
             {user?.avatarUrl ? (
               <img
                 src={user.avatarUrl}
@@ -73,10 +96,14 @@ export function Profile() {
                 {user?.name?.[0] ?? '?'}
               </div>
             )}
-            <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-            <span className="absolute -bottom-1 -right-1 text-xs bg-primary text-white rounded-full px-2 py-0.5">
-              {uploading ? '…' : '📷'}
-            </span>
+            {isSelf && (
+              <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+            )}
+            {isSelf && (
+              <span className="absolute -bottom-1 -right-1 text-xs bg-primary text-white rounded-full px-2 py-0.5">
+                {uploading ? '…' : '📷'}
+              </span>
+            )}
           </label>
           <div>
             <div className="text-lg font-semibold">{user?.name}</div>
@@ -92,6 +119,7 @@ export function Profile() {
               className="input"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              readOnly={!isSelf}
               required
             />
           </div>
@@ -104,32 +132,39 @@ export function Profile() {
               placeholder="Что-нибудь о себе: интересы, увлечения, ожидания…"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
+              readOnly={!isSelf}
             />
             <div className="text-xs theme-muted mt-1 text-right">{bio.length}/500</div>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              className="input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className="btn-primary w-full" disabled={saving}>
-            {saving ? 'Сохранение…' : 'Сохранить анкету'}
-          </button>
+          {isSelf && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                type="email"
+                className="input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+          )}
+          {isSelf ? (
+            <button type="submit" className="btn-primary w-full" disabled={saving}>
+              {saving ? 'Сохранение…' : 'Сохранить анкету'}
+            </button>
+          ) : null}
         </form>
       </div>
 
-      <div className="card mt-6 max-w-2xl border-danger/30">
-        <h3 className="font-semibold mb-3">Выход из аккаунта</h3>
-        <p className="theme-muted text-sm mb-3">Вы выйдете из аккаунта на этом устройстве</p>
-        <button onClick={logout} className="btn-danger">
-          Выйти из аккаунта
-        </button>
-      </div>
+      {isSelf && (
+        <div className="card mt-6 max-w-2xl border-danger/30">
+          <h3 className="font-semibold mb-3">Выход из аккаунта</h3>
+          <p className="theme-muted text-sm mb-3">Вы выйдете из аккаунта на этом устройстве</p>
+          <button onClick={logout} className="btn-danger">
+            Выйти из аккаунта
+          </button>
+        </div>
+      )}
     </div>
   );
 }

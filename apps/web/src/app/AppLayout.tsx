@@ -24,8 +24,8 @@ export function AppLayout() {
 
   const secondaryNav = [
     { to: '/app/pairing', label: 'Связка', icon: '💜', end: false },
-    { to: '/app/settings', label: 'Настройки', icon: '⚙️', end: true },
     { to: '/app/profile', label: 'Профиль', icon: '👤', end: false },
+    { to: '/app/settings', label: 'Настройки', icon: '⚙️', end: true },
   ];
 
   const allNav = [...navItems, ...secondaryNav];

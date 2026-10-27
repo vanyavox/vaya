@@ -117,7 +117,7 @@ function eventTouchesDay(e: { startsAt: string; endsAt: string }, y: number, m: 
 }
 
 const CHIP_CLASS =
-  'w-full text-[9px] sm:text-xs px-1 py-0.5 truncate text-white text-left hover:opacity-80';
+  'w-full text-[9px] sm:text-xs px-1 py-0.5 truncate text-white text-left hover:opacity-80 leading-tight';
 
 function chipClassFor(e: any, now: Date, opts?: { left?: boolean; right?: boolean }) {
   const past = isPastEvent(e, now);
@@ -797,7 +797,7 @@ export function Calendar() {
                       <div
                         key={i}
                         onClick={day ? () => selectDay(day) : undefined}
-                        className={`relative border-r theme-border p-1 sm:p-1.5 flex flex-col ${
+                        className={`relative border-r theme-border p-1.5 flex flex-col ${
                           day ? 'cursor-pointer' : 'theme-hover'
                         } ${isSelectedDay ? 'ring-2 ring-inset ring-primary z-10' : ''}`}
                       >
@@ -893,7 +893,7 @@ export function Calendar() {
                       className={`${chipClassFor(e, now)} absolute z-20 pointer-events-auto`}
                       style={{
                         top: `calc(1.875rem + ${lane} * 1.375rem)`,
-                        height: '1.25rem',
+                        minHeight: '1.35rem',
                         left: `calc(${(colStart * 100) / 7}% + 0.375rem)`,
                         width: `calc(${(colSpan * 100) / 7}% - 0.75rem)`,
                         backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',

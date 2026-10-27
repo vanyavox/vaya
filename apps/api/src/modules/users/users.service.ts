@@ -16,7 +16,7 @@ export class UsersService {
     return this.toDto(user);
   }
 
-  async updateProfile(userId: string, data: { name?: string; email?: string; timezone?: string }) {
+  async updateProfile(userId: string, data: { name?: string; email?: string; timezone?: string; bio?: string }) {
     if (data.email) {
       const existing = await this.prisma.user.findFirst({
         where: { email: data.email, NOT: { id: userId } },
@@ -29,6 +29,7 @@ export class UsersService {
       where: { id: userId },
       data: {
         ...(data.name !== undefined && { name: data.name }),
+        ...(data.bio !== undefined && { bio: data.bio }),
         ...(data.email !== undefined && { email: data.email }),
         ...(data.timezone !== undefined && { timezone: data.timezone }),
       },
@@ -102,12 +103,13 @@ export class UsersService {
     }
   }
 
-  private toDto(user: { id: string; email: string; name: string; avatarUrl: string | null; timezone: string; createdAt: Date }) {
+  private toDto(user: { id: string; email: string; name: string; avatarUrl: string | null; bio?: string; timezone: string; createdAt: Date }) {
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       avatarUrl: user.avatarUrl,
+      bio: (user as any).bio ?? '',
       timezone: user.timezone,
       createdAt: user.createdAt.toISOString(),
     };

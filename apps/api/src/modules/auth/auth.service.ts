@@ -145,12 +145,13 @@ export class AuthService {
     return createHash('sha256').update(raw).digest('hex');
   }
 
-  private toUserDto(user: { id: string; email: string; name: string; avatarUrl: string | null; timezone: string; createdAt: Date }) {
+  private toUserDto(user: { id: string; email: string; name: string; avatarUrl: string | null; bio?: string; timezone: string; createdAt: Date }) {
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       avatarUrl: user.avatarUrl,
+      bio: (user as any).bio ?? '',
       timezone: user.timezone,
       createdAt: user.createdAt.toISOString(),
     };

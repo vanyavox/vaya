@@ -11,6 +11,7 @@ import { WishlistDetail } from './pages/WishlistDetail';
 import { Calendar } from './pages/Calendar';
 import { Todos } from './pages/Todos';
 import { CalendarFeed } from './pages/CalendarFeed';
+import { Settings } from './pages/Settings';
 import { NotFound } from './pages/NotFound';
 import { ProtectedRoute } from './app/ProtectedRoute';
 import { GuestRoute } from './app/GuestRoute';
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/app/wishes/:id" element={<WishlistDetail />} />
         <Route path="/app/calendar" element={<Calendar />} />
         <Route path="/app/todos" element={<Todos />} />
+        <Route path="/app/settings" element={<Settings />} />
         <Route path="/app/settings/calendar-feed" element={<CalendarFeed />} />
       </Route>
 

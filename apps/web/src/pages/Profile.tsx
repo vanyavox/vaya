@@ -1,46 +1,33 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../app/AuthContext';
 import { api } from '../shared/api-client';
-import {
-  canUsePush,
-  disablePush,
-  enablePush,
-  hasActivePush,
-  isIOS,
-  isPushSupported,
-  isStandaloneIOS,
-} from '../shared/push';
+import { useToast } from '../app/ToastProvider';
 
 export function Profile() {
   const { user, refreshUser, logout } = useAuth();
+  const toast = useToast();
   const [name, setName] = useState(user?.name ?? '');
+  const [bio, setBio] = useState((user as any)?.bio ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [saving, setSaving] = useState(false);
-  const [pushEnabled, setPushEnabled] = useState(false);
-  const [pushBusy, setPushBusy] = useState(false);
-  const [pushMsg, setPushMsg] = useState('');
-  const pushSupported = isPushSupported();
-  const iosNeedsHomeScreen = isIOS() && !isStandaloneIOS();
-  const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
+  useEffect(() => {
+    setName(user?.name ?? '');
+    setBio((user as any)?.bio ?? '');
+    setEmail(user?.email ?? '');
+  }, [user?.name, user?.email, (user as any)?.bio]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setMessage('');
     try {
-      await api.patch('/users/me', { name, email });
+      await api.patch('/users/me', { name, email, bio });
       await refreshUser();
-      setMessage('Сохранено!');
+      toast('Профиль сохранён');
     } catch (err: any) {
-      setMessage(err.message ?? 'Ошибка');
+      toast(err.message ?? 'Не удалось сохранить профиль');
     } finally {
       setSaving(false);
     }
@@ -53,264 +40,95 @@ export function Profile() {
     try {
       await api.upload('/users/me/avatar', file);
       await refreshUser();
+      toast('Аватар обновлён');
     } catch (err: any) {
-      setMessage(err.message ?? 'Ошибка загрузки');
+      toast(err.message ?? 'Не удалось загрузить аватар');
     } finally {
       setUploading(false);
-    }
-  };
-
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasswordMessage('');
-    setPasswordError(false);
-
-    if (newPassword !== confirmPassword) {
-      setPasswordMessage('Пароли не совпадают');
-      setPasswordError(true);
-      return;
-    }
-    if (newPassword.length < 8) {
-      setPasswordMessage('Новый пароль — минимум 8 символов');
-      setPasswordError(true);
-      return;
-    }
-
-    setChangingPassword(true);
-    try {
-      await api.post('/users/me/password', { currentPassword, newPassword });
-      setPasswordMessage('Пароль изменён');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (err: any) {
-      setPasswordMessage(err.message ?? 'Ошибка смены пароля');
-      setPasswordError(true);
-    } finally {
-      setChangingPassword(false);
-    }
-  };
-
-
-  useEffect(() => {
-    if (!isPushSupported()) return;
-    hasActivePush().then(setPushEnabled).catch(() => undefined);
-  }, []);
-
-  const handleTogglePush = async () => {
-    setPushBusy(true);
-    setPushMsg('');
-    try {
-      if (pushEnabled) {
-        await disablePush();
-        setPushEnabled(false);
-        setPushMsg('Уведомления выключены');
-      } else {
-        await enablePush();
-        setPushEnabled(true);
-        setPushMsg('Уведомления включены');
-      }
-    } catch (err: any) {
-      setPushMsg(err?.message ?? 'Не удалось изменить подписку');
-    } finally {
-      setPushBusy(false);
+      e.target.value = '';
     }
   };
 
   return (
     <div>
-      <h1 className="text-xl sm:text-2xl font-bold mb-8">Профиль</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">Профиль</h1>
+        <Link to="/app/settings" className="btn-secondary text-sm">
+          Настройки
+        </Link>
+      </div>
 
-      <div className="max-w-lg">
-        <div className="card">
-          {/* Avatar */}
-          <div className="flex flex-col items-center mb-6">
-            <div className="relative">
-              {user?.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.name}
-                  className="w-28 h-28 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-28 h-28 rounded-full bg-primary/20 flex items-center justify-center text-primary text-4xl font-bold">
-                  {user?.name?.[0] ?? '?'}
-                </div>
-              )}
-              <label className="absolute bottom-0 right-0 bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center cursor-pointer hover:bg-primary-dark">
-                📷
-                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-              </label>
-            </div>
-            {uploading && <p className="text-sm theme-muted mt-2">Загрузка...</p>}
+      {/* Anketa */}
+      <div className="card max-w-2xl">
+        <div className="flex items-center gap-4 mb-6">
+          <label className="cursor-pointer relative">
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="w-20 h-20 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-2xl text-primary font-bold">
+                {user?.name?.[0] ?? '?'}
+              </div>
+            )}
+            <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+            <span className="absolute -bottom-1 -right-1 text-xs bg-primary text-white rounded-full px-2 py-0.5">
+              {uploading ? '…' : '📷'}
+            </span>
+          </label>
+          <div>
+            <div className="text-lg font-semibold">{user?.name}</div>
+            <div className="text-sm theme-muted">{user?.email}</div>
           </div>
-
-          <form onSubmit={handleSave} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Имя</label>
-              <input
-                type="text"
-                className="input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <input
-                type="email"
-                className="input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            {message && (
-              <div
-                className={`p-2 rounded-btn text-sm ${
-                  message === 'Сохранено!' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
-                }`}
-              >
-                {message}
-              </div>
-            )}
-
-            <button type="submit" className="btn-primary w-full" disabled={saving}>
-              {saving ? 'Сохранение...' : 'Сохранить'}
-            </button>
-          </form>
         </div>
 
-        {/* Change password */}
-        <div className="card mt-6">
-          <h3 className="font-semibold mb-1">Смена пароля</h3>
-          <p className="theme-muted text-sm mb-4">
-            Сменить пароль можете только вы
-          </p>
-          <form onSubmit={handleChangePassword} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Текущий пароль</label>
-              <input
-                type="password"
-                className="input"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Новый пароль</label>
-              <input
-                type="password"
-                className="input"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Повторите новый пароль</label>
-              <input
-                type="password"
-                className="input"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
-            </div>
-
-            {passwordMessage && (
-              <div
-                className={`p-2 rounded-btn text-sm ${
-                  passwordError ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'
-                }`}
-              >
-                {passwordMessage}
-              </div>
-            )}
-
-            <button type="submit" className="btn-primary w-full" disabled={changingPassword}>
-              {changingPassword ? 'Сохранение...' : 'Изменить пароль'}
-            </button>
-          </form>
-        </div>
-
-        {/* Push notifications */}
-        <div className="card mt-6">
-          <h3 className="font-semibold mb-2">Уведомления</h3>
-          <p className="theme-muted text-sm mb-3">
-            Сообщать, когда партнёр добавляет дела, общие события или желания
-          </p>
-          {!pushSupported ? (
-            <p className="text-sm theme-muted">
-              Push-уведомления недоступны в этом браузере
-            </p>
-          ) : iosNeedsHomeScreen ? (
-            <div className="text-sm space-y-2">
-              <p className="font-medium">
-                На iPhone уведомления работают только из иконки на экране «Домой».
-              </p>
-              <ol className="list-decimal list-inside theme-muted space-y-1">
-                <li>Откройте сайт в Safari (не в другом браузере)</li>
-                <li>Нажмите «Поделиться»</li>
-                <li>Выберите «На экран «Домой»» → «Добавить»</li>
-                <li>Запустите V&amp;Y с новой иконки и вернитесь в Профиль</li>
-              </ol>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="btn-secondary w-full"
-              >
-                Я добавил на экран «Домой» — проверить
-              </button>
-            </div>
-          ) : (
-            <>
-              <button
-                onClick={handleTogglePush}
-                disabled={pushBusy}
-                className={pushEnabled ? 'btn-secondary w-full' : 'btn-primary w-full'}
-              >
-                {pushBusy
-                  ? 'Подождите...'
-                  : pushEnabled
-                    ? 'Выключить уведомления'
-                    : 'Включить уведомления'}
-              </button>
-              {isStandaloneIOS() && (
-                <p className="text-xs theme-muted mt-2">
-                  Открыто с иконки на экране «Домой» — можно включать уведомления.
-                </p>
-              )}
-              {pushMsg && (
-                <div
-                  className={`mt-3 text-sm rounded-btn px-3 py-2 ${
-                    pushEnabled ? 'bg-success/10 text-success' : 'theme-muted theme-bg'
-                  }`}
-                >
-                  {pushMsg}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Danger zone */}
-        <div className="card mt-6 border-danger/30">
-          <h3 className="font-semibold mb-3">Выход из аккаунта</h3>
-          <p className="theme-muted text-sm mb-3">
-            Вы выйдете из аккаунта на этом устройстве
-          </p>
-          <button onClick={logout} className="btn-danger">
-            Выйти из аккаунта
+        <form onSubmit={handleSave} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Имя</label>
+            <input
+              type="text"
+              className="input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">О себе</label>
+            <textarea
+              className="input"
+              rows={5}
+              maxLength={500}
+              placeholder="Что-нибудь о себе: интересы, увлечения, ожидания…"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+            />
+            <div className="text-xs theme-muted mt-1 text-right">{bio.length}/500</div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <input
+              type="email"
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn-primary w-full" disabled={saving}>
+            {saving ? 'Сохранение…' : 'Сохранить анкету'}
           </button>
-        </div>
+        </form>
+      </div>
+
+      <div className="card mt-6 max-w-2xl border-danger/30">
+        <h3 className="font-semibold mb-3">Выход из аккаунта</h3>
+        <p className="theme-muted text-sm mb-3">Вы выйдете из аккаунта на этом устройстве</p>
+        <button onClick={logout} className="btn-danger">
+          Выйти из аккаунта
+        </button>
       </div>
     </div>
   );

@@ -68,7 +68,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Обновление профиля' })
   updateProfile(
     @CurrentUser() user: CurrentUserPayload,
-    @Body() body: { name?: string; email?: string; timezone?: string },
+    @Body() body: { name?: string; email?: string; timezone?: string; bio?: string },
   ) {
     return this.usersService.updateProfile(user.id, body);
   }

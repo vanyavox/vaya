@@ -656,16 +656,21 @@ export function Calendar() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
+      {/* Sticky on mobile so +Событие stays reachable while scrolling days */}
+      <div
+        className="sticky z-40 -mx-4 px-4 pt-2 pb-2 mb-2 sm:mx-0 sm:px-0 sm:pt-0 sm:pb-0 sm:static sm:mb-0"
+        style={{ top: 0, backgroundColor: 'var(--t-bg)' }}
+      >
+      <div className="flex items-center justify-between mb-2 sm:mb-4 lg:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold">Календарь</h1>
-        <button onClick={openCreateForm} className="btn-primary text-sm sm:text-base">
+        <button onClick={openCreateForm} className="btn-primary text-sm sm:text-base shrink-0">
           <span className="sm:hidden">+ Событие</span>
           <span className="hidden sm:inline">+ Новое событие</span>
         </button>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6 flex-wrap">
+      <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-4 lg:mb-6 flex-wrap">
         <div className="flex items-center gap-2">
           <button
             onClick={() => changeMonth(-1)}
@@ -715,6 +720,7 @@ export function Calendar() {
             Список
           </button>
         </div>
+      </div>
       </div>
 
       {/* Month grid */}
@@ -893,7 +899,11 @@ export function Calendar() {
                       className={`${chipClassFor(e, now)} absolute z-20 pointer-events-auto`}
                       style={{
                         top: `calc(1.875rem + ${lane} * 1.375rem)`,
-                        minHeight: '1.35rem',
+                        height: '1.35rem',
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
                         left: `calc(${(colStart * 100) / 7}% + 0.375rem)`,
                         width: `calc(${(colSpan * 100) / 7}% - 0.75rem)`,
                         backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',

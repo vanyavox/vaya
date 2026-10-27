@@ -227,7 +227,11 @@ export function Dashboard() {
                 {couple.members.map((m: any, i: number) => (
                   <Fragment key={m.userId}>
                     {i > 0 && <span className="text-danger text-lg leading-none">♥</span>}
-                    <div className="flex items-center gap-2">
+                    <Link
+                      to={`/app/profile/${m.userId}`}
+                      className="flex items-center gap-2 hover:opacity-80"
+                      title={`Профиль: ${m.name}`}
+                    >
                       {m.avatarUrl ? (
                         <img src={m.avatarUrl} alt={m.name} className="w-8 h-8 rounded-full" />
                       ) : (
@@ -236,7 +240,7 @@ export function Dashboard() {
                         </div>
                       )}
                       <span className="text-sm">{m.name}</span>
-                    </div>
+                    </Link>
                   </Fragment>
                 ))}
               </div>

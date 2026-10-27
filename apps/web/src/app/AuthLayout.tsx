@@ -6,7 +6,7 @@ export function AuthLayout() {
 
   return (
     <div className="min-h-screen theme-bg flex flex-col">
-      <header className="p-4 sm:p-6 flex items-center justify-between">
+      <header className="px-4 sm:px-6 safe-top pb-4 sm:pb-6 flex items-center justify-between">
         <Link to="/" className="text-2xl font-bold text-primary">
           Vaya
         </Link>

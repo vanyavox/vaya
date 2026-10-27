@@ -33,7 +33,7 @@ export function AppLayout() {
   return (
     <div className="min-h-screen theme-bg flex flex-col lg:flex-row">
       {/* Mobile top bar */}
-      <header className="lg:hidden sticky top-0 z-40 theme-surface border-b theme-border px-4 py-3 flex items-center justify-between">
+      <header className="lg:hidden sticky top-0 z-40 theme-surface border-b theme-border px-4 safe-top pb-3 flex items-center justify-between">
         <NavLink to="/app" className="text-xl font-bold text-primary">
           V&Y
         </NavLink>
@@ -63,7 +63,7 @@ export function AppLayout() {
 
       {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[52px] z-30 overlay" onClick={() => setMobileMenuOpen(false)}>
+        <div className="lg:hidden fixed inset-x-0 bottom-0 top-[calc(4rem+env(safe-area-inset-top,0px))] z-30 overlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="theme-surface border-b theme-border p-2" onClick={(e) => e.stopPropagation()}>
             {secondaryNav.map((item) => (
               <NavLink
@@ -153,7 +153,7 @@ export function AppLayout() {
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 theme-surface border-t theme-border">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 theme-surface border-t theme-border safe-bottom safe-left safe-right">
         <div className="flex items-center justify-around h-16 px-2">
           {navItems.map((item) => (
             <NavLink

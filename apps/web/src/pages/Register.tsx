@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../app/AuthContext';
+import { PasswordInput } from '../shared/PasswordInput';
 
 // Registration is closed; keep the form code but block usage
 const REGISTRATION_OPEN = false;
@@ -74,11 +75,9 @@ export function Register() {
 
         <div>
           <label className="block text-sm font-medium mb-1">Пароль</label>
-          <input
-            type="password"
-            className="input"
+          <PasswordInput
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onValueChange={setPassword}
             minLength={8}
             required
           />
@@ -86,11 +85,9 @@ export function Register() {
 
         <div>
           <label className="block text-sm font-medium mb-1">Подтверждение пароля</label>
-          <input
-            type="password"
-            className="input"
+          <PasswordInput
             value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
+            onValueChange={setConfirm}
             minLength={8}
             required
           />

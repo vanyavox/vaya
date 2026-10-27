@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../app/AuthContext';
+import { PasswordInput } from '../shared/PasswordInput';
 
 export function Login() {
   const { login } = useAuth();
@@ -48,12 +49,11 @@ export function Login() {
 
         <div>
           <label className="block text-sm font-medium mb-1">Пароль</label>
-          <input
-            type="password"
-            className="input"
+          <PasswordInput
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onValueChange={setPassword}
             required
+            autoComplete="current-password"
           />
         </div>
 

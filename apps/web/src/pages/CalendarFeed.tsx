@@ -4,7 +4,7 @@ import { api } from '../shared/api-client';
 import { useConfirm } from '../app/ConfirmProvider';
 import { useToast } from '../app/ToastProvider';
 
-export function CalendarFeed() {
+export function CalendarFeed({ embedded = false }: { embedded?: boolean } = {}) {
   const confirmRegen = useConfirm();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -41,10 +41,18 @@ export function CalendarFeed() {
 
   return (
     <div>
-      <h1 className="text-xl sm:text-2xl font-bold mb-2">Подписка на календарь</h1>
-      <p className="theme-muted mb-8">
-        Добавьте календарь Vaya в Apple Calendar, чтобы видеть события на всех устройствах
-      </p>
+      {!embedded ? (
+        <>
+          <h1 className="text-xl sm:text-2xl font-bold mb-2">Подписка на календарь</h1>
+          <p className="theme-muted mb-8">
+            Добавьте календарь Vaya в Apple Calendar, чтобы видеть события на всех устройствах
+          </p>
+        </>
+      ) : (
+        <p className="theme-muted text-sm mb-4">
+          Добавьте календарь в Apple Calendar, чтобы видеть события на всех устройствах
+        </p>
+      )}
 
       {message && (
         <div className="mb-6 p-3 rounded-btn bg-primary/10 text-primary text-sm">{message}</div>

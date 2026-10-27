@@ -11,11 +11,14 @@ import {
   isStandaloneIOS,
 } from '../shared/push';
 import { useToast } from '../app/ToastProvider';
+import { PasswordInput } from '../shared/PasswordInput';
+import { CalendarFeed } from './CalendarFeed';
 
 export function Settings() {
   const toast = useToast();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
 
   const [pushEnabled, setPushEnabled] = useState(false);
@@ -30,11 +33,16 @@ export function Settings() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== newPasswordConfirm) {
+      toast('Пароли не совпадают');
+      return;
+    }
     setChangingPassword(true);
     try {
       await api.post('/users/me/password', { currentPassword, newPassword });
       setCurrentPassword('');
       setNewPassword('');
+      setNewPasswordConfirm('');
       toast('Пароль изменён');
     } catch (err: any) {
       toast(err.message ?? 'Не удалось изменить пароль');
@@ -77,27 +85,33 @@ export function Settings() {
           <form onSubmit={handleChangePassword} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Текущий пароль</label>
-              <input
-                type="password"
-                className="input"
+              <PasswordInput
                 value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
+                onValueChange={setCurrentPassword}
                 autoComplete="current-password"
                 required
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Новый пароль</label>
-              <input
-                type="password"
-                className="input"
+              <PasswordInput
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onValueChange={setNewPassword}
                 autoComplete="new-password"
                 minLength={8}
                 required
               />
               <div className="text-xs theme-muted mt-1">Минимум 8 символов</div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Повторите новый пароль</label>
+              <PasswordInput
+                value={newPasswordConfirm}
+                onValueChange={setNewPasswordConfirm}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
             </div>
             <button type="submit" className="btn-primary w-full" disabled={changingPassword}>
               {changingPassword ? 'Сохранение…' : 'Изменить пароль'}
@@ -154,11 +168,8 @@ export function Settings() {
         </div>
 
         <div className="card">
-          <h3 className="font-semibold mb-2">Календарь</h3>
-          <p className="theme-muted text-sm mb-3">Подписка на события в Apple Calendar</p>
-          <Link to="/app/settings/calendar-feed" className="btn-secondary w-full inline-flex justify-center">
-            Подписка на календарь
-          </Link>
+          <h3 className="font-semibold mb-2">Подписка на календарь</h3>
+          <CalendarFeed embedded />
         </div>
       </div>
     </div>

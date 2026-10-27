@@ -27,7 +27,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, Props>(function Passwo
         aria-label={show ? 'Скрыть пароль' : 'Показать пароль'}
         tabIndex={0}
       >
-        {show ? '🙈' : '👁'}
+        {show ? '👁' : '🙈'}
       </button>
     </div>
   );

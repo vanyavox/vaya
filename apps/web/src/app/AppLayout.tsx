@@ -161,7 +161,7 @@ export function AppLayout() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-btn min-w-[56px] transition-colors ${
+                `flex flex-col items-center gap-0.5 px-2 py-1 rounded-btn min-w-[52px] transition-colors ${
                   isActive ? 'text-primary' : 'theme-muted theme-hover'
                 }`
               }

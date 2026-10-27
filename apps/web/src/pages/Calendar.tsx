@@ -159,6 +159,7 @@ export function Calendar() {
   const [scope, setScope] = useState<'all' | 'personal' | 'shared'>('all');
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
   const [eventStart, setEventStart] = useState(() => eventTimesForDate(new Date()).start);
@@ -729,7 +730,7 @@ export function Calendar() {
               ))}
             </div>
 
-            {/* Weeks: full-height day columns; multi-day chips overlay via grid-column */}
+            {/* Month weeks — equal cells, multi-day reserved band */}
             {weeks.map((week, wi) => {
               const weekBarsRaw = multiDayEvents
                 .map((e: any) => {
@@ -740,13 +741,12 @@ export function Calendar() {
                   if (!covered.length) return null;
                   return {
                     e,
-                    colStart: covered[0] + 1,
+                    colStart: covered[0],
                     colSpan: covered[covered.length - 1] - covered[0] + 1,
                   };
                 })
                 .filter(Boolean) as { e: any; colStart: number; colSpan: number }[];
 
-              // Pack overlapping multi-day bars into lanes so they don't cover each other
               const sortedBars = [...weekBarsRaw].sort(
                 (a, b) => a.colStart - b.colStart || b.colSpan - a.colSpan,
               );
@@ -758,17 +758,12 @@ export function Calendar() {
                 laneEnds[lane] = colEnd;
                 return { ...bar, lane };
               });
+              const multiLanes = laneEnds.length;
 
               return (
                 <div
                   key={wi}
-                  className="border-b theme-border grid grid-cols-7 min-h-[64px] sm:min-h-[100px]"
-                  style={{
-                    minHeight:
-                      laneEnds.length > 0
-                        ? `calc(3.5rem + ${laneEnds.length} * 1.4rem)`
-                        : undefined,
-                  }}
+                  className="relative border-b theme-border grid grid-cols-7 min-h-[112px] sm:min-h-[128px]"
                 >
                   {week.map((day, i) => {
                     const dayTasks = day ? tasksByDay.get(day) ?? [] : [];
@@ -783,31 +778,60 @@ export function Calendar() {
                       day === selectedDate.getDate() &&
                       month === selectedDate.getMonth() &&
                       year === selectedDate.getFullYear();
+                    const dayKey = `${year}-${month}-${day}`;
+                    const expanded = !!expandedDays[dayKey];
+                    const maxVisible = 2;
+                    const visible = expanded ? dayEvents : dayEvents.slice(0, maxVisible);
+                    const hidden = dayEvents.length - maxVisible;
+
+                    const barsInCol = weekBars.filter(
+                      (b) => i >= b.colStart && i < b.colStart + b.colSpan,
+                    );
+                    const lanesInCol = barsInCol.reduce(
+                      (acc, b) => Math.max(acc, b.lane + 1),
+                      0,
+                    );
+                    const multiBand = lanesInCol * 22; // must match bar lane pitch
 
                     return (
                       <div
                         key={i}
                         onClick={day ? () => selectDay(day) : undefined}
-                        style={{ gridColumn: i + 1, gridRow: 1 }}
-                        className={`relative border-r theme-border p-1 sm:p-2 ${
+                        className={`relative border-r theme-border p-1 sm:p-1.5 flex flex-col ${
                           day ? 'cursor-pointer' : 'theme-hover'
                         } ${isSelectedDay ? 'ring-2 ring-inset ring-primary z-10' : ''}`}
                       >
                         {day && (
                           <>
-                            <div
-                              className={`w-6 h-6 flex items-center justify-center rounded-full text-xs sm:text-sm mb-1 ${
-                                isToday
-                                  ? 'bg-primary text-white font-bold'
-                                  : isSelectedDay
-                                    ? 'font-semibold text-primary'
-                                    : ''
-                              }`}
-                            >
-                              {day}
+                            <div className="flex items-center gap-1 shrink-0">
+                              <div
+                                className={`w-6 h-6 flex items-center justify-center rounded-full text-xs sm:text-sm ${
+                                  isToday
+                                    ? 'bg-primary text-white font-bold'
+                                    : isSelectedDay
+                                      ? 'font-semibold text-primary'
+                                      : ''
+                                }`}
+                              >
+                                {day}
+                              </div>
+                              {dayTasks.length > 0 && (
+                                <div className="flex gap-0.5">
+                                  {dayTasks.slice(0, 3).map((task: any) => (
+                                    <div
+                                      key={task.id}
+                                      className="w-1 h-1 rounded-full bg-text-secondary"
+                                    />
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                            <div className="space-y-0.5">
-                              {dayEvents.slice(0, 3).map((e: any) => (
+
+                            <div
+                              className="flex-1 min-h-0 flex flex-col gap-0.5 overflow-hidden"
+                              style={{ paddingTop: multiBand }}
+                            >
+                              {visible.map((e: any) => (
                                 <button
                                   key={e.id}
                                   type="button"
@@ -829,12 +853,29 @@ export function Calendar() {
                                   )}
                                 </button>
                               ))}
-                              {dayTasks.length > 0 && (
-                                <div className="flex gap-0.5">
-                                  {dayTasks.slice(0, 3).map((t: any) => (
-                                    <div key={t.id} className="w-1 h-1 rounded-full bg-text-secondary" />
-                                  ))}
-                                </div>
+                              {!expanded && hidden > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setExpandedDays((prev) => ({ ...prev, [dayKey]: true }));
+                                  }}
+                                  className="w-full text-[10px] sm:text-xs theme-muted theme-hover rounded px-1 py-0.5 text-left"
+                                >
+                                  +{hidden} ещё
+                                </button>
+                              )}
+                              {expanded && dayEvents.length > maxVisible && (
+                                <button
+                                  type="button"
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setExpandedDays((prev) => ({ ...prev, [dayKey]: false }));
+                                  }}
+                                  className="w-full text-[10px] sm:text-xs theme-muted theme-hover rounded px-1 py-0.5 text-left"
+                                >
+                                  Свернуть
+                                </button>
                               )}
                             </div>
                           </>
@@ -843,22 +884,18 @@ export function Calendar() {
                     );
                   })}
 
-                  {/* Multi-day chips: one lane per non-overlapping bar */}
+                  {/* Multi-day bars overlay the reserved band (under date number) */}
                   {weekBars.map(({ e, colStart, colSpan, lane }) => (
                     <button
                       key={`m-${e.id}`}
                       type="button"
                       onClick={() => openEvent(e)}
-                      className={`${chipClassFor(e, now)} z-20 pointer-events-auto`}
+                      className={`${chipClassFor(e, now)} absolute z-20 pointer-events-auto`}
                       style={{
-                        gridColumn: `${colStart} / span ${colSpan}`,
-                        gridRow: 1,
-                        alignSelf: 'start',
-                        marginTop: `calc(2.15rem + ${lane} * 1.4rem)`,
-                        marginInline: '0.25rem',
-                        width: 'auto',
-                        justifySelf: 'stretch',
-                        position: 'relative',
+                        top: `calc(1.875rem + ${lane} * 1.375rem)`,
+                        height: '1.25rem',
+                        left: `calc(${(colStart * 100) / 7}% + 0.375rem)`,
+                        width: `calc(${(colSpan * 100) / 7}% - 0.75rem)`,
                         backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
                       }}
                       title={e.title}

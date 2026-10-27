@@ -980,97 +980,188 @@ export function Calendar() {
         </div>
       )}
 
-      {/* Event form modal */}
-      {showEventForm && (
-        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="theme-surface rounded-card p-6 w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-4">Новое событие</h2>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Название</label>
-                <input type="text" className="input" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Место</label>
-                <input type="text" className="input" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Начало</label>
-                  <input type="datetime-local" className="input" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Окончание</label>
-                  <input type="datetime-local" className="input" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Тип</label>
-                <KindSelect value={eventKind} onChange={setEventKind} />
-              </div>
-              <label className="flex items-center gap-2">
-                <input type="checkbox" checked={eventShared} onChange={(e) => setEventShared(e.target.checked)} />
-                <span className="text-sm">Общее событие</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={eventShowCountdown}
-                  onChange={(e) => setEventShowCountdown(e.target.checked)}
-                />
-                <span className="text-sm">Отображать обратный отсчёт</span>
-              </label>
-              <div>
-                <div className="text-sm font-medium mb-1">Файлы</div>
-                {pendingFiles.length > 0 && (
-                  <div className="space-y-1 mb-2">
-                    {pendingFiles.map((f, i) => (
-                      <div key={`${f.name}-${i}`} className="flex items-center gap-2 text-sm theme-bg rounded-btn px-2 py-1.5">
-                        <span className="flex-1 min-w-0 truncate">{f.name}</span>
-                        <span className="text-xs theme-muted flex-shrink-0">{formatFileSize(f.size)}</span>
-                        <button
-                          type="button"
-                          onClick={() => setPendingFiles((files) => files.filter((_, j) => j !== i))}
-                          className="text-danger text-xs flex-shrink-0"
-                          aria-label="Убрать файл"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+      {/* New event — BottomSheet on mobile, modal on desktop */}
+      <BooomSheet open={showEventForm} onClose={() => setShowEventForm(false)}>
+
+        <h2 className="text-lg font-semibold mb-4">Новое событие</h2>
+        <form onSubmit={handleCreate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Название</label>
+            <input type="text" className="input" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Место</label>
+            <input type="text" className="input" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Начало</label>
+              <input type="datetime-local" className="input" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Окончание</label>
+              <input type="datetime-local" className="input" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Тип</label>
+            <KindSelect value={eventKind} onChange={setEventKind} />
+          </div>
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={eventShared} onChange={(e) => setEventShared(e.target.checked)} />
+            <span className="text-sm">Общее событие</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={eventShowCountdown}
+              onChange={(e) => setEventShowCountdown(e.target.checked)}
+            />
+            <span className="text-sm">Отображать обратный отсчёт</span>
+          </label>
+          <div>
+            <div className="text-sm font-medium mb-1">Файлы</div>
+            {pendingFiles.length > 0 && (
+              <div className="space-y-1 mb-2">
+                {pendingFiles.map((f, i) => (
+                  <div key={`${f.name}-${i}`} className="flex items-center gap-2 text-sm theme-bg rounded-btn px-2 py-1.5">
+                    <span className="flex-1 min-w-0 truncate">{f.name}</span>
+                    <span className="text-xs theme-muted flex-shrink-0">{formatFileSize(f.size)}</span>
+                    <button
+                      type="button"
+                      onClick={() => setPendingFiles((files) => files.filter((_, j) => j !== i))}
+                      className="text-danger text-xs flex-shrink-0"
+                      aria-label="Убрать файл"
+                    >
+                      ×
+                    </button>
                   </div>
-                )}
-                <label className="btn-secondary text-sm cursor-pointer inline-flex items-center">
-                  + Прикрепить файл
-                  <input
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      const list = Array.from(e.target.files ?? []);
-                      const ok = list.filter((f) => {
-                        if (f.size > ATTACHMENT_MAX_SIZE) {
-                          toast(`Файл «${f.name}» больше 25 МБ`);
-                          return false;
-                        }
-                        return true;
-                      });
-                      setPendingFiles((files) => [...files, ...ok]);
-                      e.target.value = '';
-                    }}
-                  />
-                </label>
-                <div className="text-xs theme-muted mt-1">до 25 МБ</div>
+                ))}
               </div>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setShowEventForm(false)} className="btn-secondary flex-1">
-                  Отмена
-                </button>
-                <button type="submit" className="btn-primary flex-1">
-                  Создать
-                </button>
+            )}
+            <label className="btn-secondary text-sm cursor-pointer inline-flex items-center">
+              + Прикрепить файл
+              <input
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const list = Array.from(e.target.files ?? []);
+                  const ok = list.filter((f) => {
+                    if (f.size > ATTACHMENT_MAX_SIZE) {
+                      toast(`Файл «${f.name}» больше 25 МБ`);
+                      return false;
+                    }
+                    return true;
+                  });
+                  setPendingFiles((files) => [...files, ...ok]);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+            <div className="text-xs theme-muted mt-1">до 25 МБ</div>
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setShowEventForm(false)} className="btn-secondary flex-1">
+              Отмена
+            </button>
+            <button type="submit" className="btn-primary flex-1">
+              Создать
+            </button>
+          </div>
+        </form>
+      </BooomSheet>
+      {showEventForm && (
+        <div className="hidden lg:flex fixed inset-0 overlay items-center justify-center z-50" onClick={() => setShowEventForm(false)}>
+          <div className="theme-surface rounded-card p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+
+        <h2 className="text-lg font-semibold mb-4">Новое событие</h2>
+        <form onSubmit={handleCreate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Название</label>
+            <input type="text" className="input" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Место</label>
+            <input type="text" className="input" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Начало</label>
+              <input type="datetime-local" className="input" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Окончание</label>
+              <input type="datetime-local" className="input" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Тип</label>
+            <KindSelect value={eventKind} onChange={setEventKind} />
+          </div>
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={eventShared} onChange={(e) => setEventShared(e.target.checked)} />
+            <span className="text-sm">Общее событие</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={eventShowCountdown}
+              onChange={(e) => setEventShowCountdown(e.target.checked)}
+            />
+            <span className="text-sm">Отображать обратный отсчёт</span>
+          </label>
+          <div>
+            <div className="text-sm font-medium mb-1">Файлы</div>
+            {pendingFiles.length > 0 && (
+              <div className="space-y-1 mb-2">
+                {pendingFiles.map((f, i) => (
+                  <div key={`${f.name}-${i}`} className="flex items-center gap-2 text-sm theme-bg rounded-btn px-2 py-1.5">
+                    <span className="flex-1 min-w-0 truncate">{f.name}</span>
+                    <span className="text-xs theme-muted flex-shrink-0">{formatFileSize(f.size)}</span>
+                    <button
+                      type="button"
+                      onClick={() => setPendingFiles((files) => files.filter((_, j) => j !== i))}
+                      className="text-danger text-xs flex-shrink-0"
+                      aria-label="Убрать файл"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
-            </form>
+            )}
+            <label className="btn-secondary text-sm cursor-pointer inline-flex items-center">
+              + Прикрепить файл
+              <input
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const list = Array.from(e.target.files ?? []);
+                  const ok = list.filter((f) => {
+                    if (f.size > ATTACHMENT_MAX_SIZE) {
+                      toast(`Файл «${f.name}» больше 25 МБ`);
+                      return false;
+                    }
+                    return true;
+                  });
+                  setPendingFiles((files) => [...files, ...ok]);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+            <div className="text-xs theme-muted mt-1">до 25 МБ</div>
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setShowEventForm(false)} className="btn-secondary flex-1">
+              Отмена
+            </button>
+            <button type="submit" className="btn-primary flex-1">
+              Создать
+            </button>
+          </div>
+        </form>
           </div>
         </div>
       )}

@@ -74,14 +74,8 @@ export function Profile() {
         <h1 className="text-xl sm:text-2xl font-bold">
           {isSelf ? 'Профиль' : `Профиль · ${user?.name ?? ''}`}
         </h1>
-        {isSelf && (
-          <Link to="/app/settings" className="btn-secondary text-sm">
-            Настройки
-          </Link>
-        )}
       </div>
 
-      {/* Anketa */}
       <div className="card max-w-2xl">
         <div className="flex items-center gap-4 mb-6">
           <label className={`relative ${isSelf ? 'cursor-pointer' : ''}`}>
@@ -107,36 +101,48 @@ export function Profile() {
           </label>
           <div>
             <div className="text-lg font-semibold">{user?.name}</div>
-            <div className="text-sm theme-muted">{user?.email}</div>
+            {isSelf && <div className="text-sm theme-muted">{user?.email}</div>}
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Имя</label>
-            <input
-              type="text"
-              className="input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              readOnly={!isSelf}
-              required
-            />
+        {!isSelf ? (
+          /* Partner: read-only info blocks, no inputs */
+          <div className="space-y-4">
+            <div>
+              <div className="text-xs theme-muted mb-1">Имя</div>
+              <div className="text-base font-medium">{user?.name || '—'}</div>
+            </div>
+            <div>
+              <div className="text-xs theme-muted mb-1">О себе</div>
+              <div className="text-sm whitespace-pre-wrap min-h-[2rem]">
+                {user?.bio?.trim() ? user.bio : 'Пользователь пока ничего не написал о себе'}
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">О себе</label>
-            <textarea
-              className="input"
-              rows={5}
-              maxLength={500}
-              placeholder="Что-нибудь о себе: интересы, увлечения, ожидания…"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              readOnly={!isSelf}
-            />
-            <div className="text-xs theme-muted mt-1 text-right">{bio.length}/500</div>
-          </div>
-          {isSelf && (
+        ) : (
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Имя</label>
+              <input
+                type="text"
+                className="input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">О себе</label>
+              <textarea
+                className="input"
+                rows={5}
+                maxLength={500}
+                placeholder="Что-нибудь о себе: интересы, увлечения, ожидания…"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+              />
+              <div className="text-xs theme-muted mt-1 text-right">{bio.length}/500</div>
+            </div>
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
@@ -147,13 +153,11 @@ export function Profile() {
                 required
               />
             </div>
-          )}
-          {isSelf ? (
             <button type="submit" className="btn-primary w-full" disabled={saving}>
               {saving ? 'Сохранение…' : 'Сохранить анкету'}
             </button>
-          ) : null}
-        </form>
+          </form>
+        )}
       </div>
 
       {isSelf && (
@@ -168,3 +172,4 @@ export function Profile() {
     </div>
   );
 }
+

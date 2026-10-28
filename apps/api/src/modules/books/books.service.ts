@@ -28,7 +28,16 @@ export class BooksService {
     return book;
   }
 
-  async list(userId: string, query: { status?: BookStatus; q?: string; sort?: 'asc' | 'desc' }) {
+  async list(
+    userId: string,
+    query: {
+      status?: BookStatus;
+      q?: string;
+      sort?: 'asc' | 'desc';
+      page?: number;
+      perPage?: number;
+    },
+  ) {
     const coupleId = await this.getCoupleId(userId);
     const where: Prisma.BookWhereInput = { coupleId };
 
@@ -37,12 +46,26 @@ export class BooksService {
       where.title = { contains: query.q, mode: 'insensitive' };
     }
 
-    const books = await this.prisma.book.findMany({
-      where,
-      orderBy: { title: query.sort === 'desc' ? 'desc' : 'asc' },
-    });
+    const page = Math.max(1, Number(query.page) || 1);
+    const perPage = Math.min(100, Math.max(1, Number(query.perPage) || 12));
 
-    return books.map((b) => this.toDto(b));
+    const [total, books] = await Promise.all([
+      this.prisma.book.count({ where }),
+      this.prisma.book.findMany({
+        where,
+        orderBy: { title: query.sort === 'desc' ? 'desc' : 'asc' },
+        skip: (page - 1) * perPage,
+        take: perPage,
+      }),
+    ]);
+
+    return {
+      items: books.map((b) => this.toDto(b)),
+      total,
+      page,
+      perPage,
+      totalPages: Math.max(1, Math.ceil(total / perPage)),
+    };
   }
 
   async getDetail(userId: string, id: string) {

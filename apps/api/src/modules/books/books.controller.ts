@@ -62,14 +62,22 @@ export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Список книг общей библиотеки' })
+  @ApiOperation({ summary: 'Список книг общей библиотеки с пагинацией' })
   list(
     @CurrentUser() user: CurrentUserPayload,
     @Query('status') status?: 'UNREAD' | 'READ',
     @Query('q') q?: string,
     @Query('sort') sort?: 'asc' | 'desc',
+    @Query('page') page?: string,
+    @Query('perPage') perPage?: string,
   ) {
-    return this.booksService.list(user.id, { status, q, sort });
+    return this.booksService.list(user.id, {
+      status,
+      q,
+      sort,
+      page: page ? Number(page) : undefined,
+      perPage: perPage ? Number(perPage) : undefined,
+    });
   }
 
   @Get(':id')

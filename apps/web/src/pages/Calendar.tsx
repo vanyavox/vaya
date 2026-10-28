@@ -117,12 +117,14 @@ function eventTouchesDay(e: { startsAt: string; endsAt: string }, y: number, m: 
 }
 
 const CHIP_CLASS =
-  'w-full text-[9px] sm:text-xs px-1 py-0.5 truncate text-white text-left hover:opacity-80 leading-tight';
+  'h-5 flex items-center text-[9px] sm:text-xs px-1 truncate text-white text-left hover:opacity-80 leading-tight';
 
-function chipClassFor(e: any, now: Date, opts?: { left?: boolean; right?: boolean }) {
+function chipClassFor(e: any, now: Date, opts?: { left?: boolean; right?: boolean; fullWidth?: boolean }) {
   const past = isPastEvent(e, now);
   return [
     CHIP_CLASS,
+    // Multi-day bars are grid items — w-full would overflow their grid area + margins
+    opts?.fullWidth === false ? '' : 'w-full',
     past ? 'opacity-45 line-through hover:opacity-45' : '',
     opts?.left === false ? 'rounded-l-none' : 'rounded-l-btn',
     opts?.right === false ? 'rounded-r-none' : 'rounded-r-btn',
@@ -797,7 +799,7 @@ export function Calendar() {
                       (acc, b) => Math.max(acc, b.lane + 1),
                       0,
                     );
-                    const multiBand = lanesInCol * 22; // must match bar lane pitch
+                    const multiBand = lanesInCol * 24; // 20px bar + 4px gap
 
                     return (
                       <div
@@ -834,7 +836,7 @@ export function Calendar() {
                             </div>
 
                             <div
-                              className="flex-1 min-h-0 flex flex-col gap-0.5 overflow-hidden"
+                              className="flex-1 min-h-0 flex flex-col gap-1 overflow-hidden"
                               style={{ paddingTop: multiBand }}
                             >
                               {visible.map((e: any) => (
@@ -890,34 +892,37 @@ export function Calendar() {
                     );
                   })}
 
-                  {/* Multi-day bars overlay the reserved band (under date number) */}
-                  {weekBars.map(({ e, colStart, colSpan, lane }) => (
-                    <button
-                      key={`m-${e.id}`}
-                      type="button"
-                      onClick={() => openEvent(e)}
-                      className={`${chipClassFor(e, now)} absolute z-20 pointer-events-auto`}
-                      style={{
-                        top: `calc(1.875rem + ${lane} * 1.375rem)`,
-                        height: '1.35rem',
-                        paddingTop: 0,
-                        paddingBottom: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        left: `calc(${(colStart * 100) / 7}% + 0.375rem)`,
-                        width: `calc(${(colSpan * 100) / 7}% - 0.75rem)`,
-                        backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
-                      }}
-                      title={e.title}
+                  {/* Multi-day bars — same grid track as cells so insets match single-day chips */}
+                  {weekBars.length > 0 && (
+                    <div
+                      className="absolute inset-x-0 top-[1.875rem] grid grid-cols-7 z-20 pointer-events-none"
+                      style={{ gridAutoRows: '1.25rem', rowGap: '0.25rem' }}
                     >
-                      {e.title}
-                      {e.showCountdown && !isPastEvent(e, now) && (
-                        <span className="ml-1 opacity-90">
-                          {formatCountdown(new Date(e.startsAt), now)}
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                      {weekBars.map(({ e, colStart, colSpan, lane }) => (
+                        <button
+                          key={`m-${e.id}`}
+                          type="button"
+                          onClick={() => openEvent(e)}
+                          className={`${chipClassFor(e, now, { fullWidth: false })} pointer-events-auto`}
+                          style={{
+                            gridColumn: `${colStart + 1} / span ${colSpan}`,
+                            gridRow: lane + 1,
+                            marginLeft: '0.375rem',
+                            marginRight: '0.375rem',
+                            backgroundColor: e.color ?? KIND_COLORS[e.kind] ?? '#6C5CE7',
+                          }}
+                          title={e.title}
+                        >
+                          {e.title}
+                          {e.showCountdown && !isPastEvent(e, now) && (
+                            <span className="ml-1 opacity-90">
+                              {formatCountdown(new Date(e.startsAt), now)}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

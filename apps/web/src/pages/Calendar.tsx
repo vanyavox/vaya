@@ -554,22 +554,22 @@ export function Calendar() {
                 onChange={(e) => setDraft({ ...draft, location: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
-              <div className="min-w-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 min-w-0">
+              <div className="min-w-0 w-full overflow-hidden">
                 <label className="block text-sm font-medium mb-1">Начало</label>
                 <input
                   type="datetime-local"
-                  className="input min-w-0"
+                  className="input min-w-0 w-full"
                   value={draft.startsAt}
                   onChange={(e) => setDraft({ ...draft, startsAt: e.target.value })}
                   required
                 />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 w-full overflow-hidden">
                 <label className="block text-sm font-medium mb-1">Окончание</label>
                 <input
                   type="datetime-local"
-                  className="input min-w-0"
+                  className="input min-w-0 w-full"
                   value={draft.endsAt}
                   onChange={(e) => setDraft({ ...draft, endsAt: e.target.value })}
                   required
@@ -1004,14 +1004,14 @@ export function Calendar() {
             <label className="block text-sm font-medium mb-1">Место</label>
             <input type="text" className="input" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
-            <div className="min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 min-w-0">
+            <div className="min-w-0 w-full overflow-hidden">
               <label className="block text-sm font-medium mb-1">Начало</label>
-              <input type="datetime-local" className="input min-w-0" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0 w-full" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 w-full overflow-hidden">
               <label className="block text-sm font-medium mb-1">Окончание</label>
-              <input type="datetime-local" className="input min-w-0" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0 w-full" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
             </div>
           </div>
           <div>
@@ -1096,14 +1096,14 @@ export function Calendar() {
             <label className="block text-sm font-medium mb-1">Место</label>
             <input type="text" className="input" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
-            <div className="min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 min-w-0">
+            <div className="min-w-0 w-full overflow-hidden">
               <label className="block text-sm font-medium mb-1">Начало</label>
-              <input type="datetime-local" className="input min-w-0" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0 w-full" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 w-full overflow-hidden">
               <label className="block text-sm font-medium mb-1">Окончание</label>
-              <input type="datetime-local" className="input min-w-0" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0 w-full" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
             </div>
           </div>
           <div>

@@ -391,12 +391,14 @@ export function Todos() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Срок</label>
-            <input
-              type="date"
-              className="input min-w-0"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-            />
+            <div className="min-w-0 w-full overflow-hidden">
+              <input
+                type="date"
+                className="input min-w-0 w-full"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
+            </div>
           </div>
           <div className="flex gap-3">
             <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">
@@ -471,12 +473,14 @@ export function Todos() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Срок</label>
-                <input
-                  type="date"
-                  className="input min-w-0"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                />
+                <div className="min-w-0 w-full overflow-hidden">
+                  <input
+                    type="date"
+                    className="input min-w-0 w-full"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                  />
+                </div>
               </div>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">

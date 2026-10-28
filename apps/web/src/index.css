@@ -29,9 +29,11 @@
   input[type="date"],
   input[type="datetime-local"],
   input[type="time"] {
-    min-width: 0;
+    min-width: 0 !important;
     max-width: 100%;
-    width: 100%;
+    width: 100% !important;
+    -webkit-appearance: none;
+    appearance: none;
     font-size: 0.875rem;
     line-height: 1.25rem;
     padding-left: 0.5rem;
@@ -39,6 +41,27 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  /* iOS Safari: the shadow-DOM date/time text has its own min-width and
+     overflows the input. Zero it so the control can shrink. */
+  input[type="date"]::-webkit-date-and-time-value,
+  input[type="datetime-local"]::-webkit-date-and-time-value,
+  input[type="time"]::-webkit-date-and-time-value,
+  input[type="date"]::-webkit-datetime-edit,
+  input[type="datetime-local"]::-webkit-datetime-edit,
+  input[type="time"]::-webkit-datetime-edit,
+  input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+  input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper,
+  input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   /* Native datetime/date picker icons: color-scheme drives their color.
@@ -51,6 +74,7 @@
     opacity: 0.75;
     filter: none;
     flex-shrink: 0;
+    margin-left: auto;
   }
   html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
   html.dark input[type="date"]::-webkit-calendar-picker-indicator,

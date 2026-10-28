@@ -16,6 +16,16 @@ function formatCountdown(target: Date, now: Date): string {
   return `через ${m} мин`;
 }
 
+/** 0 → событие только что добавили, 100 → момент наступления */
+function countdownProgress(createdAt: string, startsAt: string, now: Date): number {
+  const created = new Date(createdAt).getTime();
+  const start = new Date(startsAt).getTime();
+  const total = start - created;
+  if (total <= 0) return 100;
+  const elapsed = now.getTime() - created;
+  return Math.min(100, Math.max(0, (elapsed / total) * 100));
+}
+
 function StatusRow({
   label,
   value,
@@ -74,7 +84,8 @@ export function Dashboard() {
     queryKey: ['events', 'upcoming'],
     queryFn: () => {
       const now = new Date();
-      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 14);
+      // Far horizon so countdown covers every future event, not just this month
+      const end = new Date(now.getFullYear() + 5, now.getMonth(), now.getDate());
       return api.get<any[]>(`/calendar/events?from=${now.toISOString()}&to=${end.toISOString()}&scope=all`);
     },
   });
@@ -103,10 +114,10 @@ export function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div className="card">
+        <Link to="/app/calendar" className="card theme-hover block">
           <div className="theme-muted text-xs sm:text-sm">События сегодня</div>
           <div className="text-2xl sm:text-3xl font-bold">{events?.length ?? 0}</div>
-        </div>
+        </Link>
         <Link to="/app/todos?assignee=me" className="card theme-hover block">
           <div className="theme-muted text-xs sm:text-sm">Мои задачи</div>
           <div className="text-2xl sm:text-3xl font-bold">{tasks?.personal?.total ?? 0}</div>
@@ -166,33 +177,50 @@ export function Dashboard() {
             </div>
             {(() => {
               const now = new Date();
-              const list = (upcoming ?? [])
-                .filter((e: any) => e.showCountdown && new Date(e.startsAt).getTime() >= now.getTime() - 60 * 60 * 1000)
-                .slice(0, 5);
+              const list = (upcoming ?? []).filter(
+                (e: any) => e.showCountdown && new Date(e.startsAt).getTime() >= now.getTime() - 60 * 60 * 1000,
+              );
               if (!list.length) {
                 return <p className="theme-muted">Событий с обратным отсчётом нет</p>;
               }
               return (
                 <div className="space-y-3">
-                  {list.map((e: any) => (
-                    <div key={e.id} className="flex items-center gap-3 p-2 rounded-btn theme-bg">
+                  {list.map((e: any) => {
+                    const progress = countdownProgress(e.createdAt, e.startsAt, now);
+                    const accent = e.color ?? '#6C5CE7';
+                    return (
                       <div
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: e.color ?? '#6C5CE7' }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium truncate">{e.title}</div>
-                        <div className="text-sm theme-muted">
-                          {new Date(e.startsAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
-                          {!e.allDay &&
-                            ` · ${new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`}
+                        key={e.id}
+                        className="relative overflow-hidden rounded-btn theme-bg"
+                        title={`Прогресс ожидания: ${Math.round(progress)}%`}
+                      >
+                        <div
+                          className="absolute inset-y-0 left-0 opacity-25"
+                          style={{ width: `${progress}%`, backgroundColor: accent }}
+                        />
+                        <div className="relative flex items-center gap-3 p-2">
+                          <div
+                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: accent }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{e.title}</div>
+                            <div className="text-sm theme-muted">
+                              {new Date(e.startsAt).toLocaleDateString('ru-RU', {
+                                day: 'numeric',
+                                month: 'short',
+                              })}
+                              {!e.allDay &&
+                                ` · ${new Date(e.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`}
+                            </div>
+                          </div>
+                          <div className="text-xs font-medium text-primary flex-shrink-0">
+                            {formatCountdown(new Date(e.startsAt), now)}
+                          </div>
                         </div>
                       </div>
-                      <div className="text-xs font-medium text-primary flex-shrink-0">
-                        {formatCountdown(new Date(e.startsAt), now)}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               );
             })()}

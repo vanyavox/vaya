@@ -267,6 +267,9 @@ export function Dashboard() {
               <Link to="/app/todos" className="quick-link">
                 ✅ Дела
               </Link>
+              <Link to="/app/books" className="quick-link">
+                📚 Библиотека
+              </Link>
               <Link
                 to="/app/settings/calendar-feed"
                 className="quick-link"

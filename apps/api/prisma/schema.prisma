@@ -55,6 +55,11 @@ enum TaskStatus {
   CANCELLED
 }
 
+enum BookStatus {
+  UNREAD
+  READ
+}
+
 enum FeedScope {
   ALL
   PERSONAL
@@ -81,6 +86,7 @@ model User {
   wishlists     Wishlist[]
   feedToken     CalendarFeedToken?
   reservedWishes Wish[]           @relation("WishReserver")
+  createdBooks  Book[]
 
   @@map("users")
 }
@@ -94,6 +100,7 @@ model Couple {
   wishlists  Wishlist[]
   events     CalendarEvent[]
   tasks      Task[]
+  books      Book[]
 
   @@map("couples")
 }
@@ -246,6 +253,24 @@ model Task {
   @@index([assigneeId, status])
   @@index([dueDate])
   @@map("tasks")
+}
+
+model Book {
+  id          String     @id @default(uuid())
+  coupleId    String
+  creatorId   String
+  title       String
+  author      String
+  description String?
+  status      BookStatus @default(UNREAD)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  couple      Couple     @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  creator     User       @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([coupleId, status])
+  @@index([coupleId, title])
+  @@map("books")
 }
 
 model CalendarFeedToken {

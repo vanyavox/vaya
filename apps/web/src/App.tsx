@@ -10,6 +10,7 @@ import { Wishlists } from './pages/Wishlists';
 import { WishlistDetail } from './pages/WishlistDetail';
 import { Calendar } from './pages/Calendar';
 import { Todos } from './pages/Todos';
+import { Books } from './pages/Books';
 import { CalendarFeed } from './pages/CalendarFeed';
 import { Settings } from './pages/Settings';
 import { NotFound } from './pages/NotFound';
@@ -55,6 +56,7 @@ export default function App() {
         <Route path="/app/wishes/:id" element={<WishlistDetail />} />
         <Route path="/app/calendar" element={<Calendar />} />
         <Route path="/app/todos" element={<Todos />} />
+        <Route path="/app/books" element={<Books />} />
         <Route path="/app/settings" element={<Settings />} />
         <Route path="/app/settings/calendar-feed" element={<CalendarFeed />} />
       </Route>

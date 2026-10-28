@@ -8,6 +8,7 @@ import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { WishesModule } from './modules/wishes/wishes.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { BooksModule } from './modules/books/books.module';
 import { HealthModule } from './modules/health/health.module';
 import { PushModule } from './modules/push/push.module';
 
@@ -23,6 +24,7 @@ import { PushModule } from './modules/push/push.module';
     WishesModule,
     CalendarModule,
     TasksModule,
+    BooksModule,
     PushModule,
   ],
 })

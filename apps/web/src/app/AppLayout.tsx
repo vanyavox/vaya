@@ -20,6 +20,7 @@ export function AppLayout() {
     { to: '/app/wishes', label: 'Желания', icon: '🎁', end: false },
     { to: '/app/calendar', label: 'Календарь', icon: '📅', end: false },
     { to: '/app/todos', label: 'Дела', icon: '✅', end: false },
+    { to: '/app/books', label: 'Библиотека', icon: '📚', end: false },
   ];
 
   const secondaryNav = [

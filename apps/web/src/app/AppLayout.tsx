@@ -64,7 +64,7 @@ export function AppLayout() {
 
       {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-0 bottom-0 top-[calc(4rem+env(safe-area-inset-top,0px))] z-30 overlay" onClick={() => setMobileMenuOpen(false)}>
+        <div className="lg:hidden fixed inset-x-0 bottom-0 top-[calc(4rem+env(safe-area-inset-top,0px))] z-50 overlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="theme-surface border-b theme-border p-2" onClick={(e) => e.stopPropagation()}>
             {secondaryNav.map((item) => (
               <NavLink

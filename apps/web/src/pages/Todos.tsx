@@ -4,6 +4,27 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { useToast } from '../app/ToastProvider';
 import { useAuth } from '../app/AuthContext';
+import { BooomSheet } from '../app/BooomSheet';
+
+function UserAvatar({
+  src,
+  name,
+  className = 'w-10 h-10',
+}: {
+  src?: string | null;
+  name?: string | null;
+  className?: string;
+}) {
+  return src ? (
+    <img src={src} alt={name ?? ''} className={`${className} rounded-full object-cover flex-shrink-0`} />
+  ) : (
+    <div
+      className={`${className} rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium flex-shrink-0`}
+    >
+      {name?.[0]?.toUpperCase() ?? '?'}
+    </div>
+  );
+}
 
 const CATEGORY_LABELS: Record<string, string> = {
   CLEANING: 'Уборка',
@@ -245,7 +266,7 @@ export function Todos() {
                   <div className={`font-medium break-words ${task.status === 'DONE' ? 'line-through' : ''}`}>
                     {task.title}
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs theme-muted">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs theme-muted mt-1">
                     {task.dueDate && (
                       <span>Срок: {new Date(task.dueDate).toLocaleDateString('ru-RU')}</span>
                     )}
@@ -256,7 +277,7 @@ export function Todos() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap pl-11 sm:pl-0">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="badge badge-neutral">
                   {CATEGORY_LABELS[task.category] ?? task.category}
                 </span>
@@ -274,7 +295,7 @@ export function Todos() {
                   {statusMenuId === task.id && (
                     <>
                       <div className="fixed inset-0 z-10" onClick={() => setStatusMenuId(null)} />
-                      <div className="absolute right-0 top-full mt-1 z-20 theme-surface border theme-border rounded-btn shadow-lg py-1 min-w-[150px]">
+                      <div className="absolute left-0 top-full mt-1 z-20 theme-surface border theme-border rounded-btn shadow-lg py-1 min-w-[150px]">
                         {Object.entries(STATUS_LABELS).map(([value, label]) => (
                           <button
                             key={value}
@@ -295,7 +316,7 @@ export function Todos() {
                 <button
                   type="button"
                   onClick={() => openDelete(task)}
-                  className="text-danger opacity-70 hover:opacity-100 text-lg leading-none px-1 ml-auto sm:ml-0"
+                  className="text-danger opacity-70 hover:opacity-100 text-lg leading-none px-1 ml-auto"
                   title="Удалить задачу"
                   aria-label="Удалить задачу"
                 >
@@ -311,10 +332,88 @@ export function Todos() {
         </div>
       )}
 
-      {/* Create form modal */}
+      {/* Create form: BottomSheet on mobile, modal on desktop */}
+      <BooomSheet open={showForm} onClose={() => setShowForm(false)}>
+        <h2 className="text-lg font-semibold mb-4">Новая задача</h2>
+        <form onSubmit={handleCreate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Название</label>
+            <input type="text" className="input" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Исполнитель</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'me' as const, label: 'Моя' },
+                { value: 'partner' as const, label: 'Партнёра' },
+                { value: 'both' as const, label: 'Для двоих' },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setAssigneeChoice(opt.value)}
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-btn border-2 text-xs sm:text-sm transition-colors ${
+                    assigneeChoice === opt.value
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'theme-border theme-muted hover:border-primary/50'
+                  }`}
+                >
+                  {opt.value === 'both' ? (
+                    <span className="flex -space-x-2">
+                      <UserAvatar src={user?.avatarUrl} name={user?.name} className="w-8 h-8" />
+                      <UserAvatar
+                        src={partner?.avatarUrl}
+                        name={partner?.name ?? 'П'}
+                        className="w-8 h-8 ring-2 ring-[var(--t-surface)]"
+                      />
+                    </span>
+                  ) : opt.value === 'me' ? (
+                    <UserAvatar src={user?.avatarUrl} name={user?.name} className="w-8 h-8" />
+                  ) : (
+                    <UserAvatar
+                      src={partner?.avatarUrl}
+                      name={partner?.name ?? 'П'}
+                      className="w-8 h-8"
+                    />
+                  )}
+                  <span className="font-medium">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Категория</label>
+            <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
+              {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Срок</label>
+            <input
+              type="date"
+              className="input min-w-0"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">
+              Отмена
+            </button>
+            <button type="submit" className="btn-primary flex-1">
+              Создать
+            </button>
+          </div>
+        </form>
+      </BooomSheet>
       {showForm && (
-        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="theme-surface rounded-card p-6 w-full max-w-md">
+        <div
+          className="hidden lg:flex fixed inset-0 overlay items-center justify-center z-50"
+          onClick={() => setShowForm(false)}
+        >
+          <div className="theme-surface rounded-card p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-semibold mb-4">Новая задача</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -325,21 +424,38 @@ export function Todos() {
                 <label className="block text-sm font-medium mb-2">Исполнитель</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { value: 'me', label: 'Моя', icon: user?.name?.[0] ?? 'Я' },
-                    { value: 'partner', label: 'Партнёра', icon: partner?.name?.[0] ?? 'П' },
-                    { value: 'both', label: 'Для двоих', icon: '👥' },
+                    { value: 'me' as const, label: 'Моя' },
+                    { value: 'partner' as const, label: 'Партнёра' },
+                    { value: 'both' as const, label: 'Для двоих' },
                   ].map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
-                      onClick={() => setAssigneeChoice(opt.value as any)}
-                      className={`flex flex-col items-center gap-1 p-3 rounded-btn border-2 text-sm transition-colors ${
+                      onClick={() => setAssigneeChoice(opt.value)}
+                      className={`flex flex-col items-center gap-1.5 p-2.5 rounded-btn border-2 text-sm transition-colors ${
                         assigneeChoice === opt.value
                           ? 'border-primary bg-primary/5 text-primary'
                           : 'theme-border theme-muted hover:border-primary/50'
                       }`}
                     >
-                      <span className="text-lg">{opt.icon}</span>
+                      {opt.value === 'both' ? (
+                        <span className="flex -space-x-2">
+                          <UserAvatar src={user?.avatarUrl} name={user?.name} className="w-8 h-8" />
+                          <UserAvatar
+                            src={partner?.avatarUrl}
+                            name={partner?.name ?? 'П'}
+                            className="w-8 h-8 ring-2 ring-[var(--t-surface)]"
+                          />
+                        </span>
+                      ) : opt.value === 'me' ? (
+                        <UserAvatar src={user?.avatarUrl} name={user?.name} className="w-8 h-8" />
+                      ) : (
+                        <UserAvatar
+                          src={partner?.avatarUrl}
+                          name={partner?.name ?? 'П'}
+                          className="w-8 h-8"
+                        />
+                      )}
                       <span className="font-medium">{opt.label}</span>
                     </button>
                   ))}
@@ -355,7 +471,12 @@ export function Todos() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Срок</label>
-                <input type="date" className="input" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                <input
+                  type="date"
+                  className="input min-w-0"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
               </div>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">
@@ -372,7 +493,7 @@ export function Todos() {
 
       {/* Delete confirm modal */}
       {deleteTarget && (
-        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
+        <div className="fixed inset-0 overlay flex items-center justify-center z-50 p-4">
           <div
             className="theme-surface rounded-card p-6 w-full max-w-sm"
             role="dialog"

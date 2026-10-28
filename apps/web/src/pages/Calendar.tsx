@@ -552,22 +552,22 @@ export function Calendar() {
                 onChange={(e) => setDraft({ ...draft, location: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
+              <div className="min-w-0">
                 <label className="block text-sm font-medium mb-1">Начало</label>
                 <input
                   type="datetime-local"
-                  className="input"
+                  className="input min-w-0"
                   value={draft.startsAt}
                   onChange={(e) => setDraft({ ...draft, startsAt: e.target.value })}
                   required
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="block text-sm font-medium mb-1">Окончание</label>
                 <input
                   type="datetime-local"
-                  className="input"
+                  className="input min-w-0"
                   value={draft.endsAt}
                   onChange={(e) => setDraft({ ...draft, endsAt: e.target.value })}
                   required
@@ -993,14 +993,14 @@ export function Calendar() {
             <label className="block text-sm font-medium mb-1">Место</label>
             <input type="text" className="input" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
+            <div className="min-w-0">
               <label className="block text-sm font-medium mb-1">Начало</label>
-              <input type="datetime-local" className="input" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-medium mb-1">Окончание</label>
-              <input type="datetime-local" className="input" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
             </div>
           </div>
           <div>
@@ -1085,14 +1085,14 @@ export function Calendar() {
             <label className="block text-sm font-medium mb-1">Место</label>
             <input type="text" className="input" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
+            <div className="min-w-0">
               <label className="block text-sm font-medium mb-1">Начало</label>
-              <input type="datetime-local" className="input" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0" value={eventStart} onChange={(e) => setEventStart(e.target.value)} required />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-medium mb-1">Окончание</label>
-              <input type="datetime-local" className="input" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
+              <input type="datetime-local" className="input min-w-0" value={eventEnd} onChange={(e) => setEventEnd(e.target.value)} required />
             </div>
           </div>
           <div>

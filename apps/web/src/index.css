@@ -24,6 +24,23 @@
     opacity: 1;
   }
 
+  /* Safari/WebKit: date & datetime inputs keep a large intrinsic min-width and
+     overflow 2-col grids / modal padding. Force them to shrink. */
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"] {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   /* Native datetime/date picker icons: color-scheme drives their color.
      Do NOT invert here — with color-scheme: dark the icons are already light,
      and filter: invert(1) would flip them back to black. */
@@ -33,6 +50,7 @@
     cursor: pointer;
     opacity: 0.75;
     filter: none;
+    flex-shrink: 0;
   }
   html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
   html.dark input[type="date"]::-webkit-calendar-picker-indicator,

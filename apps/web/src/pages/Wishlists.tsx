@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { useToast } from '../app/ToastProvider';
+import { BooomSheet } from '../app/BooomSheet';
 
 export function Wishlists() {
   const toast = useToast();
@@ -59,10 +60,56 @@ export function Wishlists() {
       <p className="text-xs theme-muted mb-4">
         Личные — что хочет партнёр. Мои — что хочу я. Общие — нужное паре.
       </p>
-      {/* Create modal */}
+      {/* Create: BottomSheet on mobile, modal on desktop */}
+      <BooomSheet open={showCreate} onClose={() => setShowCreate(false)}>
+        <h2 className="text-lg font-semibold mb-4">Новый список желаний</h2>
+        <form onSubmit={handleCreate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Название</label>
+            <input
+              type="text"
+              className="input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Описание</label>
+            <textarea
+              className="input"
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Тип</label>
+            <select
+              className="input"
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value as any)}
+            >
+              <option value="PERSONAL">Личный — что хочу я</option>
+              <option value="SHARED">Общий — что нужно нам</option>
+            </select>
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setShowCreate(false)} className="btn-secondary flex-1">
+              Отмена
+            </button>
+            <button type="submit" className="btn-primary flex-1">
+              Создать
+            </button>
+          </div>
+        </form>
+      </BooomSheet>
       {showCreate && (
-        <div className="fixed inset-0 overlay flex items-center justify-center z-50">
-          <div className="theme-surface rounded-card p-6 w-full max-w-md">
+        <div
+          className="hidden lg:flex fixed inset-0 overlay items-center justify-center z-50"
+          onClick={() => setShowCreate(false)}
+        >
+          <div className="theme-surface rounded-card p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-semibold mb-4">Новый список желаний</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>

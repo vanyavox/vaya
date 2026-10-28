@@ -676,16 +676,22 @@ export function Calendar() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => changeMonth(-1)}
-            className="btn-secondary px-3 py-1.5"
+            className="btn-secondary w-9 h-9 flex items-center justify-center shrink-0 p-0"
+            aria-label="Предыдущий месяц"
           >
-            ‹
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
           </button>
           <span className="font-semibold text-base sm:text-lg capitalize min-w-[120px] sm:min-w-[150px]">{monthName}</span>
           <button
             onClick={() => changeMonth(1)}
-            className="btn-secondary px-3 py-1.5"
+            className="btn-secondary w-9 h-9 flex items-center justify-center shrink-0 p-0"
+            aria-label="Следующий месяц"
           >
-            ›
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M9 18l6-6-6-6" />
+            </svg>
           </button>
         </div>
 

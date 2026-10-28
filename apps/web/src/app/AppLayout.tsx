@@ -32,7 +32,7 @@ export function AppLayout() {
   const allNav = [...navItems, ...secondaryNav];
 
   return (
-    <div className="min-h-screen theme-bg flex flex-col lg:flex-row">
+    <div className="h-dvh theme-bg flex flex-col lg:flex-row overflow-hidden">
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-40 theme-surface border-b theme-border px-4 safe-top pb-3 flex items-center justify-between">
         <NavLink to="/app" className="text-xl font-bold text-primary">
@@ -90,14 +90,14 @@ export function AppLayout() {
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-60 theme-surface border-r theme-border flex-col flex-shrink-0">
-        <div className="p-4">
+      <aside className="hidden lg:flex w-60 theme-surface border-r theme-border flex-col flex-shrink-0 overflow-hidden">
+        <div className="p-4 shrink-0">
           <NavLink to="/app" className="text-xl font-bold text-primary">
             V&Y
           </NavLink>
         </div>
 
-        <nav className="flex-1 px-2 space-y-1">
+        <nav className="flex-1 min-h-0 overflow-y-auto px-2 space-y-1">
           {allNav.map((item) => (
             <NavLink
               key={item.to}
@@ -114,7 +114,7 @@ export function AppLayout() {
         </nav>
 
         {/* User section */}
-        <div className="p-3 border-t theme-border">
+        <div className="p-3 border-t theme-border shrink-0">
           <NavLink
             to="/app/profile"
             className="flex items-center gap-3 p-2 rounded-btn theme-hover transition-colors"
@@ -147,7 +147,7 @@ export function AppLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto pb-20 lg:pb-0">
+      <main className="flex-1 min-h-0 overflow-y-auto pb-20 lg:pb-0">
         <div className="p-4 sm:p-6">
           <Outlet />
         </div>

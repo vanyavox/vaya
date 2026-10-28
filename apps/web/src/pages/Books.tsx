@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { useToast } from '../app/ToastProvider';
@@ -9,10 +9,83 @@ const STATUS_LABELS: Record<string, string> = {
   READ: 'Прочитана',
 };
 
+const STATUS_COLORS: Record<string, string> = {
+  UNREAD: '#d97706',
+  READ: '#00b894',
+};
+
 const STATUS_BADGE: Record<string, string> = {
   UNREAD: 'badge-warning',
   READ: 'badge-success',
 };
+
+function StatusSelect({
+  value,
+  onChange,
+}: {
+  value: 'UNREAD' | 'READ';
+  onChange: (status: 'UNREAD' | 'READ') => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        className="input w-full flex items-center gap-2"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="flex items-center gap-2">
+          <span
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            style={{ backgroundColor: STATUS_COLORS[value] }}
+          />
+          {STATUS_LABELS[value] ?? value}
+        </span>
+        <span className="theme-muted text-xs ml-auto pr-1.5 leading-none">▾</span>
+      </button>
+      {open && (
+        <div
+          className="absolute z-20 mt-1 w-full theme-surface border theme-border rounded-btn shadow-lg overflow-hidden"
+          role="listbox"
+        >
+          {(['UNREAD', 'READ'] as const).map((k) => (
+            <button
+              key={k}
+              type="button"
+              role="option"
+              aria-selected={value === k}
+              onClick={() => {
+                onChange(k);
+                setOpen(false);
+              }}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left theme-hover ${
+                value === k ? 'bg-primary/10 font-medium' : ''
+              }`}
+            >
+              <span
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: STATUS_COLORS[k] }}
+              />
+              {STATUS_LABELS[k]}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const PER_PAGE_OPTIONS = [6, 12, 24, 48];
 
@@ -177,14 +250,10 @@ export function Books() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Статус</label>
-          <select
-            className="input"
+          <StatusSelect
             value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value as 'UNREAD' | 'READ' })}
-          >
-            <option value="UNREAD">Не прочитана</option>
-            <option value="READ">Прочитана</option>
-          </select>
+            onChange={(status) => setForm({ ...form, status })}
+          />
         </div>
         <div className="flex gap-3">
           <button type="button" onClick={closeForm} className="btn-secondary flex-1">
@@ -289,19 +358,23 @@ export function Books() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {books.map((book: any) => (
-              <div key={book.id} className="card flex flex-col min-h-[140px]">
+              <div key={book.id} className="card flex flex-col h-[190px] overflow-hidden">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-semibold break-words flex-1">{book.title}</h3>
+                  <h3 className="font-semibold line-clamp-2 flex-1">{book.title}</h3>
                   <button
                     type="button"
                     onClick={() => handleToggleStatus(book)}
                     className={`badge flex-shrink-0 cursor-pointer ${STATUS_BADGE[book.status] ?? 'badge-neutral'}`}
                     title={book.status === 'READ' ? 'Отметить как непрочитанную' : 'Отметить как прочитанную'}
                   >
+                    <span
+                      className="w-2 h-2 rounded-full flex-shrink-0 mr-1"
+                      style={{ backgroundColor: STATUS_COLORS[book.status] ?? '#6b7280' }}
+                    />
                     {STATUS_LABELS[book.status] ?? book.status}
                   </button>
                 </div>
-                <div className="text-sm theme-muted mb-2">{book.author}</div>
+                <div className="text-sm theme-muted mb-2 truncate">{book.author}</div>
                 {book.description && (
                   <p className="text-sm theme-muted line-clamp-2 mb-3">{book.description}</p>
                 )}

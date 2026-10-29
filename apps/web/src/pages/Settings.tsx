@@ -71,7 +71,9 @@ export function Settings() {
   };
 
   return (
-    <div>
+    // Scroll lives on this page (not in AppLayout): max-h matches the space
+    // left by the mobile header + page padding + bottom tabs (p-6 at sm+, none at lg).
+    <div className="max-h-[calc(100dvh-177px-env(safe-area-inset-top,0px))] sm:max-h-[calc(100dvh-193px-env(safe-area-inset-top,0px))] lg:max-h-[calc(100dvh-3rem)] overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl sm:text-2xl font-bold">Настройки</h1>
       </div>

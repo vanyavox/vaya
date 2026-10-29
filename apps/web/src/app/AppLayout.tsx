@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTheme } from './ThemeContext';
 
@@ -7,7 +7,14 @@ export function AppLayout() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Pages scroll with the document (the layout keeps no scroller), so a new
+  // page would otherwise open at the previous page's scroll offset.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   const handleLogout = async () => {
     setMobileMenuOpen(false);
@@ -32,7 +39,7 @@ export function AppLayout() {
   const allNav = [...navItems, ...secondaryNav];
 
   return (
-    <div className="h-dvh theme-bg flex flex-col lg:flex-row overflow-hidden">
+    <div className="min-h-dvh theme-bg flex flex-col lg:flex-row">
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-40 theme-surface border-b theme-border px-4 safe-top pb-3 flex items-center justify-between">
         <NavLink to="/app" className="text-xl font-bold text-primary">
@@ -147,7 +154,7 @@ export function AppLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 min-h-0 overflow-y-auto pb-20 lg:pb-0">
+      <main className="flex-1 pb-20 lg:pb-0">
         <div className="p-4 sm:p-6">
           <Outlet />
         </div>

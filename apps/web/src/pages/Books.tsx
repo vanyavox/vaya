@@ -294,15 +294,6 @@ export function Books() {
     }
   };
 
-  const handleRate = async (book: any, rating: number) => {
-    try {
-      await api.patch(`/books/${book.id}`, { rating });
-      invalidate();
-    } catch (err: any) {
-      toast(err.message ?? 'Ошибка');
-    }
-  };
-
   const handleToggleStatus = async (book: any) => {
     try {
       await api.post(`/books/${book.id}/status`, {
@@ -576,7 +567,7 @@ export function Books() {
                 )}
                 <div className="mt-auto pt-2 flex items-center gap-2">
                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <StarRating value={book.rating ?? null} onChange={(rating) => handleRate(book, rating)} />
+                    <StarRating value={book.rating ?? null} />
                     {book.rating != null && <span className="text-xs theme-muted tabular-nums">{book.rating}</span>}
                   </div>
                   <button

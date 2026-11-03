@@ -20,6 +20,15 @@ const STATUS_BADGE: Record<string, string> = {
   READ: 'badge-success',
 };
 
+// 1 книга, 2 книги, 5 книг; 11 книг, 21 книга, 22 книги
+function pluralRu(n: number, forms: [string, string, string]): string {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return forms[0];
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return forms[1];
+  return forms[2];
+}
+
 function UserAvatar({
   src,
   name,
@@ -585,7 +594,7 @@ export function Books() {
           {/* Pagination */}
           <div className="flex flex-wrap items-center justify-between gap-3 mt-6">
             <div className="text-sm theme-muted">
-              {total} {total === 1 ? 'книга' : total < 5 ? 'книги' : 'книг'} · стр. {page} из {totalPages}
+              {total} {pluralRu(total, ['книга', 'книги', 'книг'])} · стр. {page} из {totalPages}
             </div>
             <div className="flex items-center gap-2">
               <button

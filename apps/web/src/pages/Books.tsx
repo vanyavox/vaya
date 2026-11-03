@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../shared/api-client';
 import { useToast } from '../app/ToastProvider';
+import { useAuth } from '../app/AuthContext';
 import { BooomSheet } from '../app/BooomSheet';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -18,6 +19,77 @@ const STATUS_BADGE: Record<string, string> = {
   UNREAD: 'badge-warning',
   READ: 'badge-success',
 };
+
+function UserAvatar({
+  src,
+  name,
+  className = 'w-10 h-10',
+}: {
+  src?: string | null;
+  name?: string | null;
+  className?: string;
+}) {
+  return src ? (
+    <img src={src} alt={name ?? ''} className={`${className} rounded-full object-cover flex-shrink-0`} />
+  ) : (
+    <div
+      className={`${className} rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium flex-shrink-0`}
+    >
+      {name?.[0]?.toUpperCase() ?? '?'}
+    </div>
+  );
+}
+
+function StarRating({
+  value,
+  onChange,
+  size = 18,
+}: {
+  value: number | null;
+  onChange?: (rating: number) => void;
+  size?: number;
+}) {
+  const [hover, setHover] = useState<number | null>(null);
+  const shown = hover ?? value ?? 0;
+
+  const pick = (e: React.MouseEvent<HTMLElement>, i: number) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return e.clientX - rect.left < rect.width / 2 ? i - 0.5 : i;
+  };
+
+  return (
+    <div
+      className="flex items-center gap-0.5 select-none"
+      style={{ fontSize: size }}
+      onMouseLeave={() => setHover(null)}
+      role="img"
+      aria-label={value != null ? `Рейтинг ${value} из 5` : 'Без оценки'}
+    >
+      {[1, 2, 3, 4, 5].map((i) => {
+        const fill = Math.min(1, Math.max(0, shown - (i - 1)));
+        return (
+          <span
+            key={i}
+            className={`relative inline-block leading-none ${onChange ? 'cursor-pointer' : ''}`}
+            style={{ width: '1em', height: '1em' }}
+            onClick={onChange ? (e) => onChange(pick(e, i)) : undefined}
+            onMouseMove={onChange ? (e) => setHover(pick(e, i)) : undefined}
+          >
+            <span className="absolute inset-0 flex items-center justify-center theme-muted">★</span>
+            <span
+              className="absolute inset-y-0 left-0 overflow-hidden flex items-center"
+              style={{ width: `${fill * 100}%` }}
+            >
+              <span className="flex items-center justify-center text-amber-400" style={{ width: '1em', height: '1em' }}>
+                ★
+              </span>
+            </span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 function StatusSelect({
   value,
@@ -89,11 +161,15 @@ function StatusSelect({
 
 const PER_PAGE_OPTIONS = [6, 12, 24, 48];
 
+type ReadBy = 'me' | 'partner' | 'both';
+
 type BookForm = {
   title: string;
   author: string;
   description: string;
   status: 'UNREAD' | 'READ';
+  rating: number | null;
+  readBy: ReadBy | null;
 };
 
 const emptyForm: BookForm = {
@@ -101,11 +177,14 @@ const emptyForm: BookForm = {
   author: '',
   description: '',
   status: 'UNREAD',
+  rating: null,
+  readBy: null,
 };
 
 export function Books() {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<'all' | 'UNREAD' | 'READ'>('all');
   const [search, setSearch] = useState('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -115,6 +194,25 @@ export function Books() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<BookForm>(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+
+  const { data: couple } = useQuery({
+    queryKey: ['couple'],
+    queryFn: () => api.get<any>('/couple').catch(() => null),
+    retry: false,
+  });
+
+  const partner = couple?.members?.find((m: any) => m.userId !== user?.id);
+
+  const readByFromReaders = (readers: { id: string }[] | undefined): ReadBy | null => {
+    if (!readers?.length) return null;
+    const ids = readers.map((r) => r.id);
+    const hasMe = user ? ids.includes(user.id) : false;
+    const hasPartner = partner ? ids.includes(partner.userId) : false;
+    if (hasMe && hasPartner) return 'both';
+    if (hasMe) return 'me';
+    if (hasPartner) return 'partner';
+    return null;
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['books', statusFilter, search, sortDir, page, perPage],
@@ -152,6 +250,8 @@ export function Books() {
       author: book.author,
       description: book.description ?? '',
       status: book.status,
+      rating: book.rating ?? null,
+      readBy: readByFromReaders(book.readers),
     });
     setShowForm(true);
   };
@@ -164,24 +264,31 @@ export function Books() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const payload = {
+      title: form.title,
+      author: form.author,
+      description: form.description || undefined,
+      status: form.status,
+      rating: form.rating,
+      readBy: form.readBy,
+    };
     try {
       if (editingId) {
-        await api.patch(`/books/${editingId}`, {
-          title: form.title,
-          author: form.author,
-          description: form.description || undefined,
-          status: form.status,
-        });
+        await api.patch(`/books/${editingId}`, payload);
       } else {
-        await api.post('/books', {
-          title: form.title,
-          author: form.author,
-          description: form.description || undefined,
-          status: form.status,
-        });
+        await api.post('/books', payload);
       }
       invalidate();
       closeForm();
+    } catch (err: any) {
+      toast(err.message ?? 'Ошибка');
+    }
+  };
+
+  const handleRate = async (book: any, rating: number) => {
+    try {
+      await api.patch(`/books/${book.id}`, { rating });
+      invalidate();
     } catch (err: any) {
       toast(err.message ?? 'Ошибка');
     }
@@ -254,6 +361,69 @@ export function Books() {
             value={form.status}
             onChange={(status) => setForm({ ...form, status })}
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Оценка
+            {form.rating != null && (
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, rating: null })}
+                className="ml-2 text-xs theme-muted underline font-normal"
+              >
+                сбросить
+              </button>
+            )}
+          </label>
+          <StarRating value={form.rating} onChange={(rating) => setForm({ ...form, rating })} size={28} />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Кем прочитана
+            {form.readBy != null && (
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, readBy: null })}
+                className="ml-2 text-xs theme-muted underline font-normal"
+              >
+                сбросить
+              </button>
+            )}
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { value: 'me' as const, label: 'Я' },
+              { value: 'partner' as const, label: 'Партнёр' },
+              { value: 'both' as const, label: 'Оба' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setForm({ ...form, readBy: opt.value })}
+                className={`flex flex-col items-center gap-1.5 p-2.5 rounded-btn border-2 text-xs sm:text-sm transition-colors ${
+                  form.readBy === opt.value
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'theme-border theme-muted hover:border-primary/50'
+                }`}
+              >
+                {opt.value === 'both' ? (
+                  <span className="flex -space-x-2">
+                    <UserAvatar src={user?.avatarUrl} name={user?.name} className="w-8 h-8" />
+                    <UserAvatar
+                      src={partner?.avatarUrl}
+                      name={partner?.name ?? 'П'}
+                      className="w-8 h-8 ring-2 ring-[var(--t-surface)]"
+                    />
+                  </span>
+                ) : opt.value === 'me' ? (
+                  <UserAvatar src={user?.avatarUrl} name={user?.name} className="w-8 h-8" />
+                ) : (
+                  <UserAvatar src={partner?.avatarUrl} name={partner?.name ?? 'П'} className="w-8 h-8" />
+                )}
+                <span className="font-medium">{opt.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
         <div className="flex gap-3">
           <button type="button" onClick={closeForm} className="btn-secondary flex-1">
@@ -358,7 +528,7 @@ export function Books() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {books.map((book: any) => (
-              <div key={book.id} className="card flex flex-col h-[190px] overflow-hidden">
+              <div key={book.id} className="card flex flex-col min-h-[190px]">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h3 className="font-semibold line-clamp-2 flex-1">{book.title}</h3>
                   <button
@@ -374,15 +544,36 @@ export function Books() {
                     {STATUS_LABELS[book.status] ?? book.status}
                   </button>
                 </div>
-                <div className="text-sm theme-muted mb-2 truncate">{book.author}</div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="text-sm theme-muted truncate flex-1 min-w-0">{book.author}</div>
+                  {book.readers?.length > 0 && (
+                    <span
+                      className="flex -space-x-1.5 flex-shrink-0"
+                      title={`Прочитана: ${book.readers.map((r: any) => r.name).join(', ')}`}
+                    >
+                      {book.readers.map((r: any) => (
+                        <UserAvatar
+                          key={r.id}
+                          src={r.avatarUrl}
+                          name={r.name}
+                          className="w-5 h-5 ring-2 ring-[var(--t-surface)]"
+                        />
+                      ))}
+                    </span>
+                  )}
+                </div>
                 {book.description && (
                   <p className="text-sm theme-muted line-clamp-2 mb-3">{book.description}</p>
                 )}
-                <div className="mt-auto pt-2">
+                <div className="mt-auto pt-2 flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <StarRating value={book.rating ?? null} onChange={(rating) => handleRate(book, rating)} />
+                    {book.rating != null && <span className="text-xs theme-muted tabular-nums">{book.rating}</span>}
+                  </div>
                   <button
                     type="button"
                     onClick={() => openEdit(book)}
-                    className="btn-secondary text-sm px-3 py-1.5"
+                    className="btn-secondary text-sm px-3 py-1.5 flex-shrink-0 ml-auto"
                   >
                     Редактировать
                   </button>

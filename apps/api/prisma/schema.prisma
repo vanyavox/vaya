@@ -87,6 +87,7 @@ model User {
   feedToken     CalendarFeedToken?
   reservedWishes Wish[]           @relation("WishReserver")
   createdBooks  Book[]
+  readBooks     Book[]           @relation("BookReaders")
 
   @@map("users")
 }
@@ -263,10 +264,12 @@ model Book {
   author      String
   description String?
   status      BookStatus @default(UNREAD)
+  rating      Float?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   couple      Couple     @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   creator     User       @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  readers     User[]     @relation("BookReaders")
 
   @@index([coupleId, status])
   @@index([coupleId, title])

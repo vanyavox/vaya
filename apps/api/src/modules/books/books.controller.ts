@@ -11,10 +11,13 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { IsString, IsOptional, IsEnum, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsIn, MinLength } from 'class-validator';
 import { BooksService } from './books.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { CurrentUser, CurrentUserPayload } from '../../common/decorators/current-user.decorator';
+
+const RATING_VALUES = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+const READ_BY_VALUES = ['me', 'partner', 'both'];
 
 class CreateBookDto {
   @IsString()
@@ -32,6 +35,16 @@ class CreateBookDto {
   @IsOptional()
   @IsEnum(['UNREAD', 'READ'])
   status?: 'UNREAD' | 'READ';
+
+  /** Оценка от 1 до 5 с шагом 0.5; null — без оценки */
+  @IsOptional()
+  @IsIn(RATING_VALUES)
+  rating?: number | null;
+
+  /** Кем прочитана: я / партнёр / оба; null — не отмечено */
+  @IsOptional()
+  @IsIn(READ_BY_VALUES)
+  readBy?: 'me' | 'partner' | 'both' | null;
 }
 
 class UpdateBookDto {
@@ -52,6 +65,14 @@ class UpdateBookDto {
   @IsOptional()
   @IsEnum(['UNREAD', 'READ'])
   status?: 'UNREAD' | 'READ';
+
+  @IsOptional()
+  @IsIn(RATING_VALUES)
+  rating?: number | null;
+
+  @IsOptional()
+  @IsIn(READ_BY_VALUES)
+  readBy?: 'me' | 'partner' | 'both' | null;
 }
 
 @ApiTags('books')

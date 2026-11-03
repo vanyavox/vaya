@@ -153,8 +153,8 @@ export function AppLayout() {
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 pb-20 lg:pb-0">
+      {/* Main content: pb must cover the fixed mobile tab bar (h-16 + safe-bottom) */}
+      <main className="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
         <div className="p-4 sm:p-6">
           <Outlet />
         </div>

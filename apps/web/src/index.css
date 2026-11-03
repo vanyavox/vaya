@@ -227,11 +227,11 @@
 .theme-muted   { color: var(--t-muted); }
 .theme-input   { background-color: var(--t-input-bg); color: var(--t-text); border-color: var(--t-border); }
 
-/* Translucent glass surface — content scrolls under it (mobile tab bar) */
+/* Transparent glass surface — content shows through, blurred (mobile tab bar) */
 .glass-bar {
-  background-color: var(--t-glass);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
+  background-color: transparent;
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
 }
 
 /* Hover states for clickable elements */

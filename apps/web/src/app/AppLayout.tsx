@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTheme } from './ThemeContext';
@@ -9,11 +9,32 @@ export function AppLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const tabRowRef = useRef<HTMLDivElement>(null);
+  const [pill, setPill] = useState<{ left: number; width: number; height: number } | null>(null);
 
   // Pages scroll with the document (the layout keeps no scroller), so a new
   // page would otherwise open at the previous page's scroll offset.
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [pathname]);
+
+  // Keep the glass pill glued to the active tab (and on resize/orientation).
+  useLayoutEffect(() => {
+    const measure = () => {
+      const active = tabRowRef.current?.querySelector<HTMLElement>('[aria-current="page"]');
+      if (!active) {
+        setPill(null);
+        return;
+      }
+      setPill({
+        left: active.offsetLeft,
+        width: active.offsetWidth,
+        height: active.offsetHeight,
+      });
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
   }, [pathname]);
 
   const handleLogout = async () => {
@@ -161,16 +182,23 @@ export function AppLayout() {
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 theme-surface border-t theme-border safe-bottom safe-left safe-right">
-        <div className="flex items-center justify-around h-16 px-2">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-bar border-t theme-border safe-bottom safe-left safe-right">
+        <div ref={tabRowRef} className="relative flex items-center justify-around h-16 px-2">
+          {pill && (
+            <div
+              className="tab-pill"
+              style={{ left: pill.left, width: pill.width, height: pill.height }}
+              aria-hidden="true"
+            />
+          )}
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-2 py-1 rounded-btn min-w-[52px] transition-colors ${
-                  isActive ? 'text-primary' : 'theme-muted theme-hover'
+                `relative flex flex-col items-center gap-0.5 px-2 py-1 rounded-btn min-w-[52px] transition-colors ${
+                  isActive ? 'text-primary dark:text-primary-light' : 'theme-muted theme-hover'
                 }`
               }
             >
